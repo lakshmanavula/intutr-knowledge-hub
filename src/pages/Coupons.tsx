@@ -134,7 +134,7 @@ export default function Coupons() {
 
   // Filter coupons
   const filteredCoupons = useMemo(() => {
-    return (coupons || []).filter((coupon) => {
+    return (Array.isArray(coupons) ? coupons : []).filter((coupon) => {
       const matchesSearch = 
         coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
         coupon.description.toLowerCase().includes(searchQuery.toLowerCase());
