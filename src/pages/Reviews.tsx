@@ -129,7 +129,7 @@ export default function Reviews() {
   const reviews = reviewsData?.content || [];
   const totalPages = reviewsData?.totalPages || 0;
 
-  const filteredReviews = reviews.filter(review => {
+  const filteredReviews = (reviews || []).filter(review => {
     if (filterCourse !== "all" && review.courseId !== filterCourse) return false;
     if (filterStatus === "approved" && !review.isApproved) return false;
     if (filterStatus === "pending" && review.isApproved) return false;
@@ -140,7 +140,7 @@ export default function Reviews() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedReviews(filteredReviews.map(review => review.id));
+      setSelectedReviews((filteredReviews || []).map(review => review.id));
     } else {
       setSelectedReviews([]);
     }
@@ -254,7 +254,7 @@ export default function Reviews() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {reviews.filter(r => r.isApproved).length}
+              {(reviews || []).filter(r => r.isApproved).length}
             </div>
           </CardContent>
         </Card>
@@ -264,8 +264,8 @@ export default function Reviews() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {reviews.length > 0 
-                ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+              {(reviews || []).length > 0 
+                ? ((reviews || []).reduce((sum, r) => sum + r.rating, 0) / (reviews || []).length).toFixed(1)
                 : "0.0"
               }
             </div>
@@ -277,7 +277,7 @@ export default function Reviews() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {reviews.filter(r => r.isPublic).length}
+              {(reviews || []).filter(r => r.isPublic).length}
             </div>
           </CardContent>
         </Card>
