@@ -27,7 +27,7 @@ import type {
   AuthUser
 } from '@/types/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -61,9 +61,9 @@ apiClient.interceptors.response.use(
 export const authApi = {
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    console.log('🔐 Attempting login to:', `${API_BASE_URL}/api/auth/login`);
+    console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);
     
-    const response = await apiClient.post<any>('/api/auth/login', credentials);
+    const response = await apiClient.post<any>('/auth/login', credentials);
     
     console.log('✅ Login successful:', response.data);
     
@@ -106,7 +106,7 @@ export const authApi = {
   // Logout user
   logout: async (): Promise<void> => {
     try {
-      await apiClient.post('/api/auth/logout');
+      await apiClient.post('/auth/logout');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -137,7 +137,7 @@ export const authApi = {
 
   // Refresh token (if your API supports it)
   refreshToken: async (): Promise<LoginResponse> => {
-    const response = await apiClient.post<LoginResponse>('/api/auth/refresh');
+    const response = await apiClient.post<LoginResponse>('/auth/refresh');
     
     if (response.data.token) {
       localStorage.setItem('authToken', response.data.token);
@@ -167,14 +167,14 @@ apiClient.interceptors.request.use(
 export const courseCategoryApi = {
   // Get all categories
   getAll: async (): Promise<CourseCategory[]> => {
-    const response = await apiClient.get<CourseCategory[]>('/api/course-categories');
+    const response = await apiClient.get<CourseCategory[]>('/course-categories');
     return response.data;
   },
 
   // Get paginated categories
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<CourseCategory>> => {
     const response = await apiClient.get<PaginatedResponse<CourseCategory>>(
-      `/api/course-categories/paged?page=${page}&size=${size}`
+      `/course-categories/paged?page=${page}&size=${size}`
     );
     return response.data;
   },

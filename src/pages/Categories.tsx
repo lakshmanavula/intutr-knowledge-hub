@@ -190,7 +190,7 @@ export default function Categories() {
 
   const handleExportExcel = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/course-categories/download-excel', {
+      const response = await fetch('http://localhost:8081/api/course-categories/download-excel', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -237,7 +237,7 @@ export default function Categories() {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:8080/api/course-categories/bulk-upload-excel', {
+      const response = await fetch('http://localhost:8081/api/course-categories/bulk-upload-excel', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
