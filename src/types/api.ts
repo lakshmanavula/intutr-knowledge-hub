@@ -269,6 +269,48 @@ export interface UpdateCouponRequest {
   applicableCourseIds: string[];
 }
 
+export interface Review {
+  id: string;
+  courseId: string;
+  courseName: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  rating: number;
+  title: string;
+  comment: string;
+  isApproved: boolean;
+  isPublic: boolean;
+  helpfulCount: number;
+  createdBy: string;
+  createdByName: string;
+  modifiedBy: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+}
+
+export interface CreateReviewRequest {
+  courseId: string;
+  userId: string;
+  rating: number;
+  title: string;
+  comment: string;
+  isApproved: boolean;
+  isPublic: boolean;
+}
+
+export interface UpdateReviewRequest {
+  courseId: string;
+  userId: string;
+  rating: number;
+  title: string;
+  comment: string;
+  isApproved: boolean;
+  isPublic: boolean;
+}
+
 // API Response types
 export interface PaginatedResponse<T> {
   content: T[];

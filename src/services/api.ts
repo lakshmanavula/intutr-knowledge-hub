@@ -18,6 +18,9 @@ import type {
   Coupon,
   CreateCouponRequest,
   UpdateCouponRequest,
+  Review,
+  CreateReviewRequest,
+  UpdateReviewRequest,
   PaginatedResponse 
 } from '@/types/api';
 
@@ -125,8 +128,10 @@ export const courseCategoryApi = {
 
 export const courseApi = {
   // Get all courses
-  getAll: async (): Promise<Course[]> => {
-    const response = await apiClient.get<Course[]>('/lob-fount-courses');
+  getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
+    const response = await apiClient.get<PaginatedResponse<Course>>(
+      `/lob-fount-courses/paginated?page=${page}&size=${size}`
+    );
     return response.data;
   },
 
@@ -354,8 +359,10 @@ export const lobDataApi = {
 
 export const userProfileApi = {
   // Get all users
-  getAll: async (): Promise<UserProfile[]> => {
-    const response = await apiClient.get<UserProfile[]>('/user-profiles');
+  getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
+    const response = await apiClient.get<PaginatedResponse<UserProfile>>(
+      `/user-profiles/paginated?page=${page}&size=${size}`
+    );
     return response.data;
   },
 
@@ -496,3 +503,78 @@ export const couponApi = {
     return response.data;
   },
 };
+
+export const reviewApi = {
+  // Get all reviews
+  getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Review>> => {
+    const response = await apiClient.get<PaginatedResponse<Review>>(
+      `/reviews/paginated?page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
+  // Get review by ID
+  getById: async (id: string): Promise<Review> => {
+    const response = await apiClient.get<Review>(`/reviews/${id}`);
+    return response.data;
+  },
+
+  // Get reviews by course
+  getByCourse: async (courseId: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<Review>> => {
+    const response = await apiClient.get<PaginatedResponse<Review>>(
+      `/reviews/course/${courseId}?page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
+  // Create new review
+  create: async (review: CreateReviewRequest): Promise<Review> => {
+    const response = await apiClient.post<Review>('/reviews', review);
+    return response.data;
+  },
+
+  // Update existing review
+  update: async (id: string, review: UpdateReviewRequest): Promise<Review> => {
+    const response = await apiClient.put<Review>(`/reviews/${id}`, review);
+    return response.data;
+  },
+
+  // Delete review
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/reviews/${id}`);
+  },
+
+  // Search reviews
+  search: async (query: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<Review>> => {
+    const response = await apiClient.get<PaginatedResponse<Review>>(
+      `/reviews/search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
+  // Bulk delete reviews
+  bulkDelete: async (ids: string[]): Promise<void> => {
+    await apiClient.post('/reviews/bulk-delete', { ids });
+  },
+
+  // Approve review
+  approve: async (id: string): Promise<Review> => {
+    const response = await apiClient.patch<Review>(`/reviews/${id}/approve`);
+    return response.data;
+  },
+
+  // Toggle public status
+  togglePublic: async (id: string): Promise<Review> => {
+    const response = await apiClient.patch<Review>(`/reviews/${id}/toggle-public`);
+    return response.data;
+  },
+
+  // Mark review as helpful
+  markHelpful: async (id: string): Promise<Review> => {
+    const response = await apiClient.post<Review>(`/reviews/${id}/helpful`);
+    return response.data;
+  },
+};
+
+// Export userApi alias for consistency
+export const userApi = userProfileApi;
