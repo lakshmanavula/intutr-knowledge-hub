@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpen,
   FolderOpen,
@@ -73,6 +74,7 @@ const topCategories = [
 
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -117,7 +119,10 @@ export default function Dashboard() {
               {currentTime.toLocaleTimeString()}
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90">
+          <Button 
+            className="bg-primary hover:bg-primary/90"
+            onClick={() => navigate('/courses')}
+          >
             <BookOpen className="w-4 h-4 mr-2" />
             Add New Course
           </Button>
@@ -265,27 +270,51 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <Button variant="outline" className="h-20 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col gap-2"
+              onClick={() => navigate('/courses')}
+            >
               <BookOpen className="w-6 h-6" />
               <span className="text-sm">Add Course</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col gap-2"
+              onClick={() => navigate('/categories')}
+            >
               <FolderOpen className="w-6 h-6" />
               <span className="text-sm">Add Category</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col gap-2"
+              onClick={() => navigate('/users')}
+            >
               <Users className="w-6 h-6" />
               <span className="text-sm">Manage Users</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col gap-2"
+              onClick={() => navigate('/reviews')}
+            >
               <Star className="w-6 h-6" />
               <span className="text-sm">View Reviews</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col gap-2"
+              onClick={() => navigate('/dashboard')}
+            >
               <TrendingUp className="w-6 h-6" />
               <span className="text-sm">Analytics</span>
             </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col gap-2"
+              onClick={() => navigate('/dashboard')}
+            >
               <Calendar className="w-6 h-6" />
               <span className="text-sm">Schedule</span>
             </Button>
