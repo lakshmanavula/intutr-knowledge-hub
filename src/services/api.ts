@@ -21,10 +21,13 @@ import type {
   Review,
   CreateReviewRequest,
   UpdateReviewRequest,
-  PaginatedResponse 
+  PaginatedResponse,
+  LoginRequest,
+  LoginResponse,
+  AuthUser
 } from '@/types/api';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:8080';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -35,14 +38,74 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
+// Authentication API
+export const authApi = {
+  // Login user
+  login: async (credentials: LoginRequest): Promise<LoginResponse> => {
+    const response = await apiClient.post<LoginResponse>('/api/auth/login', credentials);
+    
+    // Store token and user data in localStorage
+    if (response.data.token) {
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('authUser', JSON.stringify(response.data.user));
+    }
+    
+    return response.data;
+  },
+
+  // Logout user
+  logout: async (): Promise<void> => {
+    try {
+      await apiClient.post('/api/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Clear local storage regardless of API call success
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
+    }
+  },
+
+  // Get current user
+  getCurrentUser: (): AuthUser | null => {
+    const userStr = localStorage.getItem('authUser');
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('authUser');
+      }
+    }
+    return null;
+  },
+
+  // Check if user is authenticated
+  isAuthenticated: (): boolean => {
+    return !!localStorage.getItem('authToken');
+  },
+
+  // Refresh token (if your API supports it)
+  refreshToken: async (): Promise<LoginResponse> => {
+    const response = await apiClient.post<LoginResponse>('/api/auth/refresh');
+    
+    if (response.data.token) {
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('authUser', JSON.stringify(response.data.user));
+    }
+    
+    return response.data;
+  }
+};
+
 // Request interceptor for adding auth tokens if needed
 apiClient.interceptors.request.use(
   (config) => {
     // Add auth token here if available
-    // const token = localStorage.getItem('authToken');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -56,7 +119,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      console.error('Unauthorized access');
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
@@ -65,14 +130,14 @@ apiClient.interceptors.response.use(
 export const courseCategoryApi = {
   // Get all categories
   getAll: async (): Promise<CourseCategory[]> => {
-    const response = await apiClient.get<CourseCategory[]>('/course-categories');
+    const response = await apiClient.get<CourseCategory[]>('/api/course-categories');
     return response.data;
   },
 
   // Get paginated categories
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<CourseCategory>> => {
     const response = await apiClient.get<PaginatedResponse<CourseCategory>>(
-      `/course-categories/paged?page=${page}&size=${size}`
+      `/api/course-categories/paged?page=${page}&size=${size}`
     );
     return response.data;
   },

@@ -322,6 +322,27 @@ export interface PaginatedResponse<T> {
   last: boolean;
 }
 
+// Authentication types
+export interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: UserProfile;
+  expiresIn: number;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+}
+
 export interface ApiError {
   message: string;
   status: number;
