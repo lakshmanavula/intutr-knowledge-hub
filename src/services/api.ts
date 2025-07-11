@@ -38,6 +38,25 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
+// Add response interceptor to handle errors properly
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle HTTP error responses
+    if (error.response) {
+      // Server responded with error status
+      const message = error.response.data?.message || 
+                     error.response.data?.errorMessage || 
+                     'Authentication failed';
+      error.message = message;
+    } else if (error.request) {
+      // Network error
+      error.message = 'Network error. Please check your connection.';
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Authentication API
 export const authApi = {
   // Login user
@@ -144,19 +163,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authUser');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
 
 export const courseCategoryApi = {
   // Get all categories
