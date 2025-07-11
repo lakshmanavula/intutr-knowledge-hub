@@ -183,6 +183,38 @@ export interface UserProfile {
   deleted: boolean;
 }
 
+export interface CreateUserProfileRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  gender: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  profilePicture: string;
+  isActive: boolean;
+}
+
+export interface UpdateUserProfileRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  gender: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  profilePicture: string;
+  isActive: boolean;
+}
+
 // API Response types
 export interface PaginatedResponse<T> {
   content: T[];

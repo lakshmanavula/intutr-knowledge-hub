@@ -12,6 +12,9 @@ import type {
   LobData,
   CreateLobDataRequest,
   UpdateLobDataRequest,
+  UserProfile,
+  CreateUserProfileRequest,
+  UpdateUserProfileRequest,
   PaginatedResponse 
 } from '@/types/api';
 
@@ -343,5 +346,74 @@ export const lobDataApi = {
   // Reorder lob data within topic
   reorder: async (topicId: string, lobDataIds: string[]): Promise<void> => {
     await apiClient.patch(`/lob-data/topic/${topicId}/reorder`, { lobDataIds });
+  },
+};
+
+export const userProfileApi = {
+  // Get all users
+  getAll: async (): Promise<UserProfile[]> => {
+    const response = await apiClient.get<UserProfile[]>('/user-profiles');
+    return response.data;
+  },
+
+  // Get paginated users
+  getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
+    const response = await apiClient.get<PaginatedResponse<UserProfile>>(
+      `/user-profiles/paginated?page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
+  // Get user by ID
+  getById: async (id: string): Promise<UserProfile> => {
+    const response = await apiClient.get<UserProfile>(`/user-profiles/${id}`);
+    return response.data;
+  },
+
+  // Create new user
+  create: async (user: CreateUserProfileRequest): Promise<UserProfile> => {
+    const response = await apiClient.post<UserProfile>('/user-profiles', user);
+    return response.data;
+  },
+
+  // Update existing user
+  update: async (id: string, user: UpdateUserProfileRequest): Promise<UserProfile> => {
+    const response = await apiClient.put<UserProfile>(`/user-profiles/${id}`, user);
+    return response.data;
+  },
+
+  // Delete user
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/user-profiles/${id}`);
+  },
+
+  // Search users
+  search: async (criteria: { 
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    isActive?: boolean;
+    city?: string;
+    state?: string;
+    country?: string;
+    page?: number; 
+    size?: number; 
+  }): Promise<PaginatedResponse<UserProfile>> => {
+    const response = await apiClient.post<PaginatedResponse<UserProfile>>(
+      '/user-profiles/search', 
+      criteria
+    );
+    return response.data;
+  },
+
+  // Bulk delete users
+  bulkDelete: async (ids: string[]): Promise<void> => {
+    await apiClient.post('/user-profiles/bulk-delete', { ids });
+  },
+
+  // Toggle active status
+  toggleActive: async (id: string): Promise<UserProfile> => {
+    const response = await apiClient.patch<UserProfile>(`/user-profiles/${id}/toggle-active`);
+    return response.data;
   },
 };
