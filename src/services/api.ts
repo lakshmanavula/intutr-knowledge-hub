@@ -42,44 +42,46 @@ const apiClient = axios.create({
 export const authApi = {
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    console.log('🔐 Mock login attempt for:', credentials.username);
+    console.log('🔐 Attempting login to:', `${API_BASE_URL}/api/auth/login`);
     
-    // Mock successful login for local development
-    const mockResponse = {
-      token: 'mock-jwt-token-' + Date.now(),
-      expiresIn: 3600, // 1 hour
+    const response = await apiClient.post<any>('/api/auth/login', credentials);
+    
+    console.log('✅ Login successful:', response.data);
+    
+    // Map the actual API response to our expected LoginResponse format
+    const mappedResponse: LoginResponse = {
+      token: response.data.token,
+      expiresIn: response.data.expiresIn,
       user: {
-        id: '1',
-        firstName: credentials.username,
-        lastName: 'User',
-        email: credentials.username + '@example.com',
-        phoneNumber: '+1234567890',
-        dateOfBirth: '1990-01-01',
-        gender: 'Other',
-        address: '123 Main St',
-        city: 'Test City',
-        state: 'Test State',
-        country: 'Test Country',
-        postalCode: '12345',
+        id: response.data.userId,
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+        email: response.data.email,
+        phoneNumber: '',
+        dateOfBirth: '',
+        gender: '',
+        address: '',
+        city: '',
+        state: '',
+        country: '',
+        postalCode: '',
         profilePicture: '',
         isActive: true,
         createdBy: 'system',
         createdByName: 'System',
         modifiedBy: 'system',
         modifiedByName: 'System',
-        createdDate: new Date().toISOString(),
-        modifiedDate: new Date().toISOString(),
+        createdDate: response.data.loginTime,
+        modifiedDate: response.data.loginTime,
         deleted: false
       }
     };
     
-    console.log('✅ Mock login successful:', mockResponse);
-    
     // Store token and user data in localStorage
-    localStorage.setItem('authToken', mockResponse.token);
-    localStorage.setItem('authUser', JSON.stringify(mockResponse.user));
+    localStorage.setItem('authToken', mappedResponse.token);
+    localStorage.setItem('authUser', JSON.stringify(mappedResponse.user));
     
-    return mockResponse;
+    return mappedResponse;
   },
 
   // Logout user
