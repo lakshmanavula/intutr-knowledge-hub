@@ -38,7 +38,7 @@ export default function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = location.state?.from?.pathname || "/dashboard";
+      const from = location.state?.from?.pathname || "/";
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, location]);
@@ -66,7 +66,7 @@ export default function Login() {
       
       // Add a small delay to ensure auth state is updated
       setTimeout(() => {
-        const from = location.state?.from?.pathname || "/dashboard";
+        const from = location.state?.from?.pathname || "/";
         navigate(from, { replace: true });
       }, 100);
       
