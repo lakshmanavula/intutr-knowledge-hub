@@ -26,6 +26,38 @@ export interface UpdateCourseCategoryRequest {
   isActive: boolean;
 }
 
+export interface CreateCourseRequest {
+  name: string;
+  courseLabel: string;
+  description: string;
+  fees: number;
+  duration: number;
+  thumbnail: string;
+  status: 'CREATED' | 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  xlsxFilePath: string;
+  categoryId: string;
+  tags: string;
+}
+
+export interface UpdateCourseRequest {
+  name: string;
+  courseLabel: string;
+  description: string;
+  fees: number;
+  duration: number;
+  thumbnail: string;
+  status: 'CREATED' | 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  xlsxFilePath: string;
+  categoryId: string;
+  tags: string;
+}
+
+export interface UpdateCourseCategoryRequest {
+  categoryName: string;
+  description: string;
+  isActive: boolean;
+}
+
 export interface Course {
   id: string;
   name: string;
