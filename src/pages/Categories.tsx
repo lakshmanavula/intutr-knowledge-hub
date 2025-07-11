@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import * as XLSX from 'xlsx';
 import { Link } from "react-router-dom";
 import {
   Plus,
@@ -61,6 +62,7 @@ export default function Categories() {
   const [totalElements, setTotalElements] = useState(0);
   
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCategories = async () => {
     try {
@@ -184,6 +186,87 @@ export default function Categories() {
     );
   };
 
+  const handleExportExcel = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/course-categories/download-excel', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'course-categories.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Success",
+        description: "Categories exported successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to export categories. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImportExcel = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:8080/api/course-categories/bulk-upload-excel', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload file');
+      }
+
+      toast({
+        title: "Success",
+        description: "Categories imported successfully.",
+      });
+      
+      fetchCategories();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to import categories. Please try again.",
+        variant: "destructive",
+      });
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const filteredCategories = (categories || []).filter(category =>
     category.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -225,14 +308,21 @@ export default function Categories() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleImportExcel}>
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            style={{ display: 'none' }}
+          />
           <Button onClick={() => setShowCreateForm(true)} className="bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             Add Category
