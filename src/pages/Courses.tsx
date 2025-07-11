@@ -118,7 +118,7 @@ export default function Courses() {
   const fetchCategories = async () => {
     try {
       const response = await courseCategoryApi.getAll();
-      setCategories(response.filter(cat => cat.isActive));
+      setCategories((response || []).filter(cat => cat.isActive));
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -234,10 +234,10 @@ export default function Courses() {
   };
 
   const handleSelectAll = () => {
-    if (selectedCourses.length === courses.length) {
+    if (selectedCourses.length === (courses || []).length) {
       setSelectedCourses([]);
     } else {
-      setSelectedCourses(courses.map(course => course.id));
+      setSelectedCourses((courses || []).map(course => course.id));
     }
   };
 
@@ -385,7 +385,7 @@ export default function Courses() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">
-              {courses.filter(course => course.status === 'PUBLISHED').length}
+              {(courses || []).filter(course => course.status === 'PUBLISHED').length}
             </div>
             <p className="text-xs text-muted-foreground">Live courses</p>
           </CardContent>
@@ -397,7 +397,7 @@ export default function Courses() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-warning">
-              {courses.filter(course => course.status === 'DRAFT').length}
+              {(courses || []).filter(course => course.status === 'DRAFT').length}
             </div>
             <p className="text-xs text-muted-foreground">In development</p>
           </CardContent>
@@ -567,7 +567,7 @@ export default function Courses() {
                 <TableRow>
                   <TableHead className="w-12">
                     <Button variant="ghost" size="sm" onClick={handleSelectAll}>
-                      {selectedCourses.length === courses.length ? (
+                      {selectedCourses.length === (courses || []).length ? (
                         <CheckSquare className="w-4 h-4" />
                       ) : (
                         <Square className="w-4 h-4" />
@@ -585,7 +585,7 @@ export default function Courses() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {courses.map((course) => (
+                {(courses || []).map((course) => (
                   <TableRow key={course.id}>
                     <TableCell>
                       <Button
@@ -682,7 +682,7 @@ export default function Courses() {
             </Table>
           )}
 
-          {!loading && courses.length === 0 && (
+          {!loading && (courses || []).length === 0 && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No courses found.</p>
               <Button onClick={() => setShowCreateForm(true)} className="mt-4">
