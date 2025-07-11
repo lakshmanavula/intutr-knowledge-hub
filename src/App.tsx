@@ -11,6 +11,7 @@ import Users from "./pages/Users";
 import Reviews from "./pages/Reviews";
 import Coupons from "./pages/Coupons";
 import Settings from "./pages/Settings";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="categories" element={<Categories />} />
