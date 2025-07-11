@@ -64,16 +64,18 @@ export default function Login() {
         description: "Welcome back to Intutr Kmap!",
       });
       
-      // Redirect to intended page or dashboard
-      const from = location.state?.from?.pathname || "/dashboard";
-      navigate(from, { replace: true });
+      // Add a small delay to ensure auth state is updated
+      setTimeout(() => {
+        const from = location.state?.from?.pathname || "/dashboard";
+        navigate(from, { replace: true });
+      }, 100);
       
     } catch (error: any) {
       console.error("Login error:", error);
       
       const errorMessage = error.response?.data?.message || 
                           error.message || 
-                          "Invalid email or password. Please try again.";
+                          "Invalid username or password. Please try again.";
       
       toast({
         title: "Login failed",
