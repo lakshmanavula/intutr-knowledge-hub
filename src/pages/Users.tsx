@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import * as XLSX from 'xlsx';
 import {
   Plus,
   Search,
@@ -80,6 +81,7 @@ export default function Users() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
 
@@ -252,6 +254,82 @@ export default function Users() {
   // Get unique countries for filter
   const uniqueCountries = [...new Set((users || []).map(user => user.country))].filter(Boolean);
 
+  const handleExportExcel = () => {
+    // Prepare data for export
+    const exportData = users.map(user => ({
+      'First Name': user.firstName,
+      'Last Name': user.lastName,
+      'Email': user.email,
+      'Phone': user.phoneNumber,
+      'Country': user.country,
+      'State': user.state,
+      'City': user.city,
+      'Address': user.address,
+      'Postal Code': user.postalCode,
+      'Date of Birth': user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : '',
+      'Gender': user.gender,
+      'Status': user.isActive ? 'Active' : 'Inactive',
+      'Created Date': new Date(user.createdDate).toLocaleDateString(),
+      'Created By': user.createdBy
+    }));
+
+    // Create workbook and worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Users');
+
+    // Download file
+    XLSX.writeFile(wb, `users_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Success",
+      description: "Users exported successfully!",
+    });
+  };
+
+  const handleImportExcel = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        console.log('Imported data:', jsonData);
+        
+        toast({
+          title: "Success",
+          description: `Successfully imported ${jsonData.length} rows from Excel file.`,
+        });
+
+        // Here you would typically process the imported data and save it to your backend
+        // For now, we'll just log it and show a success message
+      } catch (error) {
+        console.error('Error parsing Excel file:', error);
+        toast({
+          title: "Error",
+          description: "Failed to parse Excel file. Please check the file format.",
+          variant: "destructive",
+        });
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   if (showCreateForm) {
     return (
       <UserForm
@@ -288,14 +366,21 @@ export default function Users() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleImportExcel}>
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+          />
           <Button onClick={() => setShowCreateForm(true)} className="bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             Add User

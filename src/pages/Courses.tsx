@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import * as XLSX from 'xlsx';
 import { Link } from "react-router-dom";
 import {
   Plus,
@@ -93,6 +94,7 @@ export default function Courses() {
   const [ratingRange, setRatingRange] = useState([0, 5]);
   const [durationRange, setDurationRange] = useState([0, 365]);
   const [showFilters, setShowFilters] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
 
@@ -304,6 +306,80 @@ export default function Courses() {
     );
   };
 
+  const handleExportExcel = () => {
+    // Prepare data for export
+    const exportData = courses.map(course => ({
+      'Course Name': course.name,
+      'Description': course.description,
+      'Category': categories.find(cat => cat.id === course.categoryId)?.categoryName || 'N/A',
+      'Status': course.status,
+      'Fees': course.fees,
+      'Rating': course.rating,
+      'Duration (Days)': course.duration,
+      'Created Date': new Date(course.createdDate).toLocaleDateString(),
+      'Tags': course.tags || '',
+      'Course Label': course.courseLabel,
+      'Thumbnail': course.thumbnail,
+      'Excel File Path': course.xlsxFilePath
+    }));
+
+    // Create workbook and worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Courses');
+
+    // Download file
+    XLSX.writeFile(wb, `courses_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+    
+    toast({
+      title: "Success",
+      description: "Courses exported successfully!",
+    });
+  };
+
+  const handleImportExcel = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        console.log('Imported data:', jsonData);
+        
+        toast({
+          title: "Success",
+          description: `Successfully imported ${jsonData.length} rows from Excel file.`,
+        });
+
+        // Here you would typically process the imported data and save it to your backend
+        // For now, we'll just log it and show a success message
+      } catch (error) {
+        console.error('Error parsing Excel file:', error);
+        toast({
+          title: "Error",
+          description: "Failed to parse Excel file. Please check the file format.",
+          variant: "destructive",
+        });
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   if (showCreateForm) {
     return (
       <CourseForm
@@ -351,14 +427,21 @@ export default function Courses() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleImportExcel}>
             <Upload className="w-4 h-4 mr-2" />
             Import
           </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+          />
           <Button onClick={() => setShowCreateForm(true)} className="bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4 mr-2" />
             Add Course
