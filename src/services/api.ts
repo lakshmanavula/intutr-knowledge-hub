@@ -15,6 +15,9 @@ import type {
   UserProfile,
   CreateUserProfileRequest,
   UpdateUserProfileRequest,
+  Coupon,
+  CreateCouponRequest,
+  UpdateCouponRequest,
   PaginatedResponse 
 } from '@/types/api';
 
@@ -414,6 +417,82 @@ export const userProfileApi = {
   // Toggle active status
   toggleActive: async (id: string): Promise<UserProfile> => {
     const response = await apiClient.patch<UserProfile>(`/user-profiles/${id}/toggle-active`);
+    return response.data;
+  },
+};
+
+export const couponApi = {
+  // Get all coupons
+  getAll: async (): Promise<Coupon[]> => {
+    const response = await apiClient.get<Coupon[]>('/coupons');
+    return response.data;
+  },
+
+  // Get paginated coupons
+  getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Coupon>> => {
+    const response = await apiClient.get<PaginatedResponse<Coupon>>(
+      `/coupons/paginated?page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
+  // Get coupon by ID
+  getById: async (id: string): Promise<Coupon> => {
+    const response = await apiClient.get<Coupon>(`/coupons/${id}`);
+    return response.data;
+  },
+
+  // Create new coupon
+  create: async (coupon: CreateCouponRequest): Promise<Coupon> => {
+    const response = await apiClient.post<Coupon>('/coupons', coupon);
+    return response.data;
+  },
+
+  // Update existing coupon
+  update: async (id: string, coupon: UpdateCouponRequest): Promise<Coupon> => {
+    const response = await apiClient.put<Coupon>(`/coupons/${id}`, coupon);
+    return response.data;
+  },
+
+  // Delete coupon
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/coupons/${id}`);
+  },
+
+  // Search coupons
+  search: async (criteria: { 
+    code?: string;
+    discountType?: string;
+    isActive?: boolean;
+    validFrom?: string;
+    validTo?: string;
+    page?: number; 
+    size?: number; 
+  }): Promise<PaginatedResponse<Coupon>> => {
+    const response = await apiClient.post<PaginatedResponse<Coupon>>(
+      '/coupons/search', 
+      criteria
+    );
+    return response.data;
+  },
+
+  // Bulk delete coupons
+  bulkDelete: async (ids: string[]): Promise<void> => {
+    await apiClient.post('/coupons/bulk-delete', { ids });
+  },
+
+  // Toggle active status
+  toggleActive: async (id: string): Promise<Coupon> => {
+    const response = await apiClient.patch<Coupon>(`/coupons/${id}/toggle-active`);
+    return response.data;
+  },
+
+  // Check coupon validity
+  validate: async (code: string, courseId?: string): Promise<{ valid: boolean; coupon?: Coupon; message?: string }> => {
+    const response = await apiClient.post<{ valid: boolean; coupon?: Coupon; message?: string }>('/coupons/validate', { 
+      code, 
+      courseId 
+    });
     return response.data;
   },
 };

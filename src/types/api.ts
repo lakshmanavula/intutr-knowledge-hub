@@ -215,6 +215,60 @@ export interface UpdateUserProfileRequest {
   isActive: boolean;
 }
 
+export interface Coupon {
+  id: string;
+  code: string;
+  description: string;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  minimumAmount: number;
+  maximumDiscount: number;
+  usageLimit: number;
+  usedCount: number;
+  validFrom: string;
+  validTo: string;
+  isActive: boolean;
+  applicableToAllCourses: boolean;
+  applicableCourseIds: string[];
+  createdBy: string;
+  createdByName: string;
+  modifiedBy: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+}
+
+export interface CreateCouponRequest {
+  code: string;
+  description: string;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  minimumAmount: number;
+  maximumDiscount: number;
+  usageLimit: number;
+  validFrom: string;
+  validTo: string;
+  isActive: boolean;
+  applicableToAllCourses: boolean;
+  applicableCourseIds: string[];
+}
+
+export interface UpdateCouponRequest {
+  code: string;
+  description: string;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  minimumAmount: number;
+  maximumDiscount: number;
+  usageLimit: number;
+  validFrom: string;
+  validTo: string;
+  isActive: boolean;
+  applicableToAllCourses: boolean;
+  applicableCourseIds: string[];
+}
+
 // API Response types
 export interface PaginatedResponse<T> {
   content: T[];
