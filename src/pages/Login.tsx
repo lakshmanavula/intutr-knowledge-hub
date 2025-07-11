@@ -20,7 +20,7 @@ import { Eye, EyeOff, BookOpen, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   rememberMe: z.boolean().default(false),
 });
@@ -46,7 +46,7 @@ export default function Login() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
       rememberMe: false,
     },
@@ -57,7 +57,7 @@ export default function Login() {
     
     try {
       // Use the auth context login method
-      await login(data.email, data.password, data.rememberMe);
+      await login(data.username, data.password, data.rememberMe);
       
       toast({
         title: "Login successful!",
@@ -111,14 +111,14 @@ export default function Login() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input
-                          type="email"
-                          placeholder="Enter your email"
+                          type="text"
+                          placeholder="Enter your username"
                           {...field}
                           disabled={isLoading}
                         />
