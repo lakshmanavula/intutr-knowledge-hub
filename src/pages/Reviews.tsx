@@ -52,8 +52,8 @@ export default function Reviews() {
   const [selectedReviews, setSelectedReviews] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
-  const [filterCourse, setFilterCourse] = useState<string>("");
-  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterCourse, setFilterCourse] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const size = 10;
@@ -130,7 +130,7 @@ export default function Reviews() {
   const totalPages = reviewsData?.totalPages || 0;
 
   const filteredReviews = reviews.filter(review => {
-    if (filterCourse && review.courseId !== filterCourse) return false;
+    if (filterCourse !== "all" && review.courseId !== filterCourse) return false;
     if (filterStatus === "approved" && !review.isApproved) return false;
     if (filterStatus === "pending" && review.isApproved) return false;
     if (filterStatus === "public" && !review.isPublic) return false;
@@ -301,7 +301,7 @@ export default function Reviews() {
             <SelectValue placeholder="Filter by course" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All courses</SelectItem>
+            <SelectItem value="all">All courses</SelectItem>
             {coursesData?.content?.map((course) => (
               <SelectItem key={course.id} value={course.id}>
                 {course.name}
@@ -314,7 +314,7 @@ export default function Reviews() {
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All statuses</SelectItem>
+            <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="approved">Approved</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="public">Public</SelectItem>
