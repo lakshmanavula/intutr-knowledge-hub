@@ -27,7 +27,7 @@ import type {
   AuthUser
 } from '@/types/api';
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-actual-api-server.com';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -42,7 +42,12 @@ const apiClient = axios.create({
 export const authApi = {
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
+    console.log('🔐 Attempting login to:', `${API_BASE_URL}/api/auth/login`);
+    console.log('📝 Login credentials:', { username: credentials.username, hasPassword: !!credentials.password });
+    
     const response = await apiClient.post<LoginResponse>('/api/auth/login', credentials);
+    
+    console.log('✅ Login successful:', response.data);
     
     // Store token and user data in localStorage
     if (response.data.token) {
