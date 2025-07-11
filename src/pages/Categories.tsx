@@ -124,10 +124,12 @@ export default function Categories() {
       });
       fetchCategories();
       setDeleteCategory(null);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Failed to delete category. Please try again.";
+      
       toast({
         title: "Error",
-        description: "Failed to delete category. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
