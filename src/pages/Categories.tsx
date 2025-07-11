@@ -169,10 +169,10 @@ export default function Categories() {
   };
 
   const handleSelectAll = () => {
-    if (selectedCategories.length === categories.length) {
+    if (selectedCategories.length === (categories || []).length) {
       setSelectedCategories([]);
     } else {
-      setSelectedCategories(categories.map(cat => cat.id));
+      setSelectedCategories((categories || []).map(cat => cat.id));
     }
   };
 
@@ -184,7 +184,7 @@ export default function Categories() {
     );
   };
 
-  const filteredCategories = categories.filter(category =>
+  const filteredCategories = (categories || []).filter(category =>
     category.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -259,7 +259,7 @@ export default function Categories() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">
-              {categories.filter(cat => cat.isActive).length}
+              {(categories || []).filter(cat => cat.isActive).length}
             </div>
             <p className="text-xs text-muted-foreground">
               Currently active
@@ -272,7 +272,7 @@ export default function Categories() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-warning">
-              {categories.filter(cat => !cat.isActive).length}
+              {(categories || []).filter(cat => !cat.isActive).length}
             </div>
             <p className="text-xs text-muted-foreground">
               Currently inactive
@@ -370,7 +370,7 @@ export default function Categories() {
                       size="sm"
                       onClick={handleSelectAll}
                     >
-                      {selectedCategories.length === categories.length ? (
+                      {selectedCategories.length === (categories || []).length ? (
                         <CheckSquare className="w-4 h-4" />
                       ) : (
                         <Square className="w-4 h-4" />
