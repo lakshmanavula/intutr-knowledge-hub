@@ -42,20 +42,44 @@ const apiClient = axios.create({
 export const authApi = {
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    console.log('🔐 Attempting login to:', `${API_BASE_URL}/api/auth/login`);
-    console.log('📝 Login credentials:', { username: credentials.username, hasPassword: !!credentials.password });
+    console.log('🔐 Mock login attempt for:', credentials.username);
     
-    const response = await apiClient.post<LoginResponse>('/api/auth/login', credentials);
+    // Mock successful login for local development
+    const mockResponse = {
+      token: 'mock-jwt-token-' + Date.now(),
+      expiresIn: 3600, // 1 hour
+      user: {
+        id: '1',
+        firstName: credentials.username,
+        lastName: 'User',
+        email: credentials.username + '@example.com',
+        phoneNumber: '+1234567890',
+        dateOfBirth: '1990-01-01',
+        gender: 'Other',
+        address: '123 Main St',
+        city: 'Test City',
+        state: 'Test State',
+        country: 'Test Country',
+        postalCode: '12345',
+        profilePicture: '',
+        isActive: true,
+        createdBy: 'system',
+        createdByName: 'System',
+        modifiedBy: 'system',
+        modifiedByName: 'System',
+        createdDate: new Date().toISOString(),
+        modifiedDate: new Date().toISOString(),
+        deleted: false
+      }
+    };
     
-    console.log('✅ Login successful:', response.data);
+    console.log('✅ Mock login successful:', mockResponse);
     
     // Store token and user data in localStorage
-    if (response.data.token) {
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('authUser', JSON.stringify(response.data.user));
-    }
+    localStorage.setItem('authToken', mockResponse.token);
+    localStorage.setItem('authUser', JSON.stringify(mockResponse.user));
     
-    return response.data;
+    return mockResponse;
   },
 
   // Logout user
