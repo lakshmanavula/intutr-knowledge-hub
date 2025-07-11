@@ -81,6 +81,84 @@ export interface Course {
   deleted: boolean;
 }
 
+export interface CourseTopic {
+  id: string;
+  topicName: string;
+  description: string;
+  courseId: string;
+  courseName: string;
+  orderIndex: number;
+  duration: number; // in minutes
+  isActive: boolean;
+  createdBy: string;
+  createdByName: string;
+  modifiedBy: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+}
+
+export interface CreateCourseTopicRequest {
+  topicName: string;
+  description: string;
+  courseId: string;
+  orderIndex: number;
+  duration: number;
+  isActive: boolean;
+}
+
+export interface UpdateCourseTopicRequest {
+  topicName: string;
+  description: string;
+  courseId: string;
+  orderIndex: number;
+  duration: number;
+  isActive: boolean;
+}
+
+export interface LobData {
+  id: string;
+  topicId: string;
+  topicName: string;
+  lobName: string;
+  lobDescription: string;
+  lobType: 'CONTENT' | 'EXERCISE' | 'ASSESSMENT' | 'VIDEO' | 'DOCUMENT';
+  orderIndex: number;
+  duration: number; // in minutes
+  resourceUrl: string;
+  isActive: boolean;
+  createdBy: string;
+  createdByName: string;
+  modifiedBy: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+}
+
+export interface CreateLobDataRequest {
+  topicId: string;
+  lobName: string;
+  lobDescription: string;
+  lobType: 'CONTENT' | 'EXERCISE' | 'ASSESSMENT' | 'VIDEO' | 'DOCUMENT';
+  orderIndex: number;
+  duration: number;
+  resourceUrl: string;
+  isActive: boolean;
+}
+
+export interface UpdateLobDataRequest {
+  topicId: string;
+  lobName: string;
+  lobDescription: string;
+  lobType: 'CONTENT' | 'EXERCISE' | 'ASSESSMENT' | 'VIDEO' | 'DOCUMENT';
+  orderIndex: number;
+  duration: number;
+  resourceUrl: string;
+  isActive: boolean;
+}
+
 export interface UserProfile {
   id: string;
   firstName: string;

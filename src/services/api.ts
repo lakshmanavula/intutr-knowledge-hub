@@ -6,6 +6,12 @@ import type {
   Course,
   CreateCourseRequest,
   UpdateCourseRequest,
+  CourseTopic,
+  CreateCourseTopicRequest,
+  UpdateCourseTopicRequest,
+  LobData,
+  CreateLobDataRequest,
+  UpdateLobDataRequest,
   PaginatedResponse 
 } from '@/types/api';
 
@@ -184,5 +190,158 @@ export const courseApi = {
   getByCategory: async (categoryId: string): Promise<Course[]> => {
     const response = await apiClient.get<Course[]>(`/lob-fount-courses/category/${categoryId}`);
     return response.data;
+  },
+};
+
+export const courseTopicApi = {
+  // Get all topics
+  getAll: async (): Promise<CourseTopic[]> => {
+    const response = await apiClient.get<CourseTopic[]>('/course-topics');
+    return response.data;
+  },
+
+  // Get paginated topics
+  getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<CourseTopic>> => {
+    const response = await apiClient.get<PaginatedResponse<CourseTopic>>(
+      `/course-topics/paginated?page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
+  // Get topic by ID
+  getById: async (id: string): Promise<CourseTopic> => {
+    const response = await apiClient.get<CourseTopic>(`/course-topics/${id}`);
+    return response.data;
+  },
+
+  // Get topics by course
+  getByCourse: async (courseId: string): Promise<CourseTopic[]> => {
+    const response = await apiClient.get<CourseTopic[]>(`/course-topics/course/${courseId}`);
+    return response.data;
+  },
+
+  // Create new topic
+  create: async (topic: CreateCourseTopicRequest): Promise<CourseTopic> => {
+    const response = await apiClient.post<CourseTopic>('/course-topics', topic);
+    return response.data;
+  },
+
+  // Update existing topic
+  update: async (id: string, topic: UpdateCourseTopicRequest): Promise<CourseTopic> => {
+    const response = await apiClient.put<CourseTopic>(`/course-topics/${id}`, topic);
+    return response.data;
+  },
+
+  // Delete topic
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/course-topics/${id}`);
+  },
+
+  // Search topics
+  search: async (criteria: { 
+    topicName?: string;
+    courseId?: string;
+    isActive?: boolean;
+    page?: number; 
+    size?: number; 
+  }): Promise<PaginatedResponse<CourseTopic>> => {
+    const response = await apiClient.post<PaginatedResponse<CourseTopic>>(
+      '/course-topics/search', 
+      criteria
+    );
+    return response.data;
+  },
+
+  // Bulk delete topics
+  bulkDelete: async (ids: string[]): Promise<void> => {
+    await apiClient.post('/course-topics/bulk-delete', { ids });
+  },
+
+  // Toggle active status
+  toggleActive: async (id: string): Promise<CourseTopic> => {
+    const response = await apiClient.patch<CourseTopic>(`/course-topics/${id}/toggle-active`);
+    return response.data;
+  },
+
+  // Reorder topics
+  reorder: async (courseId: string, topicIds: string[]): Promise<void> => {
+    await apiClient.patch(`/course-topics/course/${courseId}/reorder`, { topicIds });
+  },
+};
+
+export const lobDataApi = {
+  // Get all lob data
+  getAll: async (): Promise<LobData[]> => {
+    const response = await apiClient.get<LobData[]>('/lob-data');
+    return response.data;
+  },
+
+  // Get paginated lob data
+  getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<LobData>> => {
+    const response = await apiClient.get<PaginatedResponse<LobData>>(
+      `/lob-data/paginated?page=${page}&size=${size}`
+    );
+    return response.data;
+  },
+
+  // Get lob data by ID
+  getById: async (id: string): Promise<LobData> => {
+    const response = await apiClient.get<LobData>(`/lob-data/${id}`);
+    return response.data;
+  },
+
+  // Get lob data by topic
+  getByTopic: async (topicId: string): Promise<LobData[]> => {
+    const response = await apiClient.get<LobData[]>(`/lob-data/topic/${topicId}`);
+    return response.data;
+  },
+
+  // Create new lob data
+  create: async (lobData: CreateLobDataRequest): Promise<LobData> => {
+    const response = await apiClient.post<LobData>('/lob-data', lobData);
+    return response.data;
+  },
+
+  // Update existing lob data
+  update: async (id: string, lobData: UpdateLobDataRequest): Promise<LobData> => {
+    const response = await apiClient.put<LobData>(`/lob-data/${id}`, lobData);
+    return response.data;
+  },
+
+  // Delete lob data
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/lob-data/${id}`);
+  },
+
+  // Search lob data
+  search: async (criteria: { 
+    lobName?: string;
+    topicId?: string;
+    lobType?: string;
+    isActive?: boolean;
+    page?: number; 
+    size?: number; 
+  }): Promise<PaginatedResponse<LobData>> => {
+    const response = await apiClient.post<PaginatedResponse<LobData>>(
+      '/lob-data/search', 
+      criteria
+    );
+    return response.data;
+  },
+
+  // Bulk delete lob data
+  bulkDelete: async (ids: string[]): Promise<void> => {
+    await apiClient.post('/lob-data/bulk-delete', { ids });
+  },
+
+  // Toggle active status
+  toggleActive: async (id: string): Promise<LobData> => {
+    const response = await apiClient.patch<LobData>(`/lob-data/${id}/toggle-active`);
+    return response.data;
+  },
+
+  // Reorder lob data within topic
+  reorder: async (topicId: string, lobDataIds: string[]): Promise<void> => {
+    await apiClient.patch(`/lob-data/topic/${topicId}/reorder`, { lobDataIds });
   },
 };
