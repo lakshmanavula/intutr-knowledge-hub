@@ -134,7 +134,7 @@ export default function Coupons() {
 
   // Filter coupons
   const filteredCoupons = useMemo(() => {
-    return coupons.filter((coupon) => {
+    return (coupons || []).filter((coupon) => {
       const matchesSearch = 
         coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
         coupon.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -153,7 +153,7 @@ export default function Coupons() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedCoupons(filteredCoupons.map(c => c.id));
+      setSelectedCoupons((filteredCoupons || []).map(c => c.id));
     } else {
       setSelectedCoupons([]);
     }
@@ -278,7 +278,7 @@ export default function Coupons() {
               <TableRow>
                 <TableHead className="w-12">
                   <Checkbox
-                    checked={selectedCoupons.length === filteredCoupons.length && filteredCoupons.length > 0}
+                    checked={selectedCoupons.length === (filteredCoupons || []).length && (filteredCoupons || []).length > 0}
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
@@ -299,14 +299,14 @@ export default function Coupons() {
                     Loading coupons...
                   </TableCell>
                 </TableRow>
-              ) : filteredCoupons.length === 0 ? (
+              ) : (filteredCoupons || []).length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-8">
                     No coupons found.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredCoupons.map((coupon) => (
+                (filteredCoupons || []).map((coupon) => (
                   <TableRow key={coupon.id}>
                     <TableCell>
                       <Checkbox
