@@ -137,7 +137,7 @@ export function CourseTopicsManager({ course, onBack }: CourseTopicsManagerProps
     }
   };
 
-  const filteredTopics = topics.filter(topic =>
+  const filteredTopics = (Array.isArray(topics) ? topics : []).filter(topic =>
     topic.topicName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     topic.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
