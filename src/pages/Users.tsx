@@ -211,10 +211,10 @@ export default function Users() {
   };
 
   const handleSelectAll = () => {
-    if (selectedUsers.length === users.length) {
+    if (selectedUsers.length === (users || []).length) {
       setSelectedUsers([]);
     } else {
-      setSelectedUsers(users.map(user => user.id));
+      setSelectedUsers((users || []).map(user => user.id));
     }
   };
 
@@ -250,7 +250,7 @@ export default function Users() {
   };
 
   // Get unique countries for filter
-  const uniqueCountries = [...new Set(users.map(user => user.country))].filter(Boolean);
+  const uniqueCountries = [...new Set((users || []).map(user => user.country))].filter(Boolean);
 
   if (showCreateForm) {
     return (
@@ -322,7 +322,7 @@ export default function Users() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">
-              {users.filter(user => user.isActive).length}
+              {(users || []).filter(user => user.isActive).length}
             </div>
             <p className="text-xs text-muted-foreground">Active accounts</p>
           </CardContent>
@@ -334,7 +334,7 @@ export default function Users() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-warning">
-              {users.filter(user => !user.isActive).length}
+              {(users || []).filter(user => !user.isActive).length}
             </div>
             <p className="text-xs text-muted-foreground">Inactive accounts</p>
           </CardContent>
@@ -384,7 +384,7 @@ export default function Users() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Countries</SelectItem>
-                    {uniqueCountries.map((country) => (
+                    {(uniqueCountries || []).map((country) => (
                       <SelectItem key={country} value={country}>
                         {country}
                       </SelectItem>
@@ -454,7 +454,7 @@ export default function Users() {
                 <TableRow>
                   <TableHead className="w-12">
                     <Button variant="ghost" size="sm" onClick={handleSelectAll}>
-                      {selectedUsers.length === users.length ? (
+                      {selectedUsers.length === (users || []).length ? (
                         <CheckSquare className="w-4 h-4" />
                       ) : (
                         <Square className="w-4 h-4" />
@@ -471,7 +471,7 @@ export default function Users() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
+                {(users || []).map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <Button
@@ -562,7 +562,7 @@ export default function Users() {
             </Table>
           )}
 
-          {!loading && users.length === 0 && (
+          {!loading && (users || []).length === 0 && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No users found.</p>
               <Button onClick={() => setShowCreateForm(true)} className="mt-4">
