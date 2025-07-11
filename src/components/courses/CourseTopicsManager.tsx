@@ -76,10 +76,10 @@ export function CourseTopicsManager({ course, onBack }: CourseTopicsManagerProps
       // Fetch lob data counts for each topic
       const counts: Record<string, number> = {};
       await Promise.all(
-        sortedTopics.map(async (topic) => {
+        (Array.isArray(sortedTopics) ? sortedTopics : []).map(async (topic) => {
           try {
             const lobData = await lobDataApi.getByTopic(topic.id);
-            counts[topic.id] = lobData.length;
+            counts[topic.id] = Array.isArray(lobData) ? lobData.length : 0;
           } catch (error) {
             counts[topic.id] = 0;
           }
@@ -225,7 +225,7 @@ export function CourseTopicsManager({ course, onBack }: CourseTopicsManagerProps
                   {course.status}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
-                  {topics.length} topics • {Object.values(lobDataCounts).reduce((a, b) => a + b, 0)} content items
+                  {Array.isArray(topics) ? topics.length : 0} topics • {Object.values(lobDataCounts || {}).reduce((a, b) => a + b, 0)} content items
                 </span>
               </div>
             </div>
