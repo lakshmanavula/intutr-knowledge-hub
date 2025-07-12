@@ -15,7 +15,7 @@ export interface EnvironmentConfig {
 export const environments: Record<string, EnvironmentConfig> = {
   local: {
     name: 'Local Development',
-    apiBaseUrl: 'http://localhost:8081/api',
+    apiBaseUrl: 'http://localhost:8081',
     timeout: 10000,
     enableLogging: true,
     retryAttempts: 1,

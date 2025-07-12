@@ -241,25 +241,25 @@ export const courseCategoryApi = {
 
   // Get category by ID
   getById: async (id: string): Promise<CourseCategory> => {
-    const response = await getApiClient().get<CourseCategory>(`/course-categories/${id}`);
+    const response = await getApiClient().get<CourseCategory>(`/api/course-categories/${id}`);
     return response.data;
   },
 
   // Create new category
   create: async (category: CreateCourseCategoryRequest): Promise<CourseCategory> => {
-    const response = await getApiClient().post<CourseCategory>('/course-categories', category);
+    const response = await getApiClient().post<CourseCategory>('/api/course-categories', category);
     return response.data;
   },
 
   // Update existing category
   update: async (id: string, category: UpdateCourseCategoryRequest): Promise<CourseCategory> => {
-    const response = await getApiClient().put<CourseCategory>(`/course-categories/${id}`, category);
+    const response = await getApiClient().put<CourseCategory>(`/api/course-categories/${id}`, category);
     return response.data;
   },
 
   // Delete category
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/course-categories/${id}`);
+    await getApiClient().delete(`/api/course-categories/${id}`);
   },
 
   // Search categories
@@ -270,7 +270,7 @@ export const courseCategoryApi = {
     size?: number; 
   }): Promise<PaginatedResponse<CourseCategory>> => {
     const response = await getApiClient().post<PaginatedResponse<CourseCategory>>(
-      '/course-categories/search', 
+      '/api/course-categories/search', 
       criteria
     );
     return response.data;
@@ -278,7 +278,7 @@ export const courseCategoryApi = {
 
   // Bulk delete categories
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await getApiClient().post('/course-categories/bulk-delete', { ids });
+    await getApiClient().post('/api/course-categories/bulk-delete', { ids });
   },
 
   // Toggle active status
@@ -292,7 +292,7 @@ export const courseApi = {
   // Get all courses
   getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
     const response = await getApiClient().get<PaginatedResponse<Course>>(
-      `/lob-fount-courses/paginated?page=${page}&size=${size}`
+      `/api/lob-fount-courses/paginated?page=${page}&size=${size}`
     );
     return response.data;
   },
