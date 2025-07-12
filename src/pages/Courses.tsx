@@ -710,7 +710,13 @@ export default function Courses() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{course.categoryName}</Badge>
+                      <div className="min-h-[20px]">
+                        {course.categoryName ? (
+                          <Badge variant="outline">{course.categoryName}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No category</span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>{renderStarRating(course.rating)}</TableCell>
                     <TableCell>
