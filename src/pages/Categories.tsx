@@ -71,10 +71,11 @@ export default function Categories() {
       setCategories(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to fetch categories. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to fetch categories. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       console.error("Error fetching categories:", error);
@@ -104,10 +105,11 @@ export default function Categories() {
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
       setCurrentPage(0);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to search categories. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to search categories. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -146,10 +148,11 @@ export default function Categories() {
       });
       setSelectedCategories([]);
       fetchCategories();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to delete categories. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to delete categories. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -163,10 +166,11 @@ export default function Categories() {
         description: `Category "${category.categoryName}" ${category.isActive ? 'deactivated' : 'activated'} successfully.`,
       });
       fetchCategories();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to update category status. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to update category status. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -216,10 +220,11 @@ export default function Categories() {
         title: "Success",
         description: "Categories exported successfully.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to export categories. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to export categories. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -255,10 +260,11 @@ export default function Categories() {
       });
       
       fetchCategories();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to import categories. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to import categories. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
