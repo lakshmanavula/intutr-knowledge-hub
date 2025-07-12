@@ -30,9 +30,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Check if user is already authenticated on app start
-    const currentUser = authApi.getCurrentUser();
-    if (currentUser && authApi.isAuthenticated()) {
-      setUser(currentUser);
+    try {
+      const currentUser = authApi.getCurrentUser();
+      if (currentUser && authApi.isAuthenticated()) {
+        setUser(currentUser);
+      }
+    } catch (error) {
+      console.error('Error loading user on app start:', error);
+      // Clear any invalid auth data
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
     }
     setIsLoading(false);
   }, []);
