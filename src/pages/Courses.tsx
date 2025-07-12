@@ -690,7 +690,7 @@ export default function Courses() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
                           {course.thumbnail ? (
                             <img
                               src={course.thumbnail}
@@ -698,7 +698,11 @@ export default function Courses() {
                               className="w-full h-full object-cover rounded-lg"
                             />
                           ) : (
-                            <Image className="w-6 h-6 text-muted-foreground" />
+                            <img
+                              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop&crop=center"
+                              alt="Course placeholder"
+                              className="w-full h-full object-cover rounded-lg opacity-60"
+                            />
                           )}
                         </div>
                         <div>
