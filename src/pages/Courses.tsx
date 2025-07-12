@@ -105,10 +105,11 @@ export default function Courses() {
       setCourses(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to fetch courses. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to fetch courses. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       console.error("Error fetching courses:", error);
@@ -169,10 +170,11 @@ export default function Courses() {
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
       setCurrentPage(0);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to search courses. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to search courses. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -189,10 +191,11 @@ export default function Courses() {
       });
       fetchCourses();
       setDeleteCourse(null);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to delete course. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to delete course. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -209,10 +212,11 @@ export default function Courses() {
       });
       setSelectedCourses([]);
       fetchCourses();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to delete courses. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to delete courses. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -226,10 +230,11 @@ export default function Courses() {
         description: `Course "${course.name}" status updated to ${newStatus}.`,
       });
       fetchCourses();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to update course status. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to update course status. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

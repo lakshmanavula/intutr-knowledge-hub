@@ -92,10 +92,11 @@ export default function Users() {
       setUsers(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to fetch users. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to fetch users. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
       console.error("Error fetching users:", error);
@@ -146,10 +147,11 @@ export default function Users() {
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
       setCurrentPage(0);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to search users. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to search users. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -166,10 +168,11 @@ export default function Users() {
       });
       fetchUsers();
       setDeleteUser(null);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to delete user. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to delete user. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -186,10 +189,11 @@ export default function Users() {
       });
       setSelectedUsers([]);
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to delete users. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to delete users. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -203,10 +207,11 @@ export default function Users() {
         description: `User "${user.firstName} ${user.lastName}" ${user.isActive ? 'deactivated' : 'activated'} successfully.`,
       });
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to update user status. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to update user status. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

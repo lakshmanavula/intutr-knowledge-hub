@@ -38,16 +38,43 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Add response interceptor to handle errors properly
+// Add response interceptor to handle new API response format
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Handle the new API response format
+    const data = response.data;
+    
+    // If it's the new format with success field
+    if (data && typeof data.success === 'boolean') {
+      if (!data.success) {
+        // API returned success: false, treat as error
+        const error = new Error(data.message || 'Operation failed') as any;
+        error.response = response;
+        throw error;
+      }
+      // Return the actual data for successful responses
+      response.data = data.data;
+    }
+    
+    return response;
+  },
   (error) => {
     // Handle HTTP error responses
     if (error.response) {
       // Server responded with error status
-      const message = error.response.data?.message || 
-                     error.response.data?.errorMessage || 
-                     'Authentication failed';
+      const responseData = error.response.data;
+      let message = 'An error occurred';
+      
+      // Check if it's the new API format
+      if (responseData && typeof responseData.success === 'boolean') {
+        message = responseData.message || message;
+      } else {
+        // Fallback to old format
+        message = responseData?.message || 
+                 responseData?.errorMessage || 
+                 'Operation failed';
+      }
+      
       error.message = message;
     } else if (error.request) {
       // Network error
