@@ -212,10 +212,31 @@ export const courseCategoryApi = {
 
   // Get paginated categories
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<CourseCategory>> => {
-    const response = await getApiClient().get<PaginatedResponse<CourseCategory>>(
-      `/api/course-categories/paged?page=${page}&size=${size}`
-    );
-    return response.data;
+    const response = await getApiClient().get<{
+      status: string;
+      data: CourseCategory[];
+      pagination: {
+        page: number;
+        size: number;
+        totalElements: number;
+        totalPages: number;
+        first: boolean;
+        last: boolean;
+        numberOfElements: number;
+        empty: boolean;
+      };
+    }>(`/api/course-categories/paged?page=${page}&size=${size}`);
+    
+    // Transform API response to match PaginatedResponse interface
+    return {
+      content: response.data.data,
+      totalElements: response.data.pagination.totalElements,
+      totalPages: response.data.pagination.totalPages,
+      size: response.data.pagination.size,
+      number: response.data.pagination.page,
+      first: response.data.pagination.first,
+      last: response.data.pagination.last,
+    };
   },
 
   // Get category by ID
