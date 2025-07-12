@@ -69,18 +69,27 @@ export const environments: Record<string, EnvironmentConfig> = {
 
 // Get current environment from URL param, localStorage, or default to local
 export const getCurrentEnvironment = (): string => {
-  // Check URL parameter first
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlEnv = urlParams.get('env');
-  if (urlEnv && environments[urlEnv]) {
-    localStorage.setItem('selectedEnvironment', urlEnv);
-    return urlEnv;
+  // Check if we're in browser environment
+  if (typeof window === 'undefined') {
+    return 'local';
   }
 
-  // Check localStorage
-  const savedEnv = localStorage.getItem('selectedEnvironment');
-  if (savedEnv && environments[savedEnv]) {
-    return savedEnv;
+  try {
+    // Check URL parameter first
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlEnv = urlParams.get('env');
+    if (urlEnv && environments[urlEnv]) {
+      localStorage.setItem('selectedEnvironment', urlEnv);
+      return urlEnv;
+    }
+
+    // Check localStorage
+    const savedEnv = localStorage.getItem('selectedEnvironment');
+    if (savedEnv && environments[savedEnv]) {
+      return savedEnv;
+    }
+  } catch (error) {
+    console.warn('Error accessing browser storage, defaulting to local environment:', error);
   }
 
   // Default to local
