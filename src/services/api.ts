@@ -90,7 +90,7 @@ apiClient.interceptors.response.use(
 export const authApi = {
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    console.log('🔐 Attempting login to:', `${API_BASE_URL}/api/auth/login`);
+    console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);
     
     const response = await apiClient.post<any>('/auth/login', credentials);
     
