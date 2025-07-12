@@ -26,16 +26,18 @@ import type {
   LoginResponse,
   AuthUser
 } from '@/types/api';
+import { getConfig } from '@/config/environments';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api';
+// Get current environment configuration
+const config = getConfig();
 
-// Create axios instance with default config
+// Create axios instance with environment-based config
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: config.timeout,
 });
 
 // Add response interceptor to handle new API response format
@@ -88,7 +90,7 @@ apiClient.interceptors.response.use(
 export const authApi = {
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);
+    console.log('🔐 Attempting login to:', `${API_BASE_URL}/api/auth/login`);
     
     const response = await apiClient.post<any>('/auth/login', credentials);
     

@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { EnvironmentSwitcher } from "./EnvironmentSwitcher";
 
 export function TopBar() {
   const { user, logout } = useAuth();
@@ -59,6 +60,8 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-4">
+        <EnvironmentSwitcher />
+        
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-4 h-4" />
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full"></span>
