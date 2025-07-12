@@ -215,27 +215,25 @@ export const courseCategoryApi = {
     const response = await getApiClient().get<{
       status: string;
       data: CourseCategory[];
-      pagination: {
+      metadata: {
         page: number;
         size: number;
         totalElements: number;
         totalPages: number;
         first: boolean;
         last: boolean;
-        numberOfElements: number;
-        empty: boolean;
       };
     }>(`/api/course-categories/paged?page=${page}&size=${size}`);
     
     // Transform API response to match PaginatedResponse interface
     return {
       content: response.data.data,
-      totalElements: response.data.pagination.totalElements,
-      totalPages: response.data.pagination.totalPages,
-      size: response.data.pagination.size,
-      number: response.data.pagination.page,
-      first: response.data.pagination.first,
-      last: response.data.pagination.last,
+      totalElements: response.data.metadata.totalElements,
+      totalPages: response.data.metadata.totalPages,
+      size: response.data.metadata.size,
+      number: response.data.metadata.page,
+      first: response.data.metadata.first,
+      last: response.data.metadata.last,
     };
   },
 
