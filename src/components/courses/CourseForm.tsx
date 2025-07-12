@@ -438,21 +438,20 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                       )}
                     />
 
-                    {form.watch("thumbnail") && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Preview</label>
-                        <div className="w-48 h-32 bg-muted rounded-lg overflow-hidden">
-                          <img
-                            src={form.watch("thumbnail")}
-                            alt="Course thumbnail preview"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Preview</label>
+                      <div className="w-48 h-32 bg-muted rounded-lg overflow-hidden">
+                        <img
+                          src={form.watch("thumbnail") || "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop&crop=center"}
+                          alt={form.watch("thumbnail") ? "Course thumbnail preview" : "Course placeholder"}
+                          className={`w-full h-full object-cover ${!form.watch("thumbnail") ? 'opacity-60' : ''}`}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=400&fit=crop&crop=center";
+                            (e.target as HTMLImageElement).className = "w-full h-full object-cover opacity-60";
+                          }}
+                        />
                       </div>
-                    )}
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
