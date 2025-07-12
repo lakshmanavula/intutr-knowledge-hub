@@ -88,6 +88,8 @@ apiClient.interceptors.response.use(
 
 // Authentication API
 export const authApi = {
+
+  
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);
