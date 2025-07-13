@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -107,6 +107,25 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
       tags: course?.tags || "",
     },
   });
+
+  // Reset form when course changes (for edit mode)
+  useEffect(() => {
+    if (course) {
+      console.log('🔄 Resetting form with course data:', course);
+      form.reset({
+        name: course.name || "",
+        courseLabel: course.courseLabel || "",
+        description: course.description || "",
+        fees: course.fees || 0,
+        duration: course.duration || 30,
+        thumbnail: course.thumbnail || "",
+        status: course.status || "DRAFT",
+        xlsxFilePath: course.xlsxFilePath || "",
+        categoryId: course.categoryId || "",
+        tags: course.tags || "",
+      });
+    }
+  }, [course, form]);
 
   const onSubmit = async (data: CourseFormData) => {
     try {
