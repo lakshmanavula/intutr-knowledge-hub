@@ -228,11 +228,11 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-foreground">
-            {isEditing ? "Edit Course" : "Create New Course"}
+            {isEditing ? course?.name || "Edit Course" : "Create New Course"}
           </h1>
           <p className="text-muted-foreground">
             {isEditing 
-              ? "Update the course information below" 
+              ? course?.description || "Update the course information below"
               : "Fill in the information below to create a new course"
             }
           </p>
