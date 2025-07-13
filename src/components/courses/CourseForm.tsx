@@ -512,14 +512,32 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                   {course?.id ? 'Upload Image' : 'Select Image'}
                                 </Button>
                               </div>
+                              {/* Debug info */}
+                              <div className="text-xs text-muted-foreground mt-1">
+                                Debug - field.value: {field.value || 'empty'}
+                              </div>
                               {field.value && (
                                 <div className="mt-2">
                                   {field.value.startsWith('pending-upload-') ? (
-                                    <p className="text-sm text-muted-foreground">
-                                      Selected: {field.value.replace('pending-upload-', '')}
-                                    </p>
+                                    <div className="p-2 bg-blue-50 rounded border">
+                                      <p className="text-sm text-blue-700 font-medium">
+                                        📁 Selected: {field.value.replace('pending-upload-', '')}
+                                      </p>
+                                      <p className="text-xs text-blue-600">
+                                        File will be uploaded when you save the course
+                                      </p>
+                                    </div>
                                   ) : field.value.startsWith('http') ? (
-                                    <img src={field.value} alt="Thumbnail preview" className="w-20 h-20 object-cover rounded" />
+                                    <div className="space-y-2">
+                                      <img src={field.value} alt="Thumbnail preview" className="w-20 h-20 object-cover rounded border" />
+                                      <p className="text-xs text-green-600">✅ Uploaded successfully</p>
+                                    </div>
+                                  ) : field.value ? (
+                                    <div className="p-2 bg-green-50 rounded border">
+                                      <p className="text-sm text-green-700">
+                                        📁 Current file: {field.value}
+                                      </p>
+                                    </div>
                                   ) : null}
                                 </div>
                               )}
@@ -598,16 +616,33 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                   {course?.id ? 'Upload File' : 'Select File'}
                                 </Button>
                               </div>
+                              {/* Debug info */}
+                              <div className="text-xs text-muted-foreground mt-1">
+                                Debug - Excel field.value: {field.value || 'empty'}
+                              </div>
                               {field.value && (
                                 <div className="mt-2">
                                   {field.value.startsWith('pending-upload-') ? (
-                                    <p className="text-sm text-muted-foreground">
-                                      Selected: {field.value.replace('pending-upload-', '')}
-                                    </p>
+                                    <div className="p-2 bg-blue-50 rounded border">
+                                      <p className="text-sm text-blue-700 font-medium">
+                                        📄 Selected: {field.value.replace('pending-upload-', '')}
+                                      </p>
+                                      <p className="text-xs text-blue-600">
+                                        File will be uploaded when you save the course
+                                      </p>
+                                    </div>
+                                  ) : field.value.startsWith('http') ? (
+                                    <div className="p-2 bg-green-50 rounded border">
+                                      <p className="text-sm text-green-700">
+                                        📄 Uploaded: {field.value.split('/').pop()}
+                                      </p>
+                                    </div>
                                   ) : field.value ? (
-                                    <p className="text-sm text-muted-foreground">
-                                      File: {field.value.split('/').pop()}
-                                    </p>
+                                    <div className="p-2 bg-green-50 rounded border">
+                                      <p className="text-sm text-green-700">
+                                        📄 Current file: {field.value.split('/').pop()}
+                                      </p>
+                                    </div>
                                   ) : null}
                                 </div>
                               )}
