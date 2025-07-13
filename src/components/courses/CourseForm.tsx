@@ -512,10 +512,6 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                   {course?.id ? 'Upload Image' : 'Select Image'}
                                 </Button>
                               </div>
-                              {/* Debug info */}
-                              <div className="text-xs text-muted-foreground mt-1">
-                                Debug - field.value: {field.value || 'empty'}
-                              </div>
                               {field.value && (
                                 <div className="mt-2">
                                   {field.value.startsWith('pending-upload-') ? (
@@ -615,10 +611,6 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                   <Upload className="w-4 h-4 mr-2" />
                                   {course?.id ? 'Upload File' : 'Select File'}
                                 </Button>
-                              </div>
-                              {/* Debug info */}
-                              <div className="text-xs text-muted-foreground mt-1">
-                                Debug - Excel field.value: {field.value || 'empty'}
                               </div>
                               {field.value && (
                                 <div className="mt-2">
