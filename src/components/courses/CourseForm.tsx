@@ -161,7 +161,13 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
         if (selectedThumbnailFile.current) {
           try {
             const uploadResult = await courseApi.uploadThumbnail(courseId, selectedThumbnailFile.current);
-            await courseApi.update(courseId, { ...savedCourse, thumbnail: uploadResult.url });
+            console.log('Thumbnail upload response:', uploadResult);
+            
+            // Update the form field with the new URL
+            const thumbnailUrl = uploadResult.url;
+            form.setValue('thumbnail', thumbnailUrl);
+            
+            await courseApi.update(courseId, { ...savedCourse, thumbnail: thumbnailUrl });
           } catch (error) {
             console.error('Failed to upload thumbnail:', error);
           }
@@ -171,7 +177,13 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
         if (selectedExcelFile.current) {
           try {
             const uploadResult = await courseApi.uploadKmapExcel(courseId, selectedExcelFile.current);
-            await courseApi.update(courseId, { ...savedCourse, xlsxFilePath: uploadResult.url });
+            console.log('Excel upload response:', uploadResult);
+            
+            // Update the form field with the new URL
+            const excelUrl = uploadResult.url;
+            form.setValue('xlsxFilePath', excelUrl);
+            
+            await courseApi.update(courseId, { ...savedCourse, xlsxFilePath: excelUrl });
           } catch (error) {
             console.error('Failed to upload Excel file:', error);
           }
@@ -443,10 +455,14 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                      const file = e.target.files?.[0];
                                      if (file) {
                                        if (course?.id) {
-                                         try {
-                                           setIsSubmitting(true);
-                                           const uploadResult = await courseApi.uploadThumbnail(course.id, file);
-                                           field.onChange(uploadResult.url);
+                                          try {
+                                            setIsSubmitting(true);
+                                            const uploadResult = await courseApi.uploadThumbnail(course.id, file);
+                                            console.log('Thumbnail upload response:', uploadResult);
+                                            
+                                            // Handle different response structures
+                                            const thumbnailUrl = uploadResult.url;
+                                            field.onChange(thumbnailUrl);
                                            toast({
                                              title: "Success",
                                              description: "Thumbnail uploaded successfully!",
