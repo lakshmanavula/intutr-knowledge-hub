@@ -270,22 +270,53 @@ export const courseCategoryApi = {
       // Now manually handle the response structure
       const rawData = response.data;
       
-      if (rawData.status === 'SUCCESS' && rawData.data && rawData.metadata) {
-        const result = {
-          content: rawData.data,
-          totalElements: rawData.metadata.totalElements,
-          totalPages: rawData.metadata.totalPages,
-          size: rawData.metadata.size,
-          number: rawData.metadata.page,
-          first: rawData.metadata.first,
-          last: rawData.metadata.last,
+      // Handle different response formats
+      let categoryData = [];
+      let metadata = null;
+      
+      if (rawData.status === 'SUCCESS' || rawData.success === true) {
+        categoryData = rawData.data || [];
+        metadata = rawData.metadata || {};
+      } else if (Array.isArray(rawData)) {
+        // Direct array response
+        categoryData = rawData;
+        metadata = {
+          totalElements: rawData.length,
+          totalPages: Math.ceil(rawData.length / size),
+          size: size,
+          page: page,
+          first: page === 0,
+          last: (page + 1) * size >= rawData.length
         };
-        
-        console.log('✅ Categories pagination result:', result);
-        return result;
+      } else if (rawData.data) {
+        // Has data property
+        categoryData = rawData.data;
+        metadata = rawData.metadata || {};
       } else {
-        throw new Error('Invalid response format');
+        // Fallback
+        categoryData = [];
+        metadata = {
+          totalElements: 0,
+          totalPages: 0,
+          size: size,
+          page: page,
+          first: true,
+          last: true
+        };
       }
+      
+      const result = {
+        content: categoryData,
+        totalElements: metadata.totalElements || 0,
+        totalPages: metadata.totalPages || 0,
+        size: metadata.size || size,
+        number: metadata.page || page,
+        first: metadata.first !== undefined ? metadata.first : page === 0,
+        last: metadata.last !== undefined ? metadata.last : false,
+      };
+      
+      console.log('✅ Categories pagination result:', result);
+      return result;
     } catch (error: any) {
       console.error('❌ Categories pagination API Error:', error);
       throw new Error(error.message || 'Failed to fetch paginated categories');
