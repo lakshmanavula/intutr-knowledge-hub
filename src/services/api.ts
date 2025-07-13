@@ -306,7 +306,7 @@ export const courseCategoryApi = {
 
   // Toggle active status
   toggleActive: async (id: string): Promise<CourseCategory> => {
-    const response = await getApiClient().patch<CourseCategory>(`/course-categories/${id}/toggle-active`);
+    const response = await getApiClient().patch<CourseCategory>(`/api/course-categories/${id}/toggle-active`);
     return response.data;
   },
 };
@@ -362,25 +362,25 @@ export const courseApi = {
 
   // Get course by ID
   getById: async (id: string): Promise<Course> => {
-    const response = await getApiClient().get<Course>(`/lob-fount-courses/${id}`);
+    const response = await getApiClient().get<Course>(`/api/lob-fount-courses/${id}`);
     return response.data;
   },
 
   // Create new course
   create: async (course: CreateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().post<Course>('/lob-fount-courses', course);
+    const response = await getApiClient().post<Course>('/api/lob-fount-courses', course);
     return response.data;
   },
 
   // Update existing course
   update: async (id: string, course: UpdateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().put<Course>(`/lob-fount-courses/${id}`, course);
+    const response = await getApiClient().put<Course>(`/api/lob-fount-courses/${id}`, course);
     return response.data;
   },
 
   // Delete course
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/lob-fount-courses/${id}`);
+    await getApiClient().delete(`/api/lob-fount-courses/${id}`);
   },
 
   // Search courses
@@ -397,7 +397,7 @@ export const courseApi = {
     size?: number; 
   }): Promise<PaginatedResponse<Course>> => {
     const response = await getApiClient().post<PaginatedResponse<Course>>(
-      '/lob-fount-courses/search', 
+      '/api/lob-fount-courses/search', 
       criteria
     );
     return response.data;
@@ -405,18 +405,18 @@ export const courseApi = {
 
   // Bulk delete courses
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await getApiClient().post('/lob-fount-courses/bulk-delete', { ids });
+    await getApiClient().post('/api/lob-fount-courses/bulk-delete', { ids });
   },
 
   // Update course status
   updateStatus: async (id: string, status: Course['status']): Promise<Course> => {
-    const response = await getApiClient().patch<Course>(`/lob-fount-courses/${id}/status`, { status });
+    const response = await getApiClient().patch<Course>(`/api/lob-fount-courses/${id}/status`, { status });
     return response.data;
   },
 
   // Get courses by category
   getByCategory: async (categoryId: string): Promise<Course[]> => {
-    const response = await getApiClient().get<Course[]>(`/lob-fount-courses/category/${categoryId}`);
+    const response = await getApiClient().get<Course[]>(`/api/lob-fount-courses/category/${categoryId}`);
     return response.data;
   },
 };
