@@ -77,17 +77,23 @@ export default function Categories() {
     try {
       setLoading(true);
       const response = await courseCategoryApi.getPaginated(currentPage, 10);
+      console.log('Categories API Response:', response);
       setCategories(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
+      console.log('Total Pages:', response.totalPages, 'Total Elements:', response.totalElements);
     } catch (error: any) {
+      console.error("Error fetching categories:", error);
       const errorMessage = error.message || "Failed to fetch categories. Please try again.";
       toast({
-        title: "Error",
+        title: "Error", 
         description: errorMessage,
         variant: "destructive",
       });
-      console.error("Error fetching categories:", error);
+      // Set default values on error
+      setCategories([]);
+      setTotalPages(0);
+      setTotalElements(0);
     } finally {
       setLoading(false);
     }
@@ -571,104 +577,107 @@ export default function Categories() {
         </CardContent>
       </Card>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} categories
-          </p>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (currentPage > 0) setCurrentPage(prev => prev - 1);
-                  }}
-                  className={currentPage === 0 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              
-              {/* First page */}
-              {currentPage > 2 && (
-                <>
-                  <PaginationItem>
-                    <PaginationLink 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentPage(0);
-                      }}
-                    >
-                      1
-                    </PaginationLink>
-                  </PaginationItem>
-                  {currentPage > 3 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  )}
-                </>
-              )}
-              
-              {/* Current page and neighbors */}
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const pageIndex = Math.max(0, Math.min(totalPages - 5, currentPage - 2)) + i;
-                if (pageIndex >= totalPages) return null;
+      {/* Pagination - Always show for debugging */}
+      <div className="border rounded-lg p-4">
+        <p className="text-sm mb-2">Debug Info: Total Pages: {totalPages}, Current Page: {currentPage}, Total Elements: {totalElements}</p>
+        {(totalPages > 1 || true) && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} categories
+            </p>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage > 0) setCurrentPage(prev => prev - 1);
+                    }}
+                    className={currentPage === 0 ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
                 
-                return (
-                  <PaginationItem key={pageIndex}>
-                    <PaginationLink
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentPage(pageIndex);
-                      }}
-                      isActive={pageIndex === currentPage}
-                    >
-                      {pageIndex + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-              
-              {/* Last page */}
-              {currentPage < totalPages - 3 && (
-                <>
-                  {currentPage < totalPages - 4 && (
+                {/* First page */}
+                {currentPage > 2 && (
+                  <>
                     <PaginationItem>
-                      <PaginationEllipsis />
+                      <PaginationLink 
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(0);
+                        }}
+                      >
+                        1
+                      </PaginationLink>
                     </PaginationItem>
-                  )}
-                  <PaginationItem>
-                    <PaginationLink 
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentPage(totalPages - 1);
-                      }}
-                    >
-                      {totalPages}
-                    </PaginationLink>
-                  </PaginationItem>
-                </>
-              )}
-              
-              <PaginationItem>
-                <PaginationNext 
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (currentPage < totalPages - 1) setCurrentPage(prev => prev + 1);
-                  }}
-                  className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
+                    {currentPage > 3 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                  </>
+                )}
+                
+                {/* Current page and neighbors */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const pageIndex = Math.max(0, Math.min(totalPages - 5, currentPage - 2)) + i;
+                  if (pageIndex >= totalPages) return null;
+                  
+                  return (
+                    <PaginationItem key={pageIndex}>
+                      <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(pageIndex);
+                        }}
+                        isActive={pageIndex === currentPage}
+                      >
+                        {pageIndex + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                
+                {/* Last page */}
+                {currentPage < totalPages - 3 && (
+                  <>
+                    {currentPage < totalPages - 4 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+                    <PaginationItem>
+                      <PaginationLink 
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(totalPages - 1);
+                        }}
+                      >
+                        {totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  </>
+                )}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage < totalPages - 1) setCurrentPage(prev => prev + 1);
+                    }}
+                    className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteCategory} onOpenChange={() => setDeleteCategory(null)}>
