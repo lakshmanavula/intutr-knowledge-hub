@@ -255,34 +255,37 @@ export const courseCategoryApi = {
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<CourseCategory>> => {
     try {
       console.log('🔍 Fetching paginated categories:', { page, size });
-      const response = await getApiClient().get(`/api/course-categories/paged?page=${page}&size=${size}`);
       
-      console.log('📡 Categories pagination raw response:', response);
-      console.log('📋 Categories pagination response data:', response.data);
-      
-      // Response data is already processed by interceptor
-      const responseData = response.data;
-      
-      console.log('🔍 Response data structure:', {
-        hasData: !!responseData.data,
-        hasMetadata: !!responseData.metadata,
-        dataType: typeof responseData.data,
-        isDataArray: Array.isArray(responseData.data)
+      // Use a different approach - get the raw response before interceptor processes it
+      const apiClient = getApiClient();
+      const response = await apiClient.get(`/api/course-categories/paged?page=${page}&size=${size}`, {
+        transformResponse: [(data) => {
+          // Parse the JSON but don't let the interceptor modify it yet
+          return JSON.parse(data);
+        }]
       });
       
-      // Transform API response to match PaginatedResponse interface
-      const result = {
-        content: responseData.data || [],
-        totalElements: responseData.metadata?.totalElements || 0,
-        totalPages: responseData.metadata?.totalPages || 0,
-        size: responseData.metadata?.size || size,
-        number: responseData.metadata?.page || page,
-        first: responseData.metadata?.first || page === 0,
-        last: responseData.metadata?.last || false,
-      };
+      console.log('📡 Categories pagination raw response:', response.data);
       
-      console.log('✅ Categories pagination result:', result);
-      return result;
+      // Now manually handle the response structure
+      const rawData = response.data;
+      
+      if (rawData.status === 'SUCCESS' && rawData.data && rawData.metadata) {
+        const result = {
+          content: rawData.data,
+          totalElements: rawData.metadata.totalElements,
+          totalPages: rawData.metadata.totalPages,
+          size: rawData.metadata.size,
+          number: rawData.metadata.page,
+          first: rawData.metadata.first,
+          last: rawData.metadata.last,
+        };
+        
+        console.log('✅ Categories pagination result:', result);
+        return result;
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error: any) {
       console.error('❌ Categories pagination API Error:', error);
       throw new Error(error.message || 'Failed to fetch paginated categories');
