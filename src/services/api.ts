@@ -254,13 +254,24 @@ export const courseCategoryApi = {
   // Get paginated categories
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<CourseCategory>> => {
     try {
+      console.log('🔍 Fetching paginated categories:', { page, size });
       const response = await getApiClient().get(`/api/course-categories/paged?page=${page}&size=${size}`);
+      
+      console.log('📡 Categories pagination raw response:', response);
+      console.log('📋 Categories pagination response data:', response.data);
       
       // Response data is already processed by interceptor
       const responseData = response.data;
       
+      console.log('🔍 Response data structure:', {
+        hasData: !!responseData.data,
+        hasMetadata: !!responseData.metadata,
+        dataType: typeof responseData.data,
+        isDataArray: Array.isArray(responseData.data)
+      });
+      
       // Transform API response to match PaginatedResponse interface
-      return {
+      const result = {
         content: responseData.data || [],
         totalElements: responseData.metadata?.totalElements || 0,
         totalPages: responseData.metadata?.totalPages || 0,
@@ -269,6 +280,9 @@ export const courseCategoryApi = {
         first: responseData.metadata?.first || page === 0,
         last: responseData.metadata?.last || false,
       };
+      
+      console.log('✅ Categories pagination result:', result);
+      return result;
     } catch (error: any) {
       console.error('❌ Categories pagination API Error:', error);
       throw new Error(error.message || 'Failed to fetch paginated categories');
