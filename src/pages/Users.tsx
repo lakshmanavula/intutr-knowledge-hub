@@ -675,11 +675,12 @@ export default function Users() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground whitespace-nowrap">
             Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} users
           </p>
-          <Pagination>
+          <div className="flex-shrink-0">
+            <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious 
@@ -768,7 +769,8 @@ export default function Users() {
                 />
               </PaginationItem>
             </PaginationContent>
-          </Pagination>
+            </Pagination>
+          </div>
         </div>
       )}
 
