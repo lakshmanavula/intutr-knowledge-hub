@@ -575,8 +575,15 @@ export default function Categories() {
         </CardContent>
       </Card>
 
+      {/* Debug Info */}
+      <div className="mb-4 p-4 bg-muted rounded-lg">
+        <p className="text-sm">
+          Debug: Categories={categories.length}, TotalPages={totalPages}, TotalElements={totalElements}, CurrentPage={currentPage}
+        </p>
+      </div>
+
       {/* Pagination */}
-      {totalPages > 1 && (
+      {(totalPages > 1 || categories.length > 5) && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
               Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} categories
