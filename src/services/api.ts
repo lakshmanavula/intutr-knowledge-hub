@@ -52,7 +52,7 @@ const getApiClient = () => {
         // Handle the new API response format
         const data = response.data;
         
-        // If it's the new format with success field
+        // If it's the new format with success field (boolean)
         if (data && typeof data.success === 'boolean') {
           if (!data.success) {
             // API returned success: false, treat as error
@@ -62,6 +62,17 @@ const getApiClient = () => {
           }
           // Return the actual data for successful responses
           response.data = data.data;
+        }
+        // If it's the new format with status field (string)
+        else if (data && data.status === 'SUCCESS' && data.data) {
+          // Return the actual data for successful responses
+          response.data = data.data;
+        }
+        // If it's the new format with status field but error
+        else if (data && data.status && data.status !== 'SUCCESS') {
+          const error = new Error(data.message || 'Operation failed') as any;
+          error.response = response;
+          throw error;
         }
         
         return response;
