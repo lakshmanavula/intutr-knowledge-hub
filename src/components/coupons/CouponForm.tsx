@@ -86,10 +86,10 @@ export function CouponForm({ coupon, onClose }: CouponFormProps) {
   // Fetch courses for selection
   const { data: coursesData } = useQuery({
     queryKey: ["courses"],
-    queryFn: () => courseApi.getAll(0, 100),
+    queryFn: () => courseApi.getAll(),
   });
 
-  const courses = coursesData?.content || [];
+  const courses = coursesData || [];
 
   const form = useForm<CouponFormData>({
     resolver: zodResolver(couponSchema),

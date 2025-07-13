@@ -67,7 +67,7 @@ export default function Reviews() {
 
   const { data: coursesData } = useQuery({
     queryKey: ["courses-for-filter"],
-    queryFn: () => courseApi.getAll(0, 100),
+    queryFn: () => courseApi.getAll(),
   });
 
   const deleteMutation = useMutation({
@@ -302,7 +302,7 @@ export default function Reviews() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All courses</SelectItem>
-            {coursesData?.content?.map((course) => (
+            {coursesData?.map((course) => (
               <SelectItem key={course.id} value={course.id}>
                 {course.name}
               </SelectItem>

@@ -313,46 +313,51 @@ export const courseCategoryApi = {
 
 export const courseApi = {
   // Get all courses
-  getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
-    const response = await getApiClient().get<PaginatedResponse<Course>>(
-      `/api/lob-fount-courses/paginated?page=${page}&size=${size}`
-    );
-    return response.data;
+  getAll: async (): Promise<Course[]> => {
+    try {
+      const response = await getApiClient().get<{
+        status: string;
+        statusCode: number;
+        message: string;
+        data: Course[];
+        timestamp: string;
+      }>('/api/lob-fount-courses');
+      
+      return response.data.data || [];
+    } catch (error: any) {
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('Network timeout. Please check your connection and try again.');
+      }
+      throw new Error(error.message || 'Failed to fetch courses');
+    }
   },
 
-  // Get paginated courses
+  // Get paginated courses (simulating pagination from the array)
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
     try {
       const response = await getApiClient().get<{
         status: string;
+        statusCode: number;
+        message: string;
         data: Course[];
-        metadata: {
-          page: number;
-          size: number;
-          totalElements: number;
-          totalPages: number;
-          first: boolean;
-          last: boolean;
-        };
-      }>(`/api/lob-fount-courses/paginated?page=${page}&size=${size}`);
+        timestamp: string;
+      }>('/api/lob-fount-courses');
       
-      // Check if response and required data exists
-      if (!response.data || !response.data.metadata) {
-        throw new Error('Invalid response format from server');
-      }
+      const allCourses = response.data.data || [];
+      const startIndex = page * size;
+      const endIndex = startIndex + size;
+      const paginatedCourses = allCourses.slice(startIndex, endIndex);
       
-      // Transform API response to match PaginatedResponse interface
       return {
-        content: response.data.data || [],
-        totalElements: response.data.metadata.totalElements || 0,
-        totalPages: response.data.metadata.totalPages || 0,
-        size: response.data.metadata.size || size,
-        number: response.data.metadata.page || page,
-        first: response.data.metadata.first ?? true,
-        last: response.data.metadata.last ?? true,
+        content: paginatedCourses,
+        totalElements: allCourses.length,
+        totalPages: Math.ceil(allCourses.length / size),
+        size: size,
+        number: page,
+        first: page === 0,
+        last: endIndex >= allCourses.length,
       };
     } catch (error: any) {
-      // Handle network timeouts and other errors gracefully
       if (error.code === 'ECONNABORTED') {
         throw new Error('Network timeout. Please check your connection and try again.');
       }

@@ -52,7 +52,7 @@ export function ReviewForm({ review, onClose }: ReviewFormProps) {
 
   const { data: coursesData } = useQuery({
     queryKey: ["courses-for-review"],
-    queryFn: () => courseApi.getAll(0, 100),
+    queryFn: () => courseApi.getAll(),
   });
 
   const { data: usersData } = useQuery({
@@ -174,7 +174,7 @@ export function ReviewForm({ review, onClose }: ReviewFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {coursesData?.content?.map((course) => (
+                        {coursesData?.map((course) => (
                           <SelectItem key={course.id} value={course.id}>
                             {course.name}
                           </SelectItem>
