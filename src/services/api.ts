@@ -474,6 +474,40 @@ export const courseApi = {
     const response = await getApiClient().get<Course[]>(`/api/lob-fount-courses/category/${categoryId}`);
     return response.data;
   },
+
+  // Upload thumbnail for course
+  uploadThumbnail: async (courseId: string, file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await getApiClient().post<{ url: string }>(
+      `/api/lob-fount-courses/${courseId}/upload-thumbnail`, 
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  },
+
+  // Upload kmap excel for course
+  uploadKmapExcel: async (courseId: string, file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await getApiClient().post<{ url: string }>(
+      `/api/lob-fount-courses/${courseId}/upload-kmap-excel`, 
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  },
 };
 
 export const courseTopicApi = {
