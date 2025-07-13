@@ -89,6 +89,9 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
   const { toast } = useToast();
   const isEditing = !!course;
 
+  console.log('🎯 CourseForm received categories:', categories);
+  console.log('📊 Categories count:', categories?.length || 0);
+
   const form = useForm<CourseFormData>({
     resolver: zodResolver(courseSchema),
     defaultValues: {

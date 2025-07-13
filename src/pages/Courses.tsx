@@ -134,11 +134,17 @@ export default function Courses() {
 
   const fetchCategories = async () => {
     try {
+      console.log('🔍 Fetching categories...');
       const response = await courseCategoryApi.getAll();
+      console.log('📦 Categories response:', response);
+      console.log('📋 Response type:', typeof response, 'Is array:', Array.isArray(response));
+      
       // response is already an array of CourseCategory[], no need to access .data
-      setCategories(Array.isArray(response) ? response.filter(cat => cat.isActive) : []);
+      const activeCategories = Array.isArray(response) ? response.filter(cat => cat.isActive) : [];
+      console.log('✅ Active categories:', activeCategories);
+      setCategories(activeCategories);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("❌ Error fetching categories:", error);
       toast({
         title: "Error",
         description: "Failed to fetch categories. Please try again.",
