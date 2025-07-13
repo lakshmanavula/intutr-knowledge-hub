@@ -163,13 +163,19 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
             const uploadResult = await courseApi.uploadThumbnail(courseId, selectedThumbnailFile.current);
             console.log('Thumbnail upload response:', uploadResult);
             
-            // Update the form field with the new URL
+            // Update the course with the new thumbnail URL
             const thumbnailUrl = uploadResult.url;
             form.setValue('thumbnail', thumbnailUrl);
+            savedCourse.thumbnail = thumbnailUrl;
             
             await courseApi.update(courseId, { ...savedCourse, thumbnail: thumbnailUrl });
           } catch (error) {
             console.error('Failed to upload thumbnail:', error);
+            toast({
+              title: "Upload Error",
+              description: "Failed to upload thumbnail. Please try again.",
+              variant: "destructive",
+            });
           }
         }
         
@@ -179,13 +185,19 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
             const uploadResult = await courseApi.uploadKmapExcel(courseId, selectedExcelFile.current);
             console.log('Excel upload response:', uploadResult);
             
-            // Update the form field with the new URL
+            // Update the course with the new Excel file URL
             const excelUrl = uploadResult.url;
             form.setValue('xlsxFilePath', excelUrl);
+            savedCourse.xlsxFilePath = excelUrl;
             
             await courseApi.update(courseId, { ...savedCourse, xlsxFilePath: excelUrl });
           } catch (error) {
             console.error('Failed to upload Excel file:', error);
+            toast({
+              title: "Upload Error", 
+              description: "Failed to upload Excel file. Please try again.",
+              variant: "destructive",
+            });
           }
         }
       }
