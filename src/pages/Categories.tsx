@@ -77,19 +77,17 @@ export default function Categories() {
     try {
       setLoading(true);
       const response = await courseCategoryApi.getPaginated(currentPage, 10);
-      console.log('Categories API Response:', response);
       setCategories(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
-      console.log('Total Pages:', response.totalPages, 'Total Elements:', response.totalElements);
     } catch (error: any) {
-      console.error("Error fetching categories:", error);
       const errorMessage = error.message || "Failed to fetch categories. Please try again.";
       toast({
-        title: "Error", 
+        title: "Error",
         description: errorMessage,
         variant: "destructive",
       });
+      console.error("Error fetching categories:", error);
       // Set default values on error
       setCategories([]);
       setTotalPages(0);
@@ -577,10 +575,8 @@ export default function Categories() {
         </CardContent>
       </Card>
 
-      {/* Pagination - Always show for debugging */}
-      <div className="border rounded-lg p-4">
-        <p className="text-sm mb-2">Debug Info: Total Pages: {totalPages}, Current Page: {currentPage}, Total Elements: {totalElements}</p>
-        {(totalPages > 1 || true) && (
+      {/* Pagination */}
+      {totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
               Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} categories
@@ -675,9 +671,8 @@ export default function Categories() {
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteCategory} onOpenChange={() => setDeleteCategory(null)}>
