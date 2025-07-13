@@ -225,9 +225,14 @@ export const courseCategoryApi = {
   // Get all categories
   getAll: async (): Promise<CourseCategory[]> => {
     try {
+      console.log('🔗 Making API call to get categories...');
       const response = await getApiClient().get<CourseCategory[]>('/api/course-categories');
+      console.log('📡 Raw API response:', response);
+      console.log('📋 Response data:', response.data);
+      console.log('🔍 Data type:', typeof response.data, 'Is array:', Array.isArray(response.data));
       return response.data || [];
     } catch (error: any) {
+      console.error('❌ API Error:', error);
       if (error.code === 'ECONNABORTED') {
         throw new Error('Network timeout. Please check your connection and try again.');
       }
