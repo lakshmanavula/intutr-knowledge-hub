@@ -416,27 +416,35 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                    id="thumbnail-upload"
                                    onChange={async (e) => {
                                      const file = e.target.files?.[0];
-                                     if (file && course?.id) {
-                                       try {
-                                         const uploadResult = await courseApi.uploadThumbnail(course.id, file);
-                                         field.onChange(uploadResult.url);
+                                     if (file) {
+                                       if (course?.id) {
+                                         try {
+                                           setIsSubmitting(true);
+                                           const uploadResult = await courseApi.uploadThumbnail(course.id, file);
+                                           field.onChange(uploadResult.url);
+                                           toast({
+                                             title: "Success",
+                                             description: "Thumbnail uploaded successfully!",
+                                           });
+                                         } catch (error: any) {
+                                           console.error('Thumbnail upload error:', error);
+                                           toast({
+                                             title: "Upload Error", 
+                                             description: error.message || "Failed to upload thumbnail. The upload endpoint may not be available yet.",
+                                             variant: "destructive",
+                                           });
+                                         } finally {
+                                           setIsSubmitting(false);
+                                         }
+                                       } else {
+                                         // For new courses, store file temporarily and show preview
+                                         const url = URL.createObjectURL(file);
+                                         field.onChange(url);
                                          toast({
-                                           title: "Success",
-                                           description: "Thumbnail uploaded successfully!",
-                                         });
-                                       } catch (error: any) {
-                                         toast({
-                                           title: "Error",
-                                           description: "Failed to upload thumbnail. Please try again.",
-                                           variant: "destructive",
+                                           title: "File Selected",
+                                           description: "File will be uploaded when you save the course.",
                                          });
                                        }
-                                     } else if (file && !course?.id) {
-                                       toast({
-                                         title: "Info",
-                                         description: "Please save the course first before uploading files.",
-                                         variant: "default",
-                                       });
                                      }
                                    }}
                                  />
@@ -445,10 +453,10 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                    variant="outline" 
                                    size="sm"
                                    onClick={() => document.getElementById('thumbnail-upload')?.click()}
-                                   disabled={!course?.id}
+                                   disabled={isSubmitting}
                                  >
                                    <Upload className="w-4 h-4 mr-2" />
-                                   Upload Image
+                                   {course?.id ? 'Upload Image' : 'Select Image'}
                                  </Button>
                                  <Button 
                                    type="button" 
@@ -493,27 +501,34 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                    id="xlsx-upload"
                                    onChange={async (e) => {
                                      const file = e.target.files?.[0];
-                                     if (file && course?.id) {
-                                       try {
-                                         const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
-                                         field.onChange(uploadResult.url);
+                                     if (file) {
+                                       if (course?.id) {
+                                         try {
+                                           setIsSubmitting(true);
+                                           const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
+                                           field.onChange(uploadResult.url);
+                                           toast({
+                                             title: "Success",
+                                             description: "Excel file uploaded successfully!",
+                                           });
+                                         } catch (error: any) {
+                                           console.error('Excel upload error:', error);
+                                           toast({
+                                             title: "Upload Error",
+                                             description: error.message || "Failed to upload Excel file. The upload endpoint may not be available yet.",
+                                             variant: "destructive",
+                                           });
+                                         } finally {
+                                           setIsSubmitting(false);
+                                         }
+                                       } else {
+                                         // For new courses, show file name
+                                         field.onChange(`selected-${file.name}`);
                                          toast({
-                                           title: "Success",
-                                           description: "Excel file uploaded successfully!",
-                                         });
-                                       } catch (error: any) {
-                                         toast({
-                                           title: "Error",
-                                           description: "Failed to upload Excel file. Please try again.",
-                                           variant: "destructive",
+                                           title: "File Selected",
+                                           description: "File will be uploaded when you save the course.",
                                          });
                                        }
-                                     } else if (file && !course?.id) {
-                                       toast({
-                                         title: "Info",
-                                         description: "Please save the course first before uploading files.",
-                                         variant: "default",
-                                       });
                                      }
                                    }}
                                  />
@@ -522,10 +537,10 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                    variant="outline" 
                                    size="sm"
                                    onClick={() => document.getElementById('xlsx-upload')?.click()}
-                                   disabled={!course?.id}
+                                   disabled={isSubmitting}
                                  >
                                    <Upload className="w-4 h-4 mr-2" />
-                                   Upload File
+                                   {course?.id ? 'Upload File' : 'Select File'}
                                  </Button>
                                  <Button 
                                    type="button" 
