@@ -96,9 +96,15 @@ const getApiClient = () => {
     apiClient.interceptors.request.use(
       (config) => {
         // Add auth token here if available
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        try {
+          if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+              config.headers.Authorization = `Bearer ${token}`;
+            }
+          }
+        } catch (error) {
+          console.error('Error accessing localStorage for auth token:', error);
         }
         return config;
       },
@@ -173,21 +179,33 @@ export const authApi = {
 
   // Get current user
   getCurrentUser: (): AuthUser | null => {
-    const userStr = localStorage.getItem('authUser');
-    if (userStr) {
-      try {
-        return JSON.parse(userStr);
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('authUser');
+    try {
+      if (typeof window === 'undefined') return null;
+      
+      const userStr = localStorage.getItem('authUser');
+      if (userStr) {
+        try {
+          return JSON.parse(userStr);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('authUser');
+        }
       }
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
     }
     return null;
   },
 
   // Check if user is authenticated
   isAuthenticated: (): boolean => {
-    return !!localStorage.getItem('authToken');
+    try {
+      if (typeof window === 'undefined') return false;
+      return !!localStorage.getItem('authToken');
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
+      return false;
+    }
   },
 
   // Refresh token (if your API supports it)

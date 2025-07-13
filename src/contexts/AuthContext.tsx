@@ -30,18 +30,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Check if user is already authenticated on app start
-    try {
-      const currentUser = authApi.getCurrentUser();
-      if (currentUser && authApi.isAuthenticated()) {
-        setUser(currentUser);
+    const initializeAuth = async () => {
+      try {
+        // Check if we're in browser environment
+        if (typeof window === 'undefined') {
+          setIsLoading(false);
+          return;
+        }
+
+        const currentUser = authApi.getCurrentUser();
+        if (currentUser && authApi.isAuthenticated()) {
+          setUser(currentUser);
+        }
+      } catch (error) {
+        console.error('Error loading user on app start:', error);
+        // Clear any invalid auth data safely
+        try {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('authUser');
+        } catch (storageError) {
+          console.error('Error clearing auth storage:', storageError);
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading user on app start:', error);
-      // Clear any invalid auth data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authUser');
-    }
-    setIsLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (username: string, password: string, rememberMe?: boolean) => {
