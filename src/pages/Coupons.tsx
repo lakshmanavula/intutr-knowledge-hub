@@ -52,6 +52,15 @@ import {
   Calendar,
 } from "lucide-react";
 import type { Coupon } from "@/types/api";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export default function Coupons() {
   const [selectedCoupons, setSelectedCoupons] = useState<string[]>([]);
@@ -62,6 +71,8 @@ export default function Coupons() {
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [deletingCoupon, setDeletingCoupon] = useState<Coupon | null>(null);
   const [showBulkDelete, setShowBulkDelete] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 10;
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -151,9 +162,15 @@ export default function Coupons() {
     });
   }, [coupons, searchQuery, discountTypeFilter, statusFilter]);
 
+  // Get paginated coupons
+  const totalPages = Math.ceil(filteredCoupons.length / pageSize);
+  const startIndex = currentPage * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedCoupons = filteredCoupons.slice(startIndex, endIndex);
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedCoupons((filteredCoupons || []).map(c => c.id));
+      setSelectedCoupons(paginatedCoupons.map(c => c.id));
     } else {
       setSelectedCoupons([]);
     }
@@ -278,7 +295,7 @@ export default function Coupons() {
               <TableRow>
                 <TableHead className="w-12">
                   <Checkbox
-                    checked={selectedCoupons.length === (filteredCoupons || []).length && (filteredCoupons || []).length > 0}
+                    checked={selectedCoupons.length === paginatedCoupons.length && paginatedCoupons.length > 0}
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
@@ -299,14 +316,14 @@ export default function Coupons() {
                     Loading coupons...
                   </TableCell>
                 </TableRow>
-              ) : (filteredCoupons || []).length === 0 ? (
+              ) : paginatedCoupons.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-8">
                     No coupons found.
                   </TableCell>
                 </TableRow>
               ) : (
-                (filteredCoupons || []).map((coupon) => (
+                paginatedCoupons.map((coupon) => (
                   <TableRow key={coupon.id}>
                     <TableCell>
                       <Checkbox
@@ -400,6 +417,105 @@ export default function Coupons() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredCoupons.length)} of {filteredCoupons.length} coupons
+          </p>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (currentPage > 0) setCurrentPage(prev => prev - 1);
+                  }}
+                  className={currentPage === 0 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              
+              {/* First page */}
+              {currentPage > 2 && (
+                <>
+                  <PaginationItem>
+                    <PaginationLink 
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(0);
+                      }}
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+                  {currentPage > 3 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                </>
+              )}
+              
+              {/* Current page and neighbors */}
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const pageIndex = Math.max(0, Math.min(totalPages - 5, currentPage - 2)) + i;
+                if (pageIndex >= totalPages) return null;
+                
+                return (
+                  <PaginationItem key={pageIndex}>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(pageIndex);
+                      }}
+                      isActive={pageIndex === currentPage}
+                    >
+                      {pageIndex + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+              
+              {/* Last page */}
+              {currentPage < totalPages - 3 && (
+                <>
+                  {currentPage < totalPages - 4 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                  <PaginationItem>
+                    <PaginationLink 
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(totalPages - 1);
+                      }}
+                    >
+                      {totalPages}
+                    </PaginationLink>
+                  </PaginationItem>
+                </>
+              )}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages - 1) setCurrentPage(prev => prev + 1);
+                  }}
+                  className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
 
       {/* Coupon Form Dialog */}
       {showForm && (
