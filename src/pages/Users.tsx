@@ -85,6 +85,7 @@ export default function Users() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   
   // Filter states
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -97,7 +98,7 @@ export default function Users() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await userProfileApi.getPaginated(currentPage, 10);
+      const response = await userProfileApi.getPaginated(currentPage, pageSize);
       setUsers(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -116,7 +117,7 @@ export default function Users() {
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage]);
+  }, [currentPage, pageSize]);
 
   const handleSearch = async () => {
     if (!searchTerm.trim() && selectedStatus === "all" && selectedCountry === "all") {
@@ -128,7 +129,7 @@ export default function Users() {
       setLoading(true);
       const searchCriteria: any = {
         page: 0,
-        size: 10,
+        size: pageSize,
       };
 
       if (searchTerm.trim()) {
@@ -676,9 +677,28 @@ export default function Users() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground whitespace-nowrap">
-            Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} users
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground whitespace-nowrap">
+              Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} users
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Show:</span>
+              <Select value={pageSize.toString()} onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(0);
+              }}>
+                <SelectTrigger className="w-20 h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="flex-shrink-0">
             <Pagination>
             <PaginationContent>

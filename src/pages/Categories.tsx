@@ -35,6 +35,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -69,6 +76,7 @@ export default function Categories() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +84,7 @@ export default function Categories() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await courseCategoryApi.getPaginated(currentPage, 10);
+      const response = await courseCategoryApi.getPaginated(currentPage, pageSize);
       setCategories(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -99,7 +107,7 @@ export default function Categories() {
 
   useEffect(() => {
     fetchCategories();
-  }, [currentPage]);
+  }, [currentPage, pageSize]);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
@@ -112,7 +120,7 @@ export default function Categories() {
       const response = await courseCategoryApi.search({
         categoryName: searchTerm,
         page: 0,
-        size: 10,
+        size: pageSize,
       });
       setCategories(response.content);
       setTotalPages(response.totalPages);
@@ -578,9 +586,28 @@ export default function Categories() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground whitespace-nowrap">
-            Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} categories
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground whitespace-nowrap">
+              Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} categories
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Show:</span>
+              <Select value={pageSize.toString()} onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(0);
+              }}>
+                <SelectTrigger className="w-20 h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="flex-shrink-0">
             <Pagination>
               <PaginationContent>

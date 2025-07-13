@@ -72,7 +72,7 @@ export default function Coupons() {
   const [deletingCoupon, setDeletingCoupon] = useState<Coupon | null>(null);
   const [showBulkDelete, setShowBulkDelete] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -421,9 +421,28 @@ export default function Coupons() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground whitespace-nowrap">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredCoupons.length)} of {filteredCoupons.length} coupons
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground whitespace-nowrap">
+              Showing {startIndex + 1} to {Math.min(endIndex, filteredCoupons.length)} of {filteredCoupons.length} coupons
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Show:</span>
+              <Select value={pageSize.toString()} onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(0);
+              }}>
+                <SelectTrigger className="w-20 h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="flex-shrink-0">
             <Pagination>
             <PaginationContent>

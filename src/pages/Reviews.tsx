@@ -63,15 +63,15 @@ export default function Reviews() {
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [filterCourse, setFilterCourse] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [pageSize, setPageSize] = useState(10);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const size = 10;
 
   const { data: reviewsData, isLoading } = useQuery({
-    queryKey: ["reviews", page, searchQuery],
+    queryKey: ["reviews", page, searchQuery, pageSize],
     queryFn: () => searchQuery 
-      ? reviewApi.search(searchQuery, page, size)
-      : reviewApi.getAll(page, size),
+      ? reviewApi.search(searchQuery, page, pageSize)
+      : reviewApi.getAll(page, pageSize),
   });
 
   const { data: coursesData } = useQuery({
@@ -468,10 +468,29 @@ export default function Reviews() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground whitespace-nowrap">
-            Showing {page * size + 1} to {Math.min((page + 1) * size, reviewsData?.totalElements || 0)} of{" "}
-            {reviewsData?.totalElements || 0} reviews
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted-foreground whitespace-nowrap">
+              Showing {page * pageSize + 1} to {Math.min((page + 1) * pageSize, reviewsData?.totalElements || 0)} of{" "}
+              {reviewsData?.totalElements || 0} reviews
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Show:</span>
+              <Select value={pageSize.toString()} onValueChange={(value) => {
+                setPageSize(Number(value));
+                setPage(0);
+              }}>
+                <SelectTrigger className="w-20 h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="flex-shrink-0">
             <Pagination>
             <PaginationContent>
