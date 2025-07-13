@@ -297,10 +297,29 @@ export const courseApi = {
 
   // Get paginated courses
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
-    const response = await getApiClient().get<PaginatedResponse<Course>>(
-      `/lob-fount-courses/paginated?page=${page}&size=${size}`
-    );
-    return response.data;
+    const response = await getApiClient().get<{
+      status: string;
+      data: Course[];
+      metadata: {
+        page: number;
+        size: number;
+        totalElements: number;
+        totalPages: number;
+        first: boolean;
+        last: boolean;
+      };
+    }>(`/lob-fount-courses/paginated?page=${page}&size=${size}`);
+    
+    // Transform API response to match PaginatedResponse interface
+    return {
+      content: response.data.data,
+      totalElements: response.data.metadata.totalElements,
+      totalPages: response.data.metadata.totalPages,
+      size: response.data.metadata.size,
+      number: response.data.metadata.page,
+      first: response.data.metadata.first,
+      last: response.data.metadata.last,
+    };
   },
 
   // Get course by ID
