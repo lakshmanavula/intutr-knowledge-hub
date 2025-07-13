@@ -76,7 +76,7 @@ export default function Categories() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await courseCategoryApi.getPaginated(currentPage, 2); // Reduced page size for testing
+      const response = await courseCategoryApi.getPaginated(currentPage, 10);
       setCategories(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -575,18 +575,11 @@ export default function Categories() {
         </CardContent>
       </Card>
 
-      {/* Debug Info */}
-      <div className="mb-4 p-4 bg-muted rounded-lg">
-        <p className="text-sm">
-          Debug: Categories={categories.length}, TotalPages={totalPages}, TotalElements={totalElements}, CurrentPage={currentPage}
-        </p>
-      </div>
-
-      {/* Pagination - Show even with 1 page for demo */}
-      {(totalPages >= 1 && totalElements > 0) && (
+      {/* Pagination */}
+      {totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            Showing {currentPage * 2 + 1} to {Math.min((currentPage + 1) * 2, totalElements)} of {totalElements} categories
+            Showing {currentPage * 10 + 1} to {Math.min((currentPage + 1) * 10, totalElements)} of {totalElements} categories
           </p>
             <Pagination>
               <PaginationContent>
