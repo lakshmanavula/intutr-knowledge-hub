@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -87,6 +87,8 @@ const STATUS_OPTIONS = [
 export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const selectedThumbnailFile = useRef<File | null>(null);
+  const selectedExcelFile = useRef<File | null>(null);
   const isEditing = !!course;
 
   console.log('🎯 CourseForm received categories:', categories);
@@ -144,19 +146,42 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
         tags: data.tags || "",
       };
 
+      let savedCourse;
       if (isEditing) {
-        await courseApi.update(course.id, requestData);
-        toast({
-          title: "Success",
-          description: "Course updated successfully!",
-        });
+        savedCourse = await courseApi.update(course.id, requestData);
       } else {
-        await courseApi.create(requestData);
-        toast({
-          title: "Success",
-          description: "Course created successfully!",
-        });
+        savedCourse = await courseApi.create(requestData);
       }
+
+      // Upload pending files for new courses
+      if (!isEditing && savedCourse) {
+        const courseId = savedCourse.id;
+        
+        // Upload thumbnail if selected
+        if (selectedThumbnailFile.current) {
+          try {
+            const uploadResult = await courseApi.uploadThumbnail(courseId, selectedThumbnailFile.current);
+            await courseApi.update(courseId, { ...savedCourse, thumbnail: uploadResult.url });
+          } catch (error) {
+            console.error('Failed to upload thumbnail:', error);
+          }
+        }
+        
+        // Upload Excel file if selected
+        if (selectedExcelFile.current) {
+          try {
+            const uploadResult = await courseApi.uploadKmapExcel(courseId, selectedExcelFile.current);
+            await courseApi.update(courseId, { ...savedCourse, xlsxFilePath: uploadResult.url });
+          } catch (error) {
+            console.error('Failed to upload Excel file:', error);
+          }
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: isEditing ? "Course updated successfully!" : "Course created successfully!",
+      });
 
       onSuccess();
     } catch (error: any) {
@@ -437,9 +462,9 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                            setIsSubmitting(false);
                                          }
                                        } else {
-                                         // For new courses, store file temporarily and show preview
-                                         const url = URL.createObjectURL(file);
-                                         field.onChange(url);
+                                         // For new courses, store file reference and show file name
+                                         selectedThumbnailFile.current = file;
+                                         field.onChange(`pending-upload-${file.name}`);
                                          toast({
                                            title: "File Selected",
                                            description: "File will be uploaded when you save the course.",
@@ -522,8 +547,9 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                            setIsSubmitting(false);
                                          }
                                        } else {
-                                         // For new courses, show file name
-                                         field.onChange(`selected-${file.name}`);
+                                         // For new courses, store file reference
+                                         selectedExcelFile.current = file;
+                                         field.onChange(`pending-upload-${file.name}`);
                                          toast({
                                            title: "File Selected",
                                            description: "File will be uploaded when you save the course.",
