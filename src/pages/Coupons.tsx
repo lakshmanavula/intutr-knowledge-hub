@@ -419,7 +419,7 @@ export default function Coupons() {
       </Card>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {filteredCoupons.length > 0 && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <p className="text-sm text-muted-foreground whitespace-nowrap">
