@@ -206,8 +206,15 @@ export const authApi = {
 export const courseCategoryApi = {
   // Get all categories
   getAll: async (): Promise<CourseCategory[]> => {
-    const response = await getApiClient().get<CourseCategory[]>('/api/course-categories');
-    return response.data;
+    try {
+      const response = await getApiClient().get<CourseCategory[]>('/api/course-categories');
+      return response.data || [];
+    } catch (error: any) {
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('Network timeout. Please check your connection and try again.');
+      }
+      throw new Error(error.message || 'Failed to fetch categories');
+    }
   },
 
   // Get paginated categories
@@ -297,29 +304,42 @@ export const courseApi = {
 
   // Get paginated courses
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
-    const response = await getApiClient().get<{
-      status: string;
-      data: Course[];
-      metadata: {
-        page: number;
-        size: number;
-        totalElements: number;
-        totalPages: number;
-        first: boolean;
-        last: boolean;
+    try {
+      const response = await getApiClient().get<{
+        status: string;
+        data: Course[];
+        metadata: {
+          page: number;
+          size: number;
+          totalElements: number;
+          totalPages: number;
+          first: boolean;
+          last: boolean;
+        };
+      }>(`/api/lob-fount-courses/paginated?page=${page}&size=${size}`);
+      
+      // Check if response and required data exists
+      if (!response.data || !response.data.metadata) {
+        throw new Error('Invalid response format from server');
+      }
+      
+      // Transform API response to match PaginatedResponse interface
+      return {
+        content: response.data.data || [],
+        totalElements: response.data.metadata.totalElements || 0,
+        totalPages: response.data.metadata.totalPages || 0,
+        size: response.data.metadata.size || size,
+        number: response.data.metadata.page || page,
+        first: response.data.metadata.first ?? true,
+        last: response.data.metadata.last ?? true,
       };
-    }>(`/api/lob-fount-courses/paginated?page=${page}&size=${size}`);
-    
-    // Transform API response to match PaginatedResponse interface
-    return {
-      content: response.data.data,
-      totalElements: response.data.metadata.totalElements,
-      totalPages: response.data.metadata.totalPages,
-      size: response.data.metadata.size,
-      number: response.data.metadata.page,
-      first: response.data.metadata.first,
-      last: response.data.metadata.last,
-    };
+    } catch (error: any) {
+      // Handle network timeouts and other errors gracefully
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('Network timeout. Please check your connection and try again.');
+      }
+      throw new Error(error.message || 'Failed to fetch courses');
+    }
   },
 
   // Get course by ID

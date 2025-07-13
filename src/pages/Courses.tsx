@@ -102,9 +102,9 @@ export default function Courses() {
     try {
       setLoading(true);
       const response = await courseApi.getPaginated(currentPage, 10);
-      setCourses(response.content);
-      setTotalPages(response.totalPages);
-      setTotalElements(response.totalElements);
+      setCourses(response.content || []);
+      setTotalPages(response.totalPages || 0);
+      setTotalElements(response.totalElements || 0);
     } catch (error: any) {
       const errorMessage = error.message || "Failed to fetch courses. Please try again.";
       toast({
@@ -113,6 +113,10 @@ export default function Courses() {
         variant: "destructive",
       });
       console.error("Error fetching courses:", error);
+      // Set default values on error
+      setCourses([]);
+      setTotalPages(0);
+      setTotalElements(0);
     } finally {
       setLoading(false);
     }
