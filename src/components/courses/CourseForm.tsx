@@ -408,16 +408,43 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                 placeholder="https://example.com/thumbnail.jpg"
                                 {...field}
                               />
-                              <div className="flex items-center gap-2">
-                                <Button type="button" variant="outline" size="sm">
-                                  <Upload className="w-4 h-4 mr-2" />
-                                  Upload Image
-                                </Button>
-                                <Button type="button" variant="outline" size="sm">
-                                  <Link className="w-4 h-4 mr-2" />
-                                  Use URL
-                                </Button>
-                              </div>
+                               <div className="flex items-center gap-2">
+                                 <input
+                                   type="file"
+                                   accept="image/*"
+                                   className="hidden"
+                                   id="thumbnail-upload"
+                                   onChange={(e) => {
+                                     const file = e.target.files?.[0];
+                                     if (file) {
+                                       // For now, just use the file name as a placeholder
+                                       // In a real app, you'd upload to a server and get a URL
+                                       field.onChange(`uploaded-${file.name}`);
+                                     }
+                                   }}
+                                 />
+                                 <Button 
+                                   type="button" 
+                                   variant="outline" 
+                                   size="sm"
+                                   onClick={() => document.getElementById('thumbnail-upload')?.click()}
+                                 >
+                                   <Upload className="w-4 h-4 mr-2" />
+                                   Upload Image
+                                 </Button>
+                                 <Button 
+                                   type="button" 
+                                   variant="outline" 
+                                   size="sm"
+                                   onClick={() => {
+                                     const url = prompt('Enter image URL:');
+                                     if (url) field.onChange(url);
+                                   }}
+                                 >
+                                   <Link className="w-4 h-4 mr-2" />
+                                   Use URL
+                                 </Button>
+                               </div>
                             </div>
                           </FormControl>
                           <FormDescription>
@@ -440,16 +467,43 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                 placeholder="https://example.com/course-materials.xlsx"
                                 {...field}
                               />
-                              <div className="flex items-center gap-2">
-                                <Button type="button" variant="outline" size="sm">
-                                  <Upload className="w-4 h-4 mr-2" />
-                                  Upload File
-                                </Button>
-                                <Button type="button" variant="outline" size="sm">
-                                  <Link className="w-4 h-4 mr-2" />
-                                  Use URL
-                                </Button>
-                              </div>
+                               <div className="flex items-center gap-2">
+                                 <input
+                                   type="file"
+                                   accept=".xlsx,.xls,.csv"
+                                   className="hidden"
+                                   id="xlsx-upload"
+                                   onChange={(e) => {
+                                     const file = e.target.files?.[0];
+                                     if (file) {
+                                       // For now, just use the file name as a placeholder
+                                       // In a real app, you'd upload to a server and get a URL
+                                       field.onChange(`uploaded-${file.name}`);
+                                     }
+                                   }}
+                                 />
+                                 <Button 
+                                   type="button" 
+                                   variant="outline" 
+                                   size="sm"
+                                   onClick={() => document.getElementById('xlsx-upload')?.click()}
+                                 >
+                                   <Upload className="w-4 h-4 mr-2" />
+                                   Upload File
+                                 </Button>
+                                 <Button 
+                                   type="button" 
+                                   variant="outline" 
+                                   size="sm"
+                                   onClick={() => {
+                                     const url = prompt('Enter file URL:');
+                                     if (url) field.onChange(url);
+                                   }}
+                                 >
+                                   <Link className="w-4 h-4 mr-2" />
+                                   Use URL
+                                 </Button>
+                               </div>
                             </div>
                           </FormControl>
                           <FormDescription>
