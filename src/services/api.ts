@@ -331,15 +331,9 @@ export const courseApi = {
   // Get all courses
   getAll: async (): Promise<Course[]> => {
     try {
-      const response = await getApiClient().get<{
-        status: string;
-        statusCode: number;
-        message: string;
-        data: Course[];
-        timestamp: string;
-      }>('/api/lob-fount-courses');
-      
-      return response.data.data || [];
+      const response = await getApiClient().get<Course[]>('/api/lob-fount-courses');
+      // Response data is already processed by interceptor
+      return response.data || [];
     } catch (error: any) {
       if (error.code === 'ECONNABORTED') {
         throw new Error('Network timeout. Please check your connection and try again.');
@@ -351,15 +345,10 @@ export const courseApi = {
   // Get paginated courses (simulating pagination from the array)
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
     try {
-      const response = await getApiClient().get<{
-        status: string;
-        statusCode: number;
-        message: string;
-        data: Course[];
-        timestamp: string;
-      }>('/api/lob-fount-courses');
+      const response = await getApiClient().get<Course[]>('/api/lob-fount-courses');
       
-      const allCourses = response.data.data || [];
+      // Response data is already processed by interceptor
+      const allCourses = response.data || [];
       const startIndex = page * size;
       const endIndex = startIndex + size;
       const paginatedCourses = allCourses.slice(startIndex, endIndex);
