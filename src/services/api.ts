@@ -308,7 +308,7 @@ export const courseApi = {
         first: boolean;
         last: boolean;
       };
-    }>(`/lob-fount-courses/paginated?page=${page}&size=${size}`);
+    }>(`/api/lob-fount-courses/paginated?page=${page}&size=${size}`);
     
     // Transform API response to match PaginatedResponse interface
     return {
