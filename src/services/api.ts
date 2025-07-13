@@ -465,7 +465,7 @@ export const courseApi = {
 
   // Update course status
   updateStatus: async (id: string, status: Course['status']): Promise<Course> => {
-    const response = await getApiClient().patch<Course>(`/api/lob-fount-courses/${id}/status`, { status });
+    const response = await getApiClient().put<Course>(`/api/lob-fount-courses/${id}/status/${status}`);
     return response.data;
   },
 
