@@ -471,26 +471,17 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                            const uploadResult = await courseApi.uploadThumbnail(course.id, file);
                                            console.log('Thumbnail upload response:', uploadResult);
                                            
-                                           // Handle different response structures
-                                           const thumbnailUrl = uploadResult.url;
-                                           field.onChange(thumbnailUrl);
-                                           toast({
-                                             title: "Success",
-                                             description: "Thumbnail uploaded successfully!",
-                                           });
-                                           
-                                           // Store the uploaded URL before refresh
-                                           const uploadedUrl = uploadResult.url;
-                                           
-                                           // Refresh the data without closing the form
-                                           if (onRefresh) {
-                                             onRefresh();
-                                           }
-                                           
-                                           // After refresh, ensure the uploaded URL is still set in the form
-                                           setTimeout(() => {
-                                             field.onChange(uploadedUrl);
-                                           }, 100);
+                                            // Handle different response structures
+                                            const thumbnailUrl = uploadResult.url;
+                                            field.onChange(thumbnailUrl);
+                                            
+                                            // Store file name for display
+                                            selectedThumbnailFile.current = file;
+                                            
+                                            toast({
+                                              title: "Success", 
+                                              description: `Thumbnail "${file.name}" uploaded successfully!`,
+                                            });
                                         } catch (error: any) {
                                           console.error('Thumbnail upload error:', error);
                                           console.error('Error details:', error.response?.data);
@@ -537,17 +528,22 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                         File will be uploaded when you save the course
                                       </p>
                                     </div>
-                                  ) : field.value.startsWith('http') ? (
-                                    <div className="space-y-2">
-                                      <img src={field.value} alt="Thumbnail preview" className="w-20 h-20 object-cover rounded border" />
-                                      <p className="text-xs text-green-600">✅ Uploaded successfully</p>
-                                    </div>
-                                  ) : field.value ? (
-                                    <div className="p-2 bg-green-50 rounded border">
-                                      <p className="text-sm text-green-700">
-                                        📁 Current file: {field.value}
-                                      </p>
-                                    </div>
+                                   ) : field.value.startsWith('http') ? (
+                                     <div className="space-y-2">
+                                       <img src={field.value} alt="Thumbnail preview" className="w-20 h-20 object-cover rounded border" />
+                                       <div className="p-2 bg-green-50 rounded border">
+                                         <p className="text-xs text-green-600">✅ Uploaded successfully</p>
+                                         <p className="text-sm text-green-700 font-medium">
+                                           📁 {selectedThumbnailFile.current?.name || field.value.split('/').pop() || 'Uploaded file'}
+                                         </p>
+                                       </div>
+                                     </div>
+                                   ) : field.value ? (
+                                     <div className="p-2 bg-green-50 rounded border">
+                                       <p className="text-sm text-green-700">
+                                         📁 Current file: {selectedThumbnailFile.current?.name || field.value.split('/').pop() || field.value}
+                                       </p>
+                                     </div>
                                   ) : null}
                                 </div>
                               )}
@@ -585,25 +581,16 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                           console.log('Starting Excel upload for existing course...');
                                           setIsSubmitting(true);
                                           const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
-                                          console.log('Excel upload response:', uploadResult);
-                                          field.onChange(uploadResult.url);
+                                           const uploadedUrl = uploadResult.url;
+                                           field.onChange(uploadedUrl);
+                                           
+                                           // Store file name for display
+                                           selectedExcelFile.current = file;
+                                           
                                            toast({
                                              title: "Success",
-                                             description: "Excel file uploaded successfully!",
+                                             description: `Excel file "${file.name}" uploaded successfully!`,
                                            });
-                                           
-                                           // Store the uploaded URL before refresh
-                                           const uploadedUrl = uploadResult.url;
-                                           
-                                           // Refresh the data without closing the form
-                                           if (onRefresh) {
-                                             onRefresh();
-                                           }
-                                           
-                                           // After refresh, ensure the uploaded URL is still set in the form
-                                           setTimeout(() => {
-                                             field.onChange(uploadedUrl);
-                                           }, 100);
                                         } catch (error: any) {
                                           console.error('Excel upload error:', error);
                                           console.error('Excel error details:', error.response?.data);
@@ -650,18 +637,19 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                         File will be uploaded when you save the course
                                       </p>
                                     </div>
-                                  ) : field.value.startsWith('http') ? (
-                                    <div className="p-2 bg-green-50 rounded border">
-                                      <p className="text-sm text-green-700">
-                                        📄 Uploaded: {field.value.split('/').pop()}
-                                      </p>
-                                    </div>
-                                  ) : field.value ? (
-                                    <div className="p-2 bg-green-50 rounded border">
-                                      <p className="text-sm text-green-700">
-                                        📄 Current file: {field.value.split('/').pop()}
-                                      </p>
-                                    </div>
+                                   ) : field.value.startsWith('http') ? (
+                                     <div className="p-2 bg-green-50 rounded border">
+                                       <p className="text-xs text-green-600">✅ Uploaded successfully</p>
+                                       <p className="text-sm text-green-700 font-medium">
+                                         📄 {selectedExcelFile.current?.name || field.value.split('/').pop() || 'Uploaded file'}
+                                       </p>
+                                     </div>
+                                   ) : field.value ? (
+                                     <div className="p-2 bg-green-50 rounded border">
+                                       <p className="text-sm text-green-700">
+                                         📄 Current file: {selectedExcelFile.current?.name || field.value.split('/').pop() || field.value}
+                                       </p>
+                                     </div>
                                   ) : null}
                                 </div>
                               )}
