@@ -114,15 +114,25 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
   useEffect(() => {
     if (course) {
       console.log('🔄 Resetting form with course data:', course);
+      
+      // Get current form values before reset
+      const currentValues = form.getValues();
+      
       form.reset({
         name: course.name || "",
         courseLabel: course.courseLabel || "",
         description: course.description || "",
         fees: course.fees || 0,
         duration: course.duration || 30,
-        thumbnail: course.thumbnail || "",
+        // Preserve uploaded thumbnail if it exists in form, otherwise use course data
+        thumbnail: currentValues.thumbnail && currentValues.thumbnail.startsWith('http') 
+          ? currentValues.thumbnail 
+          : course.thumbnail || "",
         status: course.status || "DRAFT",
-        xlsxFilePath: course.xlsxFilePath || "",
+        // Preserve uploaded Excel file if it exists in form, otherwise use course data
+        xlsxFilePath: currentValues.xlsxFilePath && currentValues.xlsxFilePath.startsWith('http')
+          ? currentValues.xlsxFilePath
+          : course.xlsxFilePath || "",
         categoryId: course.categoryId || "",
         tags: course.tags || "",
       });
@@ -468,20 +478,24 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                          try {
                                            console.log('Starting thumbnail upload for existing course...');
                                            setIsSubmitting(true);
-                                           const uploadResult = await courseApi.uploadThumbnail(course.id, file);
-                                           console.log('Thumbnail upload response:', uploadResult);
-                                           
-                                            // Handle different response structures
-                                            const thumbnailUrl = uploadResult.url;
-                                            field.onChange(thumbnailUrl);
+                                            const uploadResult = await courseApi.uploadThumbnail(course.id, file);
+                                            console.log('Thumbnail upload response:', uploadResult);
+                                            console.log('Upload result type:', typeof uploadResult);
+                                            console.log('Upload result keys:', Object.keys(uploadResult));
                                             
-                                            // Store file name for display
-                                            selectedThumbnailFile.current = file;
-                                            
-                                            toast({
-                                              title: "Success", 
-                                              description: `Thumbnail "${file.name}" uploaded successfully!`,
-                                            });
+                                             // Handle different response structures
+                                             const thumbnailUrl = uploadResult.url;
+                                             console.log('Extracted thumbnail URL:', thumbnailUrl);
+                                             field.onChange(thumbnailUrl);
+                                             
+                                             // Store file name for display
+                                             selectedThumbnailFile.current = file;
+                                             console.log('Stored file reference:', file.name);
+                                             
+                                             toast({
+                                               title: "Success", 
+                                               description: `Thumbnail "${file.name}" uploaded successfully!`,
+                                             });
                                         } catch (error: any) {
                                           console.error('Thumbnail upload error:', error);
                                           console.error('Error details:', error.response?.data);
