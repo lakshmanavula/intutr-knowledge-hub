@@ -478,11 +478,19 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                              title: "Success",
                                              description: "Thumbnail uploaded successfully!",
                                            });
-                                          
-                                          // Refresh the data without closing the form
-                                          if (onRefresh) {
-                                            onRefresh();
-                                          }
+                                           
+                                           // Store the uploaded URL before refresh
+                                           const uploadedUrl = uploadResult.url;
+                                           
+                                           // Refresh the data without closing the form
+                                           if (onRefresh) {
+                                             onRefresh();
+                                           }
+                                           
+                                           // After refresh, ensure the uploaded URL is still set in the form
+                                           setTimeout(() => {
+                                             field.onChange(uploadedUrl);
+                                           }, 100);
                                         } catch (error: any) {
                                           console.error('Thumbnail upload error:', error);
                                           console.error('Error details:', error.response?.data);
@@ -583,11 +591,19 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                              title: "Success",
                                              description: "Excel file uploaded successfully!",
                                            });
-                                          
-                                          // Refresh the data without closing the form
-                                          if (onRefresh) {
-                                            onRefresh();
-                                          }
+                                           
+                                           // Store the uploaded URL before refresh
+                                           const uploadedUrl = uploadResult.url;
+                                           
+                                           // Refresh the data without closing the form
+                                           if (onRefresh) {
+                                             onRefresh();
+                                           }
+                                           
+                                           // After refresh, ensure the uploaded URL is still set in the form
+                                           setTimeout(() => {
+                                             field.onChange(uploadedUrl);
+                                           }, 100);
                                         } catch (error: any) {
                                           console.error('Excel upload error:', error);
                                           console.error('Excel error details:', error.response?.data);
