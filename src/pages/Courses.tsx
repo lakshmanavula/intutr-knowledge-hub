@@ -434,6 +434,7 @@ export default function Courses() {
           fetchCourses();
         }}
         onCancel={() => setEditingCourse(null)}
+        onRefresh={fetchCourses}
       />
     );
   }

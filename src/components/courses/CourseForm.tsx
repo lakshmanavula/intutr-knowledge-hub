@@ -74,6 +74,7 @@ interface CourseFormProps {
   categories: CourseCategory[];
   onSuccess: () => void;
   onCancel: () => void;
+  onRefresh?: () => void;
 }
 
 const STATUS_OPTIONS = [
@@ -83,7 +84,7 @@ const STATUS_OPTIONS = [
   { value: "ARCHIVED", label: "Archived", description: "Course is no longer active" },
 ];
 
-export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFormProps) {
+export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh }: CourseFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const selectedThumbnailFile = useRef<File | null>(null);
@@ -473,10 +474,15 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                            // Handle different response structures
                                            const thumbnailUrl = uploadResult.url;
                                            field.onChange(thumbnailUrl);
-                                          toast({
-                                            title: "Success",
-                                            description: "Thumbnail uploaded successfully!",
-                                          });
+                                           toast({
+                                             title: "Success",
+                                             description: "Thumbnail uploaded successfully!",
+                                           });
+                                          
+                                          // Refresh the data without closing the form
+                                          if (onRefresh) {
+                                            onRefresh();
+                                          }
                                         } catch (error: any) {
                                           console.error('Thumbnail upload error:', error);
                                           console.error('Error details:', error.response?.data);
@@ -573,10 +579,15 @@ export function CourseForm({ course, categories, onSuccess, onCancel }: CourseFo
                                           const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
                                           console.log('Excel upload response:', uploadResult);
                                           field.onChange(uploadResult.url);
-                                          toast({
-                                            title: "Success",
-                                            description: "Excel file uploaded successfully!",
-                                          });
+                                           toast({
+                                             title: "Success",
+                                             description: "Excel file uploaded successfully!",
+                                           });
+                                          
+                                          // Refresh the data without closing the form
+                                          if (onRefresh) {
+                                            onRefresh();
+                                          }
                                         } catch (error: any) {
                                           console.error('Excel upload error:', error);
                                           console.error('Excel error details:', error.response?.data);
