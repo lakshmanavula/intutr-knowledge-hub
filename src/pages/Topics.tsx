@@ -126,7 +126,9 @@ export default function Topics() {
       
       // Fetch KMap topics
       try {
+        console.log('Fetching KMap topics for courseId:', courseId);
         const kmapResponse = await courseApi.getKmapTopics(courseId);
+        console.log('KMap topics response:', kmapResponse);
         setKmapTopics(Array.isArray(kmapResponse) ? kmapResponse : []);
       } catch (kmapError) {
         console.error("Error fetching KMap topics:", kmapError);
