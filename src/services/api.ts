@@ -256,67 +256,66 @@ export const courseCategoryApi = {
     try {
       console.log('🔍 Fetching paginated categories:', { page, size });
       
-      // Use a different approach - get the raw response before interceptor processes it
       const apiClient = getApiClient();
-      const response = await apiClient.get(`/api/course-categories/paged?page=${page}&size=${size}`, {
-        transformResponse: [(data) => {
-          // Parse the JSON but don't let the interceptor modify it yet
-          return JSON.parse(data);
-        }]
-      });
+      const response = await apiClient.get(`/api/course-categories/paged?page=${page}&size=${size}`);
       
       console.log('📡 Categories pagination raw response:', response.data);
       
-      // Now manually handle the response structure
+      // The API is returning a direct array, which suggests it's not properly implementing pagination
+      // Let's try to get the total count from a separate endpoint or handle this properly
       const rawData = response.data;
       
-      // Handle different response formats
-      let categoryData = [];
-      let metadata = null;
-      
-      if (rawData.status === 'SUCCESS' || rawData.success === true) {
-        categoryData = rawData.data || [];
-        metadata = rawData.metadata || {};
-      } else if (Array.isArray(rawData)) {
-        // Direct array response
-        categoryData = rawData;
-        metadata = {
-          totalElements: rawData.length,
-          totalPages: Math.ceil(rawData.length / size),
+      if (Array.isArray(rawData)) {
+        // If the API returns a direct array, it's not properly paginated
+        // In this case, we need to get all data and implement client-side pagination
+        // OR the API might be returning only the current page but without metadata
+        
+        // Let's try to get the total count from all categories
+        const allCategoriesResponse = await apiClient.get('/api/course-categories');
+        const allCategories = allCategoriesResponse.data || [];
+        const totalElements = allCategories.length;
+        const totalPages = Math.ceil(totalElements / size);
+        
+        console.log('📊 Total categories from all endpoint:', totalElements);
+        
+        const result = {
+          content: rawData,
+          totalElements: totalElements,
+          totalPages: totalPages,
           size: size,
-          page: page,
+          number: page,
           first: page === 0,
-          last: (page + 1) * size >= rawData.length
+          last: page >= totalPages - 1,
         };
-      } else if (rawData.data) {
-        // Has data property
-        categoryData = rawData.data;
-        metadata = rawData.metadata || {};
+        
+        console.log('✅ Categories pagination result:', result);
+        return result;
       } else {
-        // Fallback
-        categoryData = [];
-        metadata = {
-          totalElements: 0,
-          totalPages: 0,
-          size: size,
-          page: page,
-          first: true,
-          last: true
+        // If it's an object, handle as before
+        let categoryData = [];
+        let metadata: any = {};
+        
+        if (rawData.status === 'SUCCESS' || rawData.success === true) {
+          categoryData = rawData.data || [];
+          metadata = rawData.metadata || {};
+        } else if (rawData.data) {
+          categoryData = rawData.data;
+          metadata = rawData.metadata || {};
+        }
+        
+        const result = {
+          content: categoryData,
+          totalElements: metadata.totalElements || categoryData.length,
+          totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || categoryData.length) / size),
+          size: metadata.size || size,
+          number: metadata.page || page,
+          first: metadata.first !== undefined ? metadata.first : page === 0,
+          last: metadata.last !== undefined ? metadata.last : false,
         };
+        
+        console.log('✅ Categories pagination result:', result);
+        return result;
       }
-      
-      const result = {
-        content: categoryData,
-        totalElements: metadata.totalElements || 0,
-        totalPages: metadata.totalPages || 0,
-        size: metadata.size || size,
-        number: metadata.page || page,
-        first: metadata.first !== undefined ? metadata.first : page === 0,
-        last: metadata.last !== undefined ? metadata.last : false,
-      };
-      
-      console.log('✅ Categories pagination result:', result);
-      return result;
     } catch (error: any) {
       console.error('❌ Categories pagination API Error:', error);
       throw new Error(error.message || 'Failed to fetch paginated categories');
