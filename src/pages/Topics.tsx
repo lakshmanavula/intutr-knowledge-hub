@@ -164,41 +164,6 @@ export default function Topics() {
     fetchCourseAndTopics();
   }, [courseId]);
 
-  const handleDelete = async (topic: CourseTopic) => {
-    try {
-      await courseTopicApi.delete(topic.id);
-      toast({
-        title: "Success",
-        description: `Topic "${topic.topicName}" deleted successfully.`,
-      });
-      fetchCourseAndTopics();
-      setDeleteTopic(null);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete topic. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleToggleActive = async (topic: CourseTopic) => {
-    try {
-      await courseTopicApi.toggleActive(topic.id);
-      toast({
-        title: "Success",
-        description: `Topic "${topic.topicName}" ${topic.isActive ? 'deactivated' : 'activated'} successfully.`,
-      });
-      fetchCourseAndTopics();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update topic status. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleDownloadKmapData = async () => {
     if (!courseId || !course) return;
     
@@ -234,23 +199,11 @@ export default function Topics() {
     }
   };
 
-  const filteredTopics = (Array.isArray(topics) ? topics : []).filter(topic =>
-    topic.topicName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    topic.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const filteredKmapTopics = (Array.isArray(kmapTopics) ? kmapTopics : []).filter(topic =>
     topic.topicTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (topic.description && topic.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (topic.keywords && topic.keywords.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
-  const formatDuration = (minutes: number) => {
-    if (minutes < 60) return `${minutes}m`;
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-  };
 
   const getTotalContentCount = (metaData: KMapTopic['metaData']) => {
     return Object.values(metaData).reduce((sum, count) => sum + count, 0);
@@ -259,42 +212,6 @@ export default function Topics() {
   if (!courseId) {
     navigate('/courses');
     return null;
-  }
-
-  if (showCreateForm) {
-    return (
-      <CourseTopicForm
-        courseId={courseId}
-        onSuccess={() => {
-          setShowCreateForm(false);
-          fetchCourseAndTopics();
-        }}
-        onCancel={() => setShowCreateForm(false)}
-      />
-    );
-  }
-
-  if (editingTopic) {
-    return (
-      <CourseTopicForm
-        topic={editingTopic}
-        courseId={courseId}
-        onSuccess={() => {
-          setEditingTopic(null);
-          fetchCourseAndTopics();
-        }}
-        onCancel={() => setEditingTopic(null)}
-      />
-    );
-  }
-
-  if (managingLobDataTopic) {
-    return (
-      <LobDataManager
-        topic={managingLobDataTopic}
-        onBack={() => setManagingLobDataTopic(null)}
-      />
-    );
   }
 
   return (
@@ -306,31 +223,19 @@ export default function Topics() {
           Back to Courses
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-foreground">Course Topics</h1>
+          <h1 className="text-3xl font-bold text-foreground">KMap Topics</h1>
           <p className="text-muted-foreground">
-            Manage topics and content for "{course?.name || 'Loading...'}"
+            View and download KMap topics for "{course?.name || 'Loading...'}"
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'course-topics' | 'kmap-topics')}>
-            <TabsList>
-              <TabsTrigger value="course-topics">Course Topics</TabsTrigger>
-              <TabsTrigger value="kmap-topics">KMap Topics</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <Button
-            variant="outline"
-            onClick={handleDownloadKmapData}
-            disabled={downloading || !course}
-          >
-            <Download className="w-4 h-4 mr-2" />
-            {downloading ? "Downloading..." : "Download KMap Data"}
-          </Button>
-          <Button onClick={() => setShowCreateForm(true)} className="bg-primary hover:bg-primary/90">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Topic
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={handleDownloadKmapData}
+          disabled={downloading || !course}
+        >
+          <Download className="w-4 h-4 mr-2" />
+          {downloading ? "Downloading..." : "Download KMap Data"}
+        </Button>
       </div>
 
       {/* Course Info Card */}
@@ -354,7 +259,7 @@ export default function Topics() {
                     {course.status}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {Array.isArray(topics) ? topics.length : 0} topics • {Object.values(lobDataCounts || {}).reduce((a, b) => a + b, 0)} content items
+                    {filteredKmapTopics.length} KMap topics
                   </span>
                 </div>
               </div>
@@ -369,7 +274,7 @@ export default function Topics() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search topics by name or description..."
+              placeholder="Search KMap topics by title, description, or keywords..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -378,227 +283,86 @@ export default function Topics() {
         </CardContent>
       </Card>
 
-      {/* Topics Tables */}
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'course-topics' | 'kmap-topics')}>
-        <TabsContent value="course-topics">
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Topics ({filteredTopics.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">Order</TableHead>
-                      <TableHead>Topic</TableHead>
-                      <TableHead>Duration</TableHead>
-                      <TableHead>Content Items</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Created By</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTopics.map((topic) => (
-                      <TableRow key={topic.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <GripVertical className="w-4 h-4 text-muted-foreground cursor-move" />
-                            <span className="text-sm font-medium">{topic.orderIndex}</span>
+      {/* KMap Topics Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>KMap Topics ({filteredKmapTopics.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Track #</TableHead>
+                  <TableHead>Topic</TableHead>
+                  <TableHead>Level</TableHead>
+                  <TableHead>Sequence</TableHead>
+                  <TableHead>Content Count</TableHead>
+                  <TableHead>Created By</TableHead>
+                  <TableHead>Created Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredKmapTopics.map((topic) => (
+                  <TableRow key={topic.id}>
+                    <TableCell>
+                      <Badge variant="outline">{topic.trackNum}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{topic.topicTitle}</div>
+                        {topic.description && (
+                          <div className="text-sm text-muted-foreground">
+                            {topic.description}
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{topic.topicName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {topic.description}
-                            </div>
+                        )}
+                        {topic.keywords && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Keywords: {topic.keywords}
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <Clock className="w-3 h-3 mr-1" />
-                            {formatDuration(topic.duration)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <List className="w-3 h-3" />
-                            <span>{lobDataCounts[topic.id] || 0}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={topic.isActive ? "default" : "secondary"}>
-                            {topic.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{topic.createdByName}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => setEditingTopic(topic)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit Topic
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setManagingLobDataTopic(topic)}>
-                                <List className="mr-2 h-4 w-4" />
-                                Manage Content
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleToggleActive(topic)}>
-                                {topic.isActive ? (
-                                  <EyeOff className="mr-2 h-4 w-4" />
-                                ) : (
-                                  <Eye className="mr-2 h-4 w-4" />
-                                )}
-                                {topic.isActive ? "Deactivate" : "Activate"}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() => setDeleteTopic(topic)}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">Level {topic.topicLevel}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>Topic: {topic.topicSeqNum}</div>
+                        <div className="text-muted-foreground">Quiz: {topic.quizSeqNum}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div className="font-medium">{getTotalContentCount(topic.metaData)} total</div>
+                        <div className="text-muted-foreground">
+                          {topic.metaData.mcqCount} MCQ • {topic.metaData.videoCount} Video • {topic.metaData.textCount} Text
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{topic.createdByName}</TableCell>
+                    <TableCell>
+                      {new Date(topic.createdDate).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
 
-              {!loading && filteredTopics.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">
-                    {searchTerm ? "No topics found matching your search." : "No topics created yet."}
-                  </p>
-                  <Button onClick={() => setShowCreateForm(true)} className="mt-4">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add First Topic
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="kmap-topics">
-          <Card>
-            <CardHeader>
-              <CardTitle>KMap Topics ({filteredKmapTopics.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Track #</TableHead>
-                      <TableHead>Topic</TableHead>
-                      <TableHead>Level</TableHead>
-                      <TableHead>Sequence</TableHead>
-                      <TableHead>Content Count</TableHead>
-                      <TableHead>Created By</TableHead>
-                      <TableHead>Created Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredKmapTopics.map((topic) => (
-                      <TableRow key={topic.id}>
-                        <TableCell>
-                          <Badge variant="outline">{topic.trackNum}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{topic.topicTitle}</div>
-                            {topic.description && (
-                              <div className="text-sm text-muted-foreground">
-                                {topic.description}
-                              </div>
-                            )}
-                            {topic.keywords && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                Keywords: {topic.keywords}
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">Level {topic.topicLevel}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div>Topic: {topic.topicSeqNum}</div>
-                            <div className="text-muted-foreground">Quiz: {topic.quizSeqNum}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div className="font-medium">{getTotalContentCount(topic.metaData)} total</div>
-                            <div className="text-muted-foreground">
-                              {topic.metaData.mcqCount} MCQ, {topic.metaData.videoCount} Video, {topic.metaData.textCount} Text
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{topic.createdByName}</TableCell>
-                        <TableCell>
-                          {new Date(topic.createdDate).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-
-              {!loading && filteredKmapTopics.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">
-                    {searchTerm ? "No KMap topics found matching your search." : "No KMap topics available."}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteTopic} onOpenChange={() => setDeleteTopic(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the topic
-              "{deleteTopic?.topicName}" and all its content items.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteTopic && handleDelete(deleteTopic)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          {!loading && filteredKmapTopics.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                {searchTerm ? "No KMap topics found matching your search." : "No KMap topics available for this course."}
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
