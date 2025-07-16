@@ -119,42 +119,19 @@ export default function Topics() {
       const courseResponse = await courseApi.getById(courseId);
       setCourse(courseResponse);
       
-      // Fetch course topics
-      const topicsResponse = await courseTopicApi.getByCourse(courseId);
-      const sortedTopics = topicsResponse.sort((a, b) => a.orderIndex - b.orderIndex);
-      setTopics(sortedTopics);
-      
       // Fetch KMap topics
-      try {
-        console.log('Fetching KMap topics for courseId:', courseId);
-        const kmapResponse = await courseApi.getKmapTopics(courseId);
-        console.log('KMap topics response:', kmapResponse);
-        setKmapTopics(Array.isArray(kmapResponse) ? kmapResponse : []);
-      } catch (kmapError) {
-        console.error("Error fetching KMap topics:", kmapError);
-        setKmapTopics([]);
-      }
+      console.log('Fetching KMap topics for courseId:', courseId);
+      const kmapResponse = await courseApi.getKmapTopics(courseId);
+      console.log('KMap topics response:', kmapResponse);
+      setKmapTopics(Array.isArray(kmapResponse) ? kmapResponse : []);
       
-      // Fetch lob data counts for each topic
-      const counts: Record<string, number> = {};
-      await Promise.all(
-        (Array.isArray(sortedTopics) ? sortedTopics : []).map(async (topic) => {
-          try {
-            const lobData = await lobDataApi.getByTopic(topic.id);
-            counts[topic.id] = Array.isArray(lobData) ? lobData.length : 0;
-          } catch (error) {
-            counts[topic.id] = 0;
-          }
-        })
-      );
-      setLobDataCounts(counts);
     } catch (error) {
+      console.error("Error fetching data:", error);
       toast({
         title: "Error",
         description: "Failed to fetch course data. Please try again.",
         variant: "destructive",
       });
-      console.error("Error fetching course data:", error);
     } finally {
       setLoading(false);
     }
