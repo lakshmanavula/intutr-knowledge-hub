@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import * as XLSX from 'xlsx';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -106,6 +106,7 @@ export default function Courses() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const fetchCourses = async () => {
     try {
@@ -438,45 +439,8 @@ export default function Courses() {
     }
   };
 
-  const handleViewKmapTopics = async (course: Course) => {
-    try {
-      const topics = await courseApi.getKmapTopics(course.id);
-      
-      // Create a simple dialog/modal to show topics data
-      const topicsText = JSON.stringify(topics, null, 2);
-      const newWindow = window.open('', '_blank');
-      if (newWindow) {
-        newWindow.document.write(`
-          <html>
-            <head>
-              <title>KMap Topics - ${course.name}</title>
-              <style>
-                body { font-family: monospace; padding: 20px; }
-                .header { font-size: 18px; margin-bottom: 20px; }
-                .content { white-space: pre-wrap; background: #f5f5f5; padding: 15px; border-radius: 5px; }
-              </style>
-            </head>
-            <body>
-              <div class="header">KMap Topics for: ${course.name}</div>
-              <div class="content">${topicsText}</div>
-            </body>
-          </html>
-        `);
-        newWindow.document.close();
-      }
-      
-      toast({
-        title: "Success",
-        description: `Found ${topics.length} KMap topics for "${course.name}".`,
-      });
-    } catch (error: any) {
-      const errorMessage = error.message || "Failed to fetch KMap topics. Please try again.";
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
+  const handleViewTopics = (course: Course) => {
+    navigate(`/topics/${course.id}`);
   };
 
   if (showCreateForm) {
@@ -841,9 +805,9 @@ export default function Courses() {
                             <Download className="mr-2 h-4 w-4" />
                             Download KMap Excel
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleViewKmapTopics(course)}>
-                            <List className="mr-2 h-4 w-4" />
-                            View KMap Topics
+                          <DropdownMenuItem onClick={() => handleViewTopics(course)}>
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            View Topics
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {STATUS_OPTIONS.slice(1).map((status) => (
