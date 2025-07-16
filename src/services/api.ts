@@ -524,7 +524,7 @@ export const courseApi = {
 
   // Get all KMap topics for a course
   getKmapTopics: async (courseId: string): Promise<any[]> => {
-    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/by-course/${courseId}`);
+    const response = await getApiClient().get(`/by-course/${courseId}`);
     return response.data;
   },
 };
