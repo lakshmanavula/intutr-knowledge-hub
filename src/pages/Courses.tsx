@@ -63,7 +63,6 @@ import { useToast } from "@/hooks/use-toast";
 import { courseApi, courseCategoryApi } from "@/services/api";
 import type { Course, CourseCategory } from "@/types/api";
 import { CourseForm } from "@/components/courses/CourseForm";
-import { CourseTopicsManager } from "@/components/courses/CourseTopicsManager";
 import {
   Pagination,
   PaginationContent,
@@ -91,7 +90,7 @@ export default function Courses() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [deleteCourse, setDeleteCourse] = useState<Course | null>(null);
-  const [managingTopicsCourse, setManagingTopicsCourse] = useState<Course | null>(null);
+  
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -508,14 +507,6 @@ export default function Courses() {
     );
   }
 
-  if (managingTopicsCourse) {
-    return (
-      <CourseTopicsManager
-        course={managingTopicsCourse}
-        onBack={() => setManagingTopicsCourse(null)}
-      />
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -844,10 +835,6 @@ export default function Courses() {
                           <DropdownMenuItem onClick={() => setEditingCourse(course)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Course
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setManagingTopicsCourse(course)}>
-                            <BookOpen className="mr-2 h-4 w-4" />
-                            Manage Topics
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => handleDownloadKmapExcel(course)}>
