@@ -440,6 +440,7 @@ export default function Courses() {
   };
 
   const handleViewTopics = (course: Course) => {
+    console.log('Navigating to topics page for course:', course.id);
     navigate(`/topics/${course.id}`);
   };
 
