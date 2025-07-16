@@ -2,18 +2,11 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
-  Plus,
   Search,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  GripVertical,
   BookOpen,
-  Clock,
-  Eye,
-  EyeOff,
-  List,
   Download,
+  Eye,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,24 +30,14 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { courseTopicApi, lobDataApi, courseApi } from "@/services/api";
-import type { Course, CourseTopic } from "@/types/api";
+import { courseApi } from "@/services/api";
+import type { Course } from "@/types/api";
 
 // KMap Topic interface based on the provided data structure
 interface KMapTopic {
@@ -95,8 +78,6 @@ interface KMapTopic {
     pairsCount: number;
   };
 }
-import { CourseTopicForm } from "@/components/courses/CourseTopicForm";
-import { LobDataManager } from "@/components/courses/LobDataManager";
 
 export default function Topics() {
   const { courseId } = useParams<{ courseId: string }>();
@@ -104,17 +85,19 @@ export default function Topics() {
   const { toast } = useToast();
 
   const [course, setCourse] = useState<Course | null>(null);
-  const [topics, setTopics] = useState<CourseTopic[]>([]);
   const [kmapTopics, setKmapTopics] = useState<KMapTopic[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingTopic, setEditingTopic] = useState<CourseTopic | null>(null);
-  const [deleteTopic, setDeleteTopic] = useState<CourseTopic | null>(null);
-  const [managingLobDataTopic, setManagingLobDataTopic] = useState<CourseTopic | null>(null);
-  const [lobDataCounts, setLobDataCounts] = useState<Record<string, number>>({});
   const [downloading, setDownloading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'course-topics' | 'kmap-topics'>('course-topics');
+  
+  // Column visibility state
+  const [visibleColumns, setVisibleColumns] = useState({
+    id: false,
+    trackNum: false,
+    topicLevel: false,
+    topicSequence: false,
+    quizSequence: false,
+  });
 
   const fetchCourseAndTopics = async () => {
     if (!courseId) return;
@@ -252,17 +235,71 @@ export default function Topics() {
         </Card>
       )}
 
-      {/* Search Bar */}
+      {/* Search and Column Selector */}
       <Card>
         <CardContent className="p-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search KMap topics by title, description, or keywords..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search KMap topics by title, description, or keywords..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuCheckboxItem
+                  checked={visibleColumns.id}
+                  onCheckedChange={(checked) => 
+                    setVisibleColumns(prev => ({ ...prev, id: checked }))
+                  }
+                >
+                  ID
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={visibleColumns.trackNum}
+                  onCheckedChange={(checked) => 
+                    setVisibleColumns(prev => ({ ...prev, trackNum: checked }))
+                  }
+                >
+                  Track Number
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={visibleColumns.topicLevel}
+                  onCheckedChange={(checked) => 
+                    setVisibleColumns(prev => ({ ...prev, topicLevel: checked }))
+                  }
+                >
+                  Topic Level
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={visibleColumns.topicSequence}
+                  onCheckedChange={(checked) => 
+                    setVisibleColumns(prev => ({ ...prev, topicSequence: checked }))
+                  }
+                >
+                  Topic Sequence
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={visibleColumns.quizSequence}
+                  onCheckedChange={(checked) => 
+                    setVisibleColumns(prev => ({ ...prev, quizSequence: checked }))
+                  }
+                >
+                  Quiz Sequence
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardContent>
       </Card>
@@ -281,54 +318,66 @@ export default function Topics() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
+                  {visibleColumns.id && <TableHead>ID</TableHead>}
                   <TableHead>Course Name</TableHead>
                   <TableHead>Topic Title</TableHead>
                   <TableHead>Keywords</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Topic Ancestors</TableHead>
-                  <TableHead>Track Num</TableHead>
-                  <TableHead>Topic Level</TableHead>
-                  <TableHead>Topic Sequence</TableHead>
-                  <TableHead>Quiz Sequence</TableHead>
+                  {visibleColumns.trackNum && <TableHead>Track Num</TableHead>}
+                  {visibleColumns.topicLevel && <TableHead>Topic Level</TableHead>}
+                  {visibleColumns.topicSequence && <TableHead>Topic Sequence</TableHead>}
+                  {visibleColumns.quizSequence && <TableHead>Quiz Sequence</TableHead>}
                   <TableHead>Meta Data</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredKmapTopics.map((topic) => (
                   <TableRow key={topic.id}>
-                    <TableCell className="font-mono text-xs">{topic.id}</TableCell>
+                    {visibleColumns.id && (
+                      <TableCell className="font-mono text-xs max-w-24 truncate">
+                        {topic.id}
+                      </TableCell>
+                    )}
                     <TableCell>{topic.courseName}</TableCell>
                     <TableCell>
                       <div className="font-medium">{topic.topicTitle}</div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
+                      <div className="text-sm max-w-32 truncate">
                         {topic.keywords || '-'}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm max-w-xs truncate">
+                      <div className="text-sm max-w-48 truncate">
                         {topic.description || '-'}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
+                      <div className="text-sm max-w-32 truncate">
                         {topic.topicAncestors.length > 0 ? JSON.stringify(topic.topicAncestors) : '-'}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{topic.trackNum}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">Level {topic.topicLevel}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{topic.topicSeqNum}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">{topic.quizSeqNum}</div>
-                    </TableCell>
+                    {visibleColumns.trackNum && (
+                      <TableCell>
+                        <Badge variant="outline">{topic.trackNum}</Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.topicLevel && (
+                      <TableCell>
+                        <Badge variant="secondary">Level {topic.topicLevel}</Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.topicSequence && (
+                      <TableCell>
+                        <div className="text-sm">{topic.topicSeqNum}</div>
+                      </TableCell>
+                    )}
+                    {visibleColumns.quizSequence && (
+                      <TableCell>
+                        <div className="text-sm">{topic.quizSeqNum}</div>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <Dialog>
                         <DialogTrigger asChild>
