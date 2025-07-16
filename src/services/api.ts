@@ -511,7 +511,7 @@ export const courseApi = {
   // Download KMap data as Excel
   downloadKmapExcel: async (courseId: string): Promise<Blob> => {
     const response = await getApiClient().get(
-      `/api/courses/${courseId}/kmap/download-excel`,
+      `/download-excel/${courseId}`,
       {
         responseType: 'blob',
         headers: {
@@ -524,7 +524,7 @@ export const courseApi = {
 
   // Get all KMap topics for a course
   getKmapTopics: async (courseId: string): Promise<any[]> => {
-    const response = await getApiClient().get(`/api/courses/${courseId}/kmap/topics`);
+    const response = await getApiClient().get(`/by-course/${courseId}`);
     return response.data;
   },
 };
