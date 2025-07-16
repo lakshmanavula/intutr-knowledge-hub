@@ -507,6 +507,26 @@ export const courseApi = {
     );
     return response.data;
   },
+
+  // Download KMap data as Excel
+  downloadKmapExcel: async (courseId: string): Promise<Blob> => {
+    const response = await getApiClient().get(
+      `/api/courses/${courseId}/kmap/download-excel`,
+      {
+        responseType: 'blob',
+        headers: {
+          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        },
+      }
+    );
+    return response.data;
+  },
+
+  // Get all KMap topics for a course
+  getKmapTopics: async (courseId: string): Promise<any[]> => {
+    const response = await getApiClient().get(`/api/courses/${courseId}/kmap/topics`);
+    return response.data;
+  },
 };
 
 export const courseTopicApi = {

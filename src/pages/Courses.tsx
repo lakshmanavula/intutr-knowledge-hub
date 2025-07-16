@@ -411,6 +411,75 @@ export default function Courses() {
     }
   };
 
+  const handleDownloadKmapExcel = async (course: Course) => {
+    try {
+      const blob = await courseApi.downloadKmapExcel(course.id);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${course.name}_kmap_data.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Success",
+        description: `KMap data for "${course.name}" downloaded successfully!`,
+      });
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to download KMap data. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleViewKmapTopics = async (course: Course) => {
+    try {
+      const topics = await courseApi.getKmapTopics(course.id);
+      
+      // Create a simple dialog/modal to show topics data
+      const topicsText = JSON.stringify(topics, null, 2);
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.write(`
+          <html>
+            <head>
+              <title>KMap Topics - ${course.name}</title>
+              <style>
+                body { font-family: monospace; padding: 20px; }
+                .header { font-size: 18px; margin-bottom: 20px; }
+                .content { white-space: pre-wrap; background: #f5f5f5; padding: 15px; border-radius: 5px; }
+              </style>
+            </head>
+            <body>
+              <div class="header">KMap Topics for: ${course.name}</div>
+              <div class="content">${topicsText}</div>
+            </body>
+          </html>
+        `);
+        newWindow.document.close();
+      }
+      
+      toast({
+        title: "Success",
+        description: `Found ${topics.length} KMap topics for "${course.name}".`,
+      });
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to fetch KMap topics. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (showCreateForm) {
     return (
       <CourseForm
@@ -779,6 +848,15 @@ export default function Courses() {
                           <DropdownMenuItem onClick={() => setManagingTopicsCourse(course)}>
                             <BookOpen className="mr-2 h-4 w-4" />
                             Manage Topics
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleDownloadKmapExcel(course)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download KMap Excel
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewKmapTopics(course)}>
+                            <List className="mr-2 h-4 w-4" />
+                            View KMap Topics
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {STATUS_OPTIONS.slice(1).map((status) => (
