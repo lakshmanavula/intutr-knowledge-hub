@@ -28,6 +28,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -274,56 +281,143 @@ export default function Topics() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Track #</TableHead>
-                  <TableHead>Topic</TableHead>
-                  <TableHead>Level</TableHead>
-                  <TableHead>Sequence</TableHead>
-                  <TableHead>Content Count</TableHead>
-                  <TableHead>Created By</TableHead>
-                  <TableHead>Created Date</TableHead>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Course Name</TableHead>
+                  <TableHead>Topic Title</TableHead>
+                  <TableHead>Keywords</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Topic Ancestors</TableHead>
+                  <TableHead>Track Num</TableHead>
+                  <TableHead>Topic Level</TableHead>
+                  <TableHead>Topic Sequence</TableHead>
+                  <TableHead>Quiz Sequence</TableHead>
+                  <TableHead>Meta Data</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredKmapTopics.map((topic) => (
                   <TableRow key={topic.id}>
+                    <TableCell className="font-mono text-xs">{topic.id}</TableCell>
+                    <TableCell>{topic.courseName}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{topic.trackNum}</Badge>
+                      <div className="font-medium">{topic.topicTitle}</div>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{topic.topicTitle}</div>
-                        {topic.description && (
-                          <div className="text-sm text-muted-foreground">
-                            {topic.description}
-                          </div>
-                        )}
-                        {topic.keywords && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Keywords: {topic.keywords}
-                          </div>
-                        )}
+                      <div className="text-sm">
+                        {topic.keywords || '-'}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm max-w-xs truncate">
+                        {topic.description || '-'}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {topic.topicAncestors.length > 0 ? JSON.stringify(topic.topicAncestors) : '-'}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{topic.trackNum}</Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary">Level {topic.topicLevel}</Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
-                        <div>Topic: {topic.topicSeqNum}</div>
-                        <div className="text-muted-foreground">Quiz: {topic.quizSeqNum}</div>
-                      </div>
+                      <div className="text-sm">{topic.topicSeqNum}</div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
-                        <div className="font-medium">{getTotalContentCount(topic.metaData)} total</div>
-                        <div className="text-muted-foreground">
-                          {topic.metaData.mcqCount} MCQ • {topic.metaData.videoCount} Video • {topic.metaData.textCount} Text
-                        </div>
-                      </div>
+                      <div className="text-sm">{topic.quizSeqNum}</div>
                     </TableCell>
-                    <TableCell>{topic.createdByName}</TableCell>
                     <TableCell>
-                      {new Date(topic.createdDate).toLocaleDateString()}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Meta Data - {topic.topicTitle}</DialogTitle>
+                          </DialogHeader>
+                          <div className="grid grid-cols-2 gap-4 py-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="font-medium">Text Count:</span>
+                                <span>{topic.metaData.textCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">MCQ Count:</span>
+                                <span>{topic.metaData.mcqCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">MCQM Count:</span>
+                                <span>{topic.metaData.mcqmCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">TOF Count:</span>
+                                <span>{topic.metaData.tofCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">MTF Count:</span>
+                                <span>{topic.metaData.mtfCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">SEQ Count:</span>
+                                <span>{topic.metaData.seqCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">FITB Count:</span>
+                                <span>{topic.metaData.fitbCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">PIC Count:</span>
+                                <span>{topic.metaData.picCount}</span>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="font-medium">Short Count:</span>
+                                <span>{topic.metaData.shortCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Essay Count:</span>
+                                <span>{topic.metaData.essayCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Num Count:</span>
+                                <span>{topic.metaData.numCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Mnemonics Count:</span>
+                                <span>{topic.metaData.mnemonicsCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Video Count:</span>
+                                <span>{topic.metaData.videoCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Link Count:</span>
+                                <span>{topic.metaData.linkCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Stmt Count:</span>
+                                <span>{topic.metaData.stmtCount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Pairs Count:</span>
+                                <span>{topic.metaData.pairsCount}</span>
+                              </div>
+                            </div>
+                            <div className="col-span-2 pt-4 border-t">
+                              <div className="flex justify-between text-lg font-semibold">
+                                <span>Total Content:</span>
+                                <span>{getTotalContentCount(topic.metaData)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </TableCell>
                   </TableRow>
                 ))}
