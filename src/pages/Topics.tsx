@@ -41,7 +41,7 @@ import type { Course } from "@/types/api";
 
 // Track interface
 interface Track {
-  trackNum: string;
+  trackNumber: string;  // API returns trackNumber, not trackNum
   trackName: string;
 }
 
@@ -127,7 +127,7 @@ export default function Topics() {
       
       // Select first track by default and fetch its topics
       if (tracksArray.length > 0) {
-        const firstTrack = tracksArray[0].trackNum;
+        const firstTrack = tracksArray[0].trackNumber;
         setSelectedTrack(firstTrack);
         await fetchTopicsForTrack(firstTrack);
       }
@@ -168,9 +168,9 @@ export default function Topics() {
     }
   };
 
-  const handleTrackSelect = async (trackNum: string) => {
-    setSelectedTrack(trackNum);
-    await fetchTopicsForTrack(trackNum);
+  const handleTrackSelect = async (trackNumber: string) => {
+    setSelectedTrack(trackNumber);
+    await fetchTopicsForTrack(trackNumber);
   };
 
   useEffect(() => {
@@ -291,13 +291,13 @@ export default function Topics() {
             <div className="flex flex-wrap gap-2">
               {tracks.map((track, index) => (
                 <Button
-                  key={track.trackNum || `track-${index}`}
-                  variant={selectedTrack === track.trackNum ? "default" : "outline"}
+                  key={track.trackNumber || `track-${index}`}
+                  variant={selectedTrack === track.trackNumber ? "default" : "outline"}
                   size="sm"
-                  onClick={() => handleTrackSelect(track.trackNum)}
+                  onClick={() => handleTrackSelect(track.trackNumber)}
                   disabled={tracksLoading}
                 >
-                  {track.trackName || `Track ${track.trackNum}`}
+                  {track.trackName || `Track ${track.trackNumber}`}
                 </Button>
               ))}
             </div>
