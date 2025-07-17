@@ -39,6 +39,12 @@ import { useToast } from "@/hooks/use-toast";
 import { courseApi } from "@/services/api";
 import type { Course } from "@/types/api";
 
+// Track interface
+interface Track {
+  trackNum: string;
+  trackName: string;
+}
+
 // KMap Topic interface based on the provided data structure
 interface KMapTopic {
   id: string;
@@ -85,8 +91,11 @@ export default function Topics() {
   const { toast } = useToast();
 
   const [course, setCourse] = useState<Course | null>(null);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [selectedTrack, setSelectedTrack] = useState<string>("");
   const [kmapTopics, setKmapTopics] = useState<KMapTopic[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tracksLoading, setTracksLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [downloading, setDownloading] = useState(false);
   
@@ -99,7 +108,7 @@ export default function Topics() {
     quizSequence: false,
   });
 
-  const fetchCourseAndTopics = async () => {
+  const fetchCourseAndTracks = async () => {
     if (!courseId) return;
     
     try {
@@ -109,14 +118,22 @@ export default function Topics() {
       const courseResponse = await courseApi.getById(courseId);
       setCourse(courseResponse);
       
-      // Fetch KMap topics
-      console.log('Fetching KMap topics for courseId:', courseId);
-      const kmapResponse = await courseApi.getKmapTopics(courseId);
-      console.log('KMap topics response:', kmapResponse);
-      setKmapTopics(Array.isArray(kmapResponse) ? kmapResponse : []);
+      // Fetch track names
+      console.log('Fetching tracks for courseId:', courseId);
+      const tracksResponse = await courseApi.getTrackNames(courseId);
+      console.log('Tracks response:', tracksResponse);
+      const tracksArray = Array.isArray(tracksResponse) ? tracksResponse : [];
+      setTracks(tracksArray);
+      
+      // Select first track by default and fetch its topics
+      if (tracksArray.length > 0) {
+        const firstTrack = tracksArray[0].trackNum;
+        setSelectedTrack(firstTrack);
+        await fetchTopicsForTrack(firstTrack);
+      }
       
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching course and tracks:", error);
       toast({
         title: "Error",
         description: "Failed to fetch course data. Please try again.",
@@ -127,8 +144,37 @@ export default function Topics() {
     }
   };
 
+  const fetchTopicsForTrack = async (trackNum: string) => {
+    if (!courseId || !trackNum) return;
+    
+    try {
+      setTracksLoading(true);
+      
+      // Fetch topics for selected track
+      console.log('Fetching topics for courseId:', courseId, 'trackNum:', trackNum);
+      const topicsResponse = await courseApi.getTopicsByTrack(courseId, trackNum);
+      console.log('Topics for track response:', topicsResponse);
+      setKmapTopics(Array.isArray(topicsResponse) ? topicsResponse : []);
+      
+    } catch (error) {
+      console.error("Error fetching topics for track:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch topics for selected track. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setTracksLoading(false);
+    }
+  };
+
+  const handleTrackSelect = async (trackNum: string) => {
+    setSelectedTrack(trackNum);
+    await fetchTopicsForTrack(trackNum);
+  };
+
   useEffect(() => {
-    fetchCourseAndTopics();
+    fetchCourseAndTracks();
   }, [courseId]);
 
   const handleDownloadKmapData = async () => {
@@ -235,6 +281,30 @@ export default function Topics() {
         </Card>
       )}
 
+      {/* Track Selection */}
+      {tracks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Course Tracks</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {tracks.map((track) => (
+                <Button
+                  key={track.trackNum}
+                  variant={selectedTrack === track.trackNum ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleTrackSelect(track.trackNum)}
+                  disabled={tracksLoading}
+                >
+                  {track.trackName || `Track ${track.trackNum}`}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Search and Column Selector */}
       <Card>
         <CardContent className="p-6">
@@ -310,7 +380,7 @@ export default function Topics() {
           <CardTitle>KMap Topics ({filteredKmapTopics.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {loading || tracksLoading ? (
             <div className="flex items-center justify-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>

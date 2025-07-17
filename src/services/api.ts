@@ -524,7 +524,19 @@ export const courseApi = {
 
   // Get all KMap topics for a course
   getKmapTopics: async (courseId: string): Promise<any[]> => {
-    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/by-course/${courseId}`);
+    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/${courseId}`);
+    return response.data;
+  },
+
+  // Get track names and numbers for a course
+  getTrackNames: async (courseId: string): Promise<any[]> => {
+    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/track-name-and-number/${courseId}`);
+    return response.data;
+  },
+
+  // Get topics by course and track
+  getTopicsByTrack: async (courseId: string, trackNum: string): Promise<any[]> => {
+    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/by-course/${courseId}/${trackNum}`);
     return response.data;
   },
 };
