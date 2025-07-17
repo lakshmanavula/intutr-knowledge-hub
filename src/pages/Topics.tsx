@@ -289,9 +289,9 @@ export default function Topics() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {tracks.map((track) => (
+              {tracks.map((track, index) => (
                 <Button
-                  key={track.trackNum}
+                  key={track.trackNum || `track-${index}`}
                   variant={selectedTrack === track.trackNum ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleTrackSelect(track.trackNum)}
