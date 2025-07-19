@@ -721,6 +721,13 @@ export const userProfileApi = {
     const metadata = rawData.metadata || {};
     
     console.log('👥 Users data:', usersData);
+    console.log('🏢 Sample user location fields:', usersData[0] ? {
+      city: usersData[0].city,
+      state: usersData[0].state, 
+      country: usersData[0].country,
+      location: usersData[0].location,
+      address: usersData[0].address
+    } : 'No users');
     console.log('📊 Metadata:', metadata);
     
     // Map API response to UserProfile structure
