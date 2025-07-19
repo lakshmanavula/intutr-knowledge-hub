@@ -823,16 +823,16 @@ export const couponApi = {
 
   // Get paginated coupons
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Coupon>> => {
-    const response = await getApiClient().get<PaginatedResponse<Coupon>>(
+    const response = await getApiClient().get<any>(
       `/api/v1/coupons/paged?page=${page}&size=${size}`
     );
     
     // Map API response fields to Coupon interface
-    const mappedContent = response.data.content.map((coupon: any): Coupon => ({
+    const mappedContent = response.data.data.map((coupon: any): Coupon => ({
       id: coupon.id,
       code: coupon.code,
       description: coupon.description || '',
-      discountType: coupon.couponType === 'Percentage' ? 'PERCENTAGE' : 'FIXED_AMOUNT',
+      discountType: coupon.discountType === 'Percentage' ? 'PERCENTAGE' : 'FIXED_AMOUNT',
       discountValue: coupon.discountValue,
       minimumAmount: coupon.minPurchaseAmount,
       maximumDiscount: coupon.maxDiscountAmount,
@@ -853,8 +853,13 @@ export const couponApi = {
     }));
 
     return {
-      ...response.data,
-      content: mappedContent
+      content: mappedContent,
+      totalElements: response.data.metadata.totalElements,
+      totalPages: response.data.metadata.totalPages,
+      size: response.data.metadata.size,
+      number: response.data.metadata.page,
+      first: response.data.metadata.first,
+      last: response.data.metadata.last
     };
   },
 
