@@ -825,12 +825,20 @@ export const couponApi = {
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Coupon>> => {
     try {
       console.log(`🔍 Making API call to: /api/v1/coupons/paged?page=${page}&size=${size}`);
-      const response = await getApiClient().get<any>(
-        `/api/v1/coupons/paged?page=${page}&size=${size}`
-      );
       
-      // Extract data from the exact API response structure
-      const { data: couponsArray, metadata } = response.data;
+      // Bypass the interceptor to get raw response with metadata
+      const apiClient = getApiClient();
+      const response = await apiClient.get(`/api/v1/coupons/paged?page=${page}&size=${size}`, {
+        transformResponse: [(data) => data], // Keep raw response
+      });
+      
+      // Parse the raw response
+      const rawData = JSON.parse(response.data);
+      console.log("🔍 Raw coupon API response:", rawData);
+      
+      // Extract data and metadata
+      const couponsArray = rawData.data || [];
+      const metadata = rawData.metadata || {};
       
       console.log("📊 Coupons from API:", couponsArray);
       console.log("📊 Metadata from API:", metadata);
