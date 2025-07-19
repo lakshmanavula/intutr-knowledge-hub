@@ -269,11 +269,6 @@ export default function Users() {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     
-    // Check if it's an age group (contains a dash)
-    if (dateString.includes('-')) {
-      return `Age group: ${dateString}`;
-    }
-    
     // Try to parse as date
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
