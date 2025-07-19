@@ -698,7 +698,7 @@ export const userProfileApi = {
   // Get all users
   getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     const response = await getApiClient().get<PaginatedResponse<UserProfile>>(
-      `api/user-profiles/paginated?page=${page}&size=${size}`
+      `api/user-profiles/paged?page=${page}&size=${size}`
     );
     return response.data;
   },
@@ -706,7 +706,7 @@ export const userProfileApi = {
   // Get paginated users
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     const response = await getApiClient().get<PaginatedResponse<UserProfile>>(
-      `/user-profiles/paginated?page=${page}&size=${size}`
+      `/user-profiles/paged?page=${page}&size=${size}`
     );
     return response.data;
   },
