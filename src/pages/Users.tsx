@@ -613,10 +613,6 @@ export default function Users() {
                         </Avatar>
                         <div>
                           <div className="font-medium">{user.firstName} {user.lastName}</div>
-                          <div className="text-sm text-muted-foreground flex items-center">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            Last Logged In: {formatDate(user.modifiedDate)}
-                          </div>
                         </div>
                       </div>
                     </TableCell>
