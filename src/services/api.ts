@@ -828,19 +828,12 @@ export const couponApi = {
       const response = await getApiClient().get<any>(
         `/api/v1/coupons/paged?page=${page}&size=${size}`
       );
-      console.log("✅ API Response received:", response);
-      console.log("📊 Response data:", response.data);
-    
-      // Check response structure
-      console.log("📊 Full response structure:", JSON.stringify(response.data, null, 2));
       
-      // Extract data safely
-      const apiResponseData = response.data;
-      const couponsArray = apiResponseData.data || [];
-      const metadata = apiResponseData.metadata || {};
+      // Extract data from the exact API response structure
+      const { data: couponsArray, metadata } = response.data;
       
-      console.log("📊 Coupons array:", couponsArray);
-      console.log("📊 Metadata:", metadata);
+      console.log("📊 Coupons from API:", couponsArray);
+      console.log("📊 Metadata from API:", metadata);
       
       // Map API response fields to Coupon interface  
       const mappedContent = couponsArray.map((coupon: any): Coupon => ({
@@ -871,12 +864,12 @@ export const couponApi = {
 
       return {
         content: mappedContent,
-        totalElements: metadata.totalElements || 0,
-        totalPages: metadata.totalPages || 0,
-        size: metadata.size || 10,
-        number: metadata.page || 0,
-        first: metadata.first || true,
-        last: metadata.last || true
+        totalElements: metadata.totalElements,
+        totalPages: metadata.totalPages,
+        size: metadata.size,
+        number: metadata.page,
+        first: metadata.first,
+        last: metadata.last
       };
     } catch (error: any) {
       console.error("❌ Coupon API Error:", error);
