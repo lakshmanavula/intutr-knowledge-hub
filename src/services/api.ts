@@ -823,44 +823,52 @@ export const couponApi = {
 
   // Get paginated coupons
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Coupon>> => {
-    const response = await getApiClient().get<any>(
-      `/api/v1/coupons/paged?page=${page}&size=${size}`
-    );
+    try {
+      console.log(`🔍 Making API call to: /api/v1/coupons/paged?page=${page}&size=${size}`);
+      const response = await getApiClient().get<any>(
+        `/api/v1/coupons/paged?page=${page}&size=${size}`
+      );
+      console.log("✅ API Response received:", response);
+      console.log("📊 Response data:", response.data);
     
-    // Map API response fields to Coupon interface
-    const mappedContent = response.data.data.map((coupon: any): Coupon => ({
-      id: coupon.id,
-      code: coupon.code,
-      description: coupon.description || '',
-      discountType: coupon.discountType === 'Percentage' ? 'PERCENTAGE' : 'FIXED_AMOUNT',
-      discountValue: coupon.discountValue,
-      minimumAmount: coupon.minPurchaseAmount,
-      maximumDiscount: coupon.maxDiscountAmount,
-      usageLimit: coupon.usageLimitPerCoupon,
-      usedCount: coupon.currentUsageCount,
-      validFrom: coupon.startDate,
-      validTo: coupon.endDate,
-      isActive: coupon.isActive,
-      applicableToAllCourses: true, // Default value, adjust based on your needs
-      applicableCourseIds: [], // Default value, adjust based on your needs
-      createdBy: coupon.createdBy,
-      createdByName: coupon.createdByName,
-      modifiedBy: coupon.modifiedBy,
-      modifiedByName: coupon.modifiedByName,
-      createdDate: coupon.createdDate,
-      modifiedDate: coupon.modifiedDate,
-      deleted: coupon.deleted
-    }));
+      // Map API response fields to Coupon interface
+      const mappedContent = response.data.data.map((coupon: any): Coupon => ({
+        id: coupon.id,
+        code: coupon.code,
+        description: coupon.description || '',
+        discountType: coupon.discountType === 'Percentage' ? 'PERCENTAGE' : 'FIXED_AMOUNT',
+        discountValue: coupon.discountValue,
+        minimumAmount: coupon.minPurchaseAmount,
+        maximumDiscount: coupon.maxDiscountAmount,
+        usageLimit: coupon.usageLimitPerCoupon,
+        usedCount: coupon.currentUsageCount,
+        validFrom: coupon.startDate,
+        validTo: coupon.endDate,
+        isActive: coupon.isActive,
+        applicableToAllCourses: true, // Default value, adjust based on your needs
+        applicableCourseIds: [], // Default value, adjust based on your needs
+        createdBy: coupon.createdBy,
+        createdByName: coupon.createdByName,
+        modifiedBy: coupon.modifiedBy,
+        modifiedByName: coupon.modifiedByName,
+        createdDate: coupon.createdDate,
+        modifiedDate: coupon.modifiedDate,
+        deleted: coupon.deleted
+      }));
 
-    return {
-      content: mappedContent,
-      totalElements: response.data.metadata.totalElements,
-      totalPages: response.data.metadata.totalPages,
-      size: response.data.metadata.size,
-      number: response.data.metadata.page,
-      first: response.data.metadata.first,
-      last: response.data.metadata.last
-    };
+      return {
+        content: mappedContent,
+        totalElements: response.data.metadata.totalElements,
+        totalPages: response.data.metadata.totalPages,
+        size: response.data.metadata.size,
+        number: response.data.metadata.page,
+        first: response.data.metadata.first,
+        last: response.data.metadata.last
+      };
+    } catch (error: any) {
+      console.error("❌ Coupon API Error:", error);
+      throw new Error(error.message || 'Failed to fetch coupons');
+    }
   },
 
   // Get coupon by ID

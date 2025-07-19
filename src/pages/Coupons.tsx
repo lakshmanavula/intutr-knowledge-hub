@@ -78,12 +78,16 @@ export default function Coupons() {
   const queryClient = useQueryClient();
 
   // Fetch coupons
-  const { data: couponsResponse, isLoading } = useQuery({
+  const { data: couponsResponse, isLoading, error } = useQuery({
     queryKey: ["coupons", currentPage, pageSize],
     queryFn: () => couponApi.getPaginated(currentPage, pageSize),
   });
 
   const coupons = couponsResponse?.content || [];
+  
+  // Debug the query state
+  console.log("🔍 Query state:", { couponsResponse, isLoading, error });
+  console.log("📊 Coupons array:", coupons);
 
   // Delete mutation
   const deleteMutation = useMutation({
