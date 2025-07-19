@@ -824,9 +824,38 @@ export const couponApi = {
   // Get paginated coupons
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Coupon>> => {
     const response = await getApiClient().get<PaginatedResponse<Coupon>>(
-      `/coupons/paginated?page=${page}&size=${size}`
+      `/api/v1/coupons/paged?page=${page}&size=${size}`
     );
-    return response.data;
+    
+    // Map API response fields to Coupon interface
+    const mappedContent = response.data.content.map((coupon: any): Coupon => ({
+      id: coupon.id,
+      code: coupon.code,
+      description: coupon.description || '',
+      discountType: coupon.couponType === 'Percentage' ? 'PERCENTAGE' : 'FIXED_AMOUNT',
+      discountValue: coupon.discountValue,
+      minimumAmount: coupon.minPurchaseAmount,
+      maximumDiscount: coupon.maxDiscountAmount,
+      usageLimit: coupon.usageLimitPerCoupon,
+      usedCount: coupon.currentUsageCount,
+      validFrom: coupon.startDate,
+      validTo: coupon.endDate,
+      isActive: coupon.isActive,
+      applicableToAllCourses: true, // Default value, adjust based on your needs
+      applicableCourseIds: [], // Default value, adjust based on your needs
+      createdBy: coupon.createdBy,
+      createdByName: coupon.createdByName,
+      modifiedBy: coupon.modifiedBy,
+      modifiedByName: coupon.modifiedByName,
+      createdDate: coupon.createdDate,
+      modifiedDate: coupon.modifiedDate,
+      deleted: coupon.deleted
+    }));
+
+    return {
+      ...response.data,
+      content: mappedContent
+    };
   },
 
   // Get coupon by ID
