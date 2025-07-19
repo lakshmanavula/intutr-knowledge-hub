@@ -831,8 +831,11 @@ export const couponApi = {
       console.log("✅ API Response received:", response);
       console.log("📊 Response data:", response.data);
     
-      // Map API response fields to Coupon interface
-      const mappedContent = response.data.data.map((coupon: any): Coupon => ({
+      // Map API response fields to Coupon interface  
+      const couponsData = response.data.data || [];
+      console.log("📊 Coupons data to map:", couponsData);
+      
+      const mappedContent = couponsData.map((coupon: any): Coupon => ({
         id: coupon.id,
         code: coupon.code,
         description: coupon.description || '',
@@ -855,6 +858,8 @@ export const couponApi = {
         modifiedDate: coupon.modifiedDate,
         deleted: coupon.deleted
       }));
+
+      console.log("✅ Mapped coupons:", mappedContent);
 
       return {
         content: mappedContent,
