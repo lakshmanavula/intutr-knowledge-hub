@@ -78,10 +78,12 @@ export default function Coupons() {
   const queryClient = useQueryClient();
 
   // Fetch coupons
-  const { data: coupons = [], isLoading } = useQuery({
-    queryKey: ["coupons"],
-    queryFn: couponApi.getAll,
+  const { data: couponsResponse, isLoading } = useQuery({
+    queryKey: ["coupons", currentPage, pageSize],
+    queryFn: () => couponApi.getPaginated(currentPage, pageSize),
   });
+
+  const coupons = couponsResponse?.content || [];
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -162,11 +164,12 @@ export default function Coupons() {
     });
   }, [coupons, searchQuery, discountTypeFilter, statusFilter]);
 
-  // Get paginated coupons
-  const totalPages = Math.ceil(filteredCoupons.length / pageSize);
+  // Server-side pagination
+  const totalPages = couponsResponse?.totalPages || 0;
+  const totalElements = couponsResponse?.totalElements || 0;
   const startIndex = currentPage * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedCoupons = filteredCoupons.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + pageSize, totalElements);
+  const paginatedCoupons = filteredCoupons;
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
