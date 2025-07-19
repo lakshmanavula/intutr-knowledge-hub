@@ -84,11 +84,6 @@ export default function Coupons() {
   });
 
   const coupons = couponsResponse?.content || [];
-  
-  // Debug logging
-  console.log("🔍 Coupons response:", couponsResponse);
-  console.log("📊 Coupons array:", coupons);
-  console.log("🔢 Coupons length:", coupons.length);
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -152,13 +147,7 @@ export default function Coupons() {
 
   // Filter coupons
   const filteredCoupons = useMemo(() => {
-    console.log("🔍 Filtering coupons, input array:", coupons);
-    console.log("🔍 Is coupons an array?", Array.isArray(coupons));
-    console.log("🔍 Search query:", searchQuery);
-    console.log("🔍 Discount type filter:", discountTypeFilter);
-    console.log("🔍 Status filter:", statusFilter);
-    
-    const filtered = (Array.isArray(coupons) ? coupons : []).filter((coupon) => {
+    return (Array.isArray(coupons) ? coupons : []).filter((coupon) => {
       const matchesSearch = 
         coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
         coupon.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -171,19 +160,8 @@ export default function Coupons() {
         (statusFilter === "active" && coupon.isActive) ||
         (statusFilter === "inactive" && !coupon.isActive);
 
-      console.log(`🔍 Coupon ${coupon.code}:`, {
-        matchesSearch,
-        matchesDiscountType,
-        matchesStatus,
-        discountType: coupon.discountType,
-        isActive: coupon.isActive
-      });
-
       return matchesSearch && matchesDiscountType && matchesStatus;
     });
-    
-    console.log("🔍 Filtered coupons:", filtered);
-    return filtered;
   }, [coupons, searchQuery, discountTypeFilter, statusFilter]);
 
   // Server-side pagination
