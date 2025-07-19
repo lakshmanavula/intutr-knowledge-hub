@@ -238,7 +238,7 @@ export default function Topics() {
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-foreground">KMap Topics</h1>
           <p className="text-muted-foreground">
-            View and download KMap topics for "{course?.name || 'Loading...'}"
+            View and download KMap topics for "{course?.courseLabel || 'Loading...'}"
           </p>
         </div>
         <Button
@@ -260,7 +260,7 @@ export default function Topics() {
                 <BookOpen className="w-8 h-8 text-muted-foreground" />
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold">{course.name}</h3>
+                <h3 className="text-xl font-semibold">{course.courseLabel}</h3>
                 <p className="text-muted-foreground">{course.description}</p>
                 <div className="flex items-center gap-4 mt-2">
                   <Badge variant="outline">{course.categoryName}</Badge>
