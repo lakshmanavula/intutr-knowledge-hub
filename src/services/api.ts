@@ -962,5 +962,135 @@ export const reviewApi = {
   },
 };
 
+// Course Ratings API
+export const courseRatingApi = {
+  // Get paginated course ratings
+  getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Review>> => {
+    // Bypass the interceptor to get raw response with nested metadata
+    const apiClient = getApiClient();
+    const response = await apiClient.get(`/api/course-ratings/paged?page=${page}&size=${size}`, {
+      transformResponse: [(data) => data], // Keep raw response
+    });
+    
+    // Parse the raw response
+    const rawData = JSON.parse(response.data);
+    console.log('🔍 Raw course ratings API response:', rawData);
+    
+    // Extract data from nested structure
+    const ratingsData = rawData.data?.content || [];
+    const metadata = rawData.data || {};
+    
+    console.log('⭐ Ratings data:', ratingsData);
+    console.log('📊 Ratings metadata:', metadata);
+    
+    // Map API response to Review structure (assuming rating maps to review)
+    const mappedRatings = ratingsData.map((rating: any): Review => ({
+      id: rating.id,
+      courseId: rating.courseId,
+      courseName: rating.courseName || '',
+      userId: rating.userId,
+      userName: rating.userName || '',
+      userEmail: rating.userEmail || '',
+      rating: rating.rating,
+      title: rating.title || '',
+      comment: rating.comment || '',
+      isApproved: rating.isApproved ?? true,
+      isPublic: rating.isPublic ?? true,
+      helpfulCount: rating.helpfulCount || 0,
+      createdBy: rating.createdBy,
+      createdByName: rating.createdByName,
+      modifiedBy: rating.modifiedBy,
+      modifiedByName: rating.modifiedByName,
+      createdDate: rating.createdDate,
+      modifiedDate: rating.modifiedDate,
+      deleted: rating.deleted || false
+    }));
+
+    console.log('✅ Mapped ratings:', mappedRatings);
+
+    return {
+      content: mappedRatings,
+      totalElements: metadata.totalElements || mappedRatings.length,
+      totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || mappedRatings.length) / size),
+      size: metadata.size || size,
+      number: metadata.number || page,
+      first: metadata.first !== undefined ? metadata.first : page === 0,
+      last: metadata.last !== undefined ? metadata.last : false,
+    };
+  },
+
+  // Get course rating by ID
+  getById: async (id: string): Promise<Review> => {
+    const response = await getApiClient().get(`/api/course-ratings/${id}`);
+    return response.data;
+  },
+
+  // Create new course rating
+  create: async (rating: { courseId: string; userId: string; rating: number; comment?: string }): Promise<Review> => {
+    const response = await getApiClient().post('/api/course-ratings', rating);
+    return response.data;
+  },
+
+  // Update existing course rating
+  update: async (id: string, rating: { rating: number; comment?: string }): Promise<Review> => {
+    const response = await getApiClient().put(`/api/course-ratings/${id}`, rating);
+    return response.data;
+  },
+
+  // Delete course rating
+  delete: async (id: string): Promise<void> => {
+    await getApiClient().delete(`/api/course-ratings/${id}`);
+  },
+
+  // Get ratings by course
+  getByCourse: async (courseId: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<Review>> => {
+    const apiClient = getApiClient();
+    const response = await apiClient.get(`/api/course-ratings/course/${courseId}?page=${page}&size=${size}`, {
+      transformResponse: [(data) => data],
+    });
+    
+    const rawData = JSON.parse(response.data);
+    const ratingsData = rawData.data?.content || [];
+    const metadata = rawData.data || {};
+    
+    const mappedRatings = ratingsData.map((rating: any): Review => ({
+      id: rating.id,
+      courseId: rating.courseId,
+      courseName: rating.courseName || '',
+      userId: rating.userId,
+      userName: rating.userName || '',
+      userEmail: rating.userEmail || '',
+      rating: rating.rating,
+      title: rating.title || '',
+      comment: rating.comment || '',
+      isApproved: rating.isApproved ?? true,
+      isPublic: rating.isPublic ?? true,
+      helpfulCount: rating.helpfulCount || 0,
+      createdBy: rating.createdBy,
+      createdByName: rating.createdByName,
+      modifiedBy: rating.modifiedBy,
+      modifiedByName: rating.modifiedByName,
+      createdDate: rating.createdDate,
+      modifiedDate: rating.modifiedDate,
+      deleted: rating.deleted || false
+    }));
+
+    return {
+      content: mappedRatings,
+      totalElements: metadata.totalElements || mappedRatings.length,
+      totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || mappedRatings.length) / size),
+      size: metadata.size || size,
+      number: metadata.number || page,
+      first: metadata.first !== undefined ? metadata.first : page === 0,
+      last: metadata.last !== undefined ? metadata.last : false,
+    };
+  },
+
+  // Bulk delete course ratings
+  bulkDelete: async (ids: string[]): Promise<void> => {
+    await getApiClient().post('/api/course-ratings/bulk-delete', { ids });
+  },
+};
+
 // Export userApi alias for consistency
 export const userApi = userProfileApi;

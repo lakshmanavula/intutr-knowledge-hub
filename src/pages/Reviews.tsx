@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { reviewApi, courseApi } from "@/services/api";
+import { reviewApi, courseApi, courseRatingApi } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -69,9 +69,10 @@ export default function Reviews() {
 
   const { data: reviewsData, isLoading } = useQuery({
     queryKey: ["reviews", page, searchQuery, pageSize],
-    queryFn: () => searchQuery 
-      ? reviewApi.search(searchQuery, page, pageSize)
-      : reviewApi.getAll(page, pageSize),
+    queryFn: () => {
+      // Use courseRatingApi for paginated data with proper nested structure handling
+      return courseRatingApi.getPaginated(page, pageSize);
+    },
   });
 
   const { data: coursesData } = useQuery({
