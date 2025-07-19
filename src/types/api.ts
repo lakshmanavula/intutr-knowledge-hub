@@ -174,6 +174,7 @@ export interface UserProfile {
   postalCode: string;
   profilePicture: string;
   isActive: boolean;
+  lastLoggedIn: string;
   createdBy: string;
   createdByName: string;
   modifiedBy: string;

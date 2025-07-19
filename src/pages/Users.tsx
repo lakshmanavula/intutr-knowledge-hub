@@ -632,7 +632,7 @@ export default function Users() {
                     </TableCell>
                     <TableCell>{getStatusBadge(user.isActive)}</TableCell>
                     <TableCell>
-                      <span className="text-sm text-muted-foreground">Recently</span>
+                      {user.lastLoggedIn ? formatDate(user.lastLoggedIn) : 'Never'}
                     </TableCell>
                     <TableCell>{formatDate(user.createdDate)}</TableCell>
                     <TableCell>{user.createdByName}</TableCell>
