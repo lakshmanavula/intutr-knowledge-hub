@@ -705,10 +705,59 @@ export const userProfileApi = {
 
   // Get paginated users
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
-    const response = await getApiClient().get<PaginatedResponse<UserProfile>>(
-      `/api/user-profiles/paged?page=${page}&size=${size}`
-    );
-    return response.data;
+    // Bypass the interceptor to get raw response with metadata
+    const apiClient = getApiClient();
+    const response = await apiClient.get(`/api/user-profiles/paged?page=${page}&size=${size}`, {
+      transformResponse: [(data) => data], // Keep raw response
+    });
+    
+    // Parse the raw response
+    const rawData = JSON.parse(response.data);
+    console.log('🔍 Raw user API response:', rawData);
+    
+    // Extract data and metadata
+    const usersData = rawData.data || [];
+    const metadata = rawData.metadata || {};
+    
+    console.log('👥 Users data:', usersData);
+    console.log('📊 Metadata:', metadata);
+    
+    // Map API response to UserProfile structure
+    const mappedUsers = usersData.map((user: any): UserProfile => ({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneNumber: user.mobile || '',
+      dateOfBirth: user.ageGroup || '',
+      gender: user.gender || '',
+      address: '',
+      city: user.location?.split(',')[0]?.trim() || '',
+      state: user.location?.split(',')[1]?.trim() || '',
+      country: user.location?.split(',')[2]?.trim() || user.location || '',
+      postalCode: '',
+      profilePicture: '',
+      isActive: user.status?.toLowerCase() === 'active',
+      createdBy: user.createdBy,
+      createdByName: user.createdByName,
+      modifiedBy: user.modifiedBy,
+      modifiedByName: user.modifiedByName,
+      createdDate: user.createdDate,
+      modifiedDate: user.modifiedDate,
+      deleted: user.deleted
+    }));
+
+    console.log('✅ Mapped users:', mappedUsers);
+
+    return {
+      content: mappedUsers,
+      totalElements: metadata.totalElements || mappedUsers.length,
+      totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || mappedUsers.length) / size),
+      size: metadata.size || size,
+      number: metadata.page || page,
+      first: metadata.first !== undefined ? metadata.first : page === 0,
+      last: metadata.last !== undefined ? metadata.last : false,
+    };
   },
 
   // Get user by ID
