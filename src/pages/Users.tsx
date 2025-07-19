@@ -298,7 +298,7 @@ export default function Users() {
       'City': user.city,
       'Address': user.address,
       'Postal Code': user.postalCode,
-      'Date of Birth': user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : '',
+      'Date of Birth': user.dateOfBirth || '',
       'Gender': user.gender,
       'Status': user.isActive ? 'Active' : 'Inactive',
       'Created Date': new Date(user.createdDate).toLocaleDateString(),
