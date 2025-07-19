@@ -577,6 +577,7 @@ export default function Users() {
                   <TableHead>Contact</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Last Logged In</TableHead>
                   <TableHead>Created Date</TableHead>
                   <TableHead>Created By</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -630,6 +631,9 @@ export default function Users() {
                       </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(user.isActive)}</TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">Recently</span>
+                    </TableCell>
                     <TableCell>{formatDate(user.createdDate)}</TableCell>
                     <TableCell>{user.createdByName}</TableCell>
                     <TableCell className="text-right">
