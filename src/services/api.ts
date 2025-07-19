@@ -831,11 +831,19 @@ export const couponApi = {
       console.log("✅ API Response received:", response);
       console.log("📊 Response data:", response.data);
     
-      // Map API response fields to Coupon interface  
-      const couponsData = response.data.data || [];
-      console.log("📊 Coupons data to map:", couponsData);
+      // Check response structure
+      console.log("📊 Full response structure:", JSON.stringify(response.data, null, 2));
       
-      const mappedContent = couponsData.map((coupon: any): Coupon => ({
+      // Extract data safely
+      const apiResponseData = response.data;
+      const couponsArray = apiResponseData.data || [];
+      const metadata = apiResponseData.metadata || {};
+      
+      console.log("📊 Coupons array:", couponsArray);
+      console.log("📊 Metadata:", metadata);
+      
+      // Map API response fields to Coupon interface  
+      const mappedContent = couponsArray.map((coupon: any): Coupon => ({
         id: coupon.id,
         code: coupon.code,
         description: coupon.description || '',
@@ -848,8 +856,8 @@ export const couponApi = {
         validFrom: coupon.startDate,
         validTo: coupon.endDate,
         isActive: coupon.isActive,
-        applicableToAllCourses: true, // Default value, adjust based on your needs
-        applicableCourseIds: [], // Default value, adjust based on your needs
+        applicableToAllCourses: true,
+        applicableCourseIds: [],
         createdBy: coupon.createdBy,
         createdByName: coupon.createdByName,
         modifiedBy: coupon.modifiedBy,
@@ -863,12 +871,12 @@ export const couponApi = {
 
       return {
         content: mappedContent,
-        totalElements: response.data.metadata.totalElements,
-        totalPages: response.data.metadata.totalPages,
-        size: response.data.metadata.size,
-        number: response.data.metadata.page,
-        first: response.data.metadata.first,
-        last: response.data.metadata.last
+        totalElements: metadata.totalElements || 0,
+        totalPages: metadata.totalPages || 0,
+        size: metadata.size || 10,
+        number: metadata.page || 0,
+        first: metadata.first || true,
+        last: metadata.last || true
       };
     } catch (error: any) {
       console.error("❌ Coupon API Error:", error);
