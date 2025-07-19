@@ -98,7 +98,11 @@ export default function Users() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
+      console.log('🔍 Fetching users - page:', currentPage, 'size:', pageSize);
       const response = await userProfileApi.getPaginated(currentPage, pageSize);
+      console.log('📡 User API response:', response);
+      console.log('👥 Users content:', response.content);
+      console.log('📊 Total elements:', response.totalElements);
       setUsers(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
