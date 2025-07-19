@@ -267,7 +267,20 @@ export default function Users() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    if (!dateString) return 'N/A';
+    
+    // Check if it's an age range (contains a dash)
+    if (dateString.includes('-')) {
+      return `${dateString} years old`;
+    }
+    
+    // Try to parse as date
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return dateString; // Return as-is if not a valid date
+    }
+    
+    return date.toLocaleDateString();
   };
 
   // Get unique countries for filter
