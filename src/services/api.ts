@@ -740,9 +740,9 @@ export const userProfileApi = {
       dateOfBirth: user.dateOfBirth || '',
       gender: user.gender || '',
       address: user.address || '',
-      city: user.city || '',
-      state: user.state || '',
-      country: user.country || '',
+      city: user.location || '', // Using location field
+      state: '', // Not available as separate field
+      country: '', // Not available as separate field
       postalCode: user.postalCode || '',
       profilePicture: user.profilePicture || '',
       isActive: user.isActive,

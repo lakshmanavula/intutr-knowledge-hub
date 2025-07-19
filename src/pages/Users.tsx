@@ -627,12 +627,7 @@ export default function Users() {
                     <TableCell>
                       <div className="flex items-center text-sm">
                         <MapPin className="w-3 h-3 mr-1" />
-                        <span>
-                          {[user.city, user.state, user.country]
-                            .filter(Boolean)
-                            .filter(part => part.trim() !== '')
-                            .join(', ') || 'Not specified'}
-                        </span>
+                        <span>{user.city || 'Not specified'}</span>
                       </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(user.isActive)}</TableCell>
