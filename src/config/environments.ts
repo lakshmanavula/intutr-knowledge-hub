@@ -15,7 +15,7 @@ export interface EnvironmentConfig {
 export const environments: Record<string, EnvironmentConfig> = {
   local: {
     name: 'Local Development',
-    apiBaseUrl: 'http://localhost:8081',
+    apiBaseUrl: 'https://intutr-kmap-app.onrender.com',
     timeout: 30000,
     enableLogging: true,
     retryAttempts: 1,
