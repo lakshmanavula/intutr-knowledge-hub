@@ -137,6 +137,30 @@ export interface LobData {
   deleted: boolean;
 }
 
+export interface LobFountMaster {
+  id: string;
+  createdBy: string;
+  modifiedBy: string;
+  createdByName: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+  courseId: string;
+  topicId: string;
+  topicTitle: string;
+  lobType: string;
+  trackNum: string;
+  topicSeqNum: string;
+  topicLevel: number;
+  quizSeqNum: string;
+  lobChunkIdx: number;
+  lobData: {
+    content: string;
+  };
+  isActive: boolean;
+}
+
 export interface CreateLobDataRequest {
   topicId: string;
   lobName: string;

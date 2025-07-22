@@ -10,6 +10,7 @@ import type {
   CreateCourseTopicRequest,
   UpdateCourseTopicRequest,
   LobData,
+  LobFountMaster,
   CreateLobDataRequest,
   UpdateLobDataRequest,
   UserProfile,
@@ -1154,6 +1155,55 @@ export const courseRatingApi = {
   // Bulk delete course ratings
   bulkDelete: async (ids: string[]): Promise<void> => {
     await getApiClient().post('/api/course-ratings/bulk-delete', { ids });
+  },
+};
+
+// LOB Fount Master API
+export const lobFountMasterApi = {
+  // Get paginated LOBs
+  getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<LobFountMaster>> => {
+    try {
+      const response = await getApiClient().get(`/api/lob-fount-master/paged?page=${page}&size=${size}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to fetch LOBs');
+    }
+  },
+
+  // Get LOBs by topic ID
+  getByTopicId: async (topicId: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<LobFountMaster>> => {
+    try {
+      const response = await getApiClient().get(`/api/lob-fount-master/topic/${topicId}?page=${page}&size=${size}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to fetch LOBs for topic');
+    }
+  },
+
+  // Get LOB by ID
+  getById: async (id: string): Promise<LobFountMaster> => {
+    try {
+      const response = await getApiClient().get(`/api/lob-fount-master/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to fetch LOB');
+    }
+  },
+
+  // Download LOBs as file
+  downloadLobs: async (topicId?: string): Promise<Blob> => {
+    try {
+      const url = topicId ? `/api/lob-fount-master/download?topicId=${topicId}` : '/api/lob-fount-master/download';
+      const response = await getApiClient().get(url, {
+        responseType: 'blob',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to download LOBs');
+    }
   },
 };
 

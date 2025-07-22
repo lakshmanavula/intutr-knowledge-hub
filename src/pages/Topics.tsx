@@ -7,6 +7,8 @@ import {
   Download,
   Eye,
   Settings,
+  FileDown,
+  Database,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,8 +38,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { courseApi } from "@/services/api";
-import type { Course } from "@/types/api";
+import { courseApi, lobFountMasterApi } from "@/services/api";
+import type { Course, LobFountMaster, PaginatedResponse } from "@/types/api";
 
 // Track interface
 interface Track {
@@ -98,6 +100,8 @@ export default function Topics() {
   const [tracksLoading, setTracksLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const [lobData, setLobData] = useState<{ [topicId: string]: LobFountMaster[] }>({});
+  const [lobLoading, setLobLoading] = useState<{ [topicId: string]: boolean }>({});
   
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState({
@@ -209,6 +213,52 @@ export default function Topics() {
       console.error("Error downloading KMap data:", error);
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleFetchLobData = async (topicId: string) => {
+    try {
+      setLobLoading(prev => ({ ...prev, [topicId]: true }));
+      const response = await lobFountMasterApi.getByTopicId(topicId);
+      setLobData(prev => ({ ...prev, [topicId]: response.content }));
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch LOB data. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error fetching LOB data:", error);
+    } finally {
+      setLobLoading(prev => ({ ...prev, [topicId]: false }));
+    }
+  };
+
+  const handleDownloadLobData = async (topicId: string, topicTitle: string) => {
+    try {
+      const blob = await lobFountMasterApi.downloadLobs(topicId);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `lob-data-${topicTitle.replace(/[^a-zA-Z0-9]/g, '-')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: `LOB data downloaded successfully for "${topicTitle}".`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to download LOB data. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error downloading LOB data:", error);
     }
   };
 
@@ -399,6 +449,7 @@ export default function Topics() {
                   {visibleColumns.topicSequence && <TableHead>Topic Sequence</TableHead>}
                   {visibleColumns.quizSequence && <TableHead>Quiz Sequence</TableHead>}
                   <TableHead>Meta Data</TableHead>
+                  <TableHead>LOB Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -555,6 +606,76 @@ export default function Topics() {
                           </div>
                         </DialogContent>
                       </Dialog>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleFetchLobData(topic.id)}
+                              disabled={lobLoading[topic.id]}
+                            >
+                              <Database className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
+                            <DialogHeader>
+                              <DialogTitle>LOB Data - {topic.topicTitle}</DialogTitle>
+                            </DialogHeader>
+                            <div className="py-4">
+                              {lobLoading[topic.id] ? (
+                                <div className="flex items-center justify-center h-32">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                              ) : lobData[topic.id] && lobData[topic.id].length > 0 ? (
+                                <div className="space-y-4">
+                                  {lobData[topic.id].map((lob, index) => (
+                                    <div key={lob.id} className="border rounded-lg p-4">
+                                      <div className="grid grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                          <strong>LOB Type:</strong> {lob.lobType}
+                                        </div>
+                                        <div>
+                                          <strong>Track Number:</strong> {lob.trackNum}
+                                        </div>
+                                        <div>
+                                          <strong>Topic Sequence:</strong> {lob.topicSeqNum}
+                                        </div>
+                                        <div>
+                                          <strong>Quiz Sequence:</strong> {lob.quizSeqNum}
+                                        </div>
+                                        <div>
+                                          <strong>LOB Chunk Index:</strong> {lob.lobChunkIdx}
+                                        </div>
+                                        <div>
+                                          <strong>Active:</strong> {lob.isActive ? 'Yes' : 'No'}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <strong>Content:</strong>
+                                        <pre className="bg-muted p-3 rounded mt-2 text-sm overflow-auto">
+                                          {lob.lobData.content}
+                                        </pre>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-muted-foreground">No LOB data available for this topic</p>
+                              )}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleDownloadLobData(topic.id, topic.topicTitle)}
+                        >
+                          <FileDown className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
