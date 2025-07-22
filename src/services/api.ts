@@ -1163,9 +1163,28 @@ export const lobFountMasterApi = {
   // Get paginated LOBs
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<LobFountMaster>> => {
     try {
-      const response = await getApiClient().get(`/api/lob-fount-master/paged?page=${page}&size=${size}`);
-      return response.data;
+      const apiClient = getApiClient();
+      const response = await apiClient.get(`/api/lob-fount-master/paged?page=${page}&size=${size}`, {
+        transformResponse: [(data) => data],
+      });
+      
+      const rawData = JSON.parse(response.data);
+      console.log('LOB API raw response:', rawData);
+      
+      const lobsData = rawData.data || [];
+      const metadata = rawData.metadata || {};
+      
+      return {
+        content: lobsData,
+        totalElements: metadata.totalElements || lobsData.length,
+        totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || lobsData.length) / size),
+        size: metadata.size || size,
+        number: metadata.page || page,
+        first: metadata.first !== undefined ? metadata.first : page === 0,
+        last: metadata.last !== undefined ? metadata.last : false,
+      };
     } catch (error: any) {
+      console.error('Error fetching LOBs:', error);
       throw new Error(error.message || 'Failed to fetch LOBs');
     }
   },

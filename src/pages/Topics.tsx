@@ -221,15 +221,18 @@ export default function Topics() {
     try {
       setLobLoading(true);
       setShowAllLobs(true);
+      console.log('Fetching all LOB data...');
       const response = await lobFountMasterApi.getPaginated(0, 1000); // Get a large number to show all
-      setAllLobData(response.content);
+      console.log('LOB response:', response);
+      console.log('LOB content:', response.content);
+      setAllLobData(response.content || []);
     } catch (error) {
+      console.error('Error fetching LOB data:', error);
       toast({
         title: "Error",
         description: "Failed to fetch LOB data. Please try again.",
         variant: "destructive",
       });
-      console.error("Error fetching LOB data:", error);
     } finally {
       setLobLoading(false);
     }
