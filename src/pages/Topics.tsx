@@ -508,7 +508,7 @@ export default function Topics() {
                             <DialogTitle>Topic Ancestors - {topic.topicTitle}</DialogTitle>
                           </DialogHeader>
                           <div className="py-4">
-                            {topic.topicAncestors.length > 0 ? (
+                            {topic.topicAncestors && topic.topicAncestors.length > 0 ? (
                               <pre className="bg-muted p-4 rounded-lg text-sm overflow-auto">
                                 {JSON.stringify(topic.topicAncestors, null, 2)}
                               </pre>
@@ -656,9 +656,9 @@ export default function Topics() {
               <div className="flex items-center justify-center h-32">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
-            ) : allLobData.length > 0 ? (
+            ) : allLobData && allLobData.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {allLobData.map((lob) => (
+                {allLobData?.map((lob) => (
                   <Card key={lob.id} className="p-4">
                     <div className="space-y-3">
                       <div className="flex justify-between items-start">
