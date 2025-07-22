@@ -66,22 +66,22 @@ interface KMapTopic {
   quizSeqNum: string;
   topicAncestors: any[];
   metaData: {
-    textCount: number;
-    mcqCount: number;
-    mcqmCount: number;
-    tofCount: number;
-    mtfCount: number;
-    seqCount: number;
-    fitbCount: number;
-    picCount: number;
-    shortCount: number;
-    essayCount: number;
-    numCount: number;
-    mnemonicsCount: number;
-    videoCount: number;
-    linkCount: number;
-    stmtCount: number;
-    pairsCount: number;
+    text_count: number;
+    mcq_count: number;
+    mcqm_count: number;
+    tof_count: number;
+    mtf_count: number;
+    seq_count: number;
+    fitb_count: number;
+    pic_count: number;
+    short_count: number;
+    essay_count: number;
+    num_count: number;
+    mnemonics_count: number;
+    video_count: number;
+    link_count: number;
+    stmt_count: number;
+    pairs_count: number;
   };
 }
 
@@ -463,69 +463,69 @@ export default function Topics() {
                             <div className="space-y-2">
                               <div className="flex justify-between">
                                 <span className="font-medium">Text Count:</span>
-                                <span>{topic.metaData.textCount}</span>
+                                <span>{topic.metaData.text_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">MCQ Count:</span>
-                                <span>{topic.metaData.mcqCount}</span>
+                                <span>{topic.metaData.mcq_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">MCQM Count:</span>
-                                <span>{topic.metaData.mcqmCount}</span>
+                                <span>{topic.metaData.mcqm_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">TOF Count:</span>
-                                <span>{topic.metaData.tofCount}</span>
+                                <span>{topic.metaData.tof_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">MTF Count:</span>
-                                <span>{topic.metaData.mtfCount}</span>
+                                <span>{topic.metaData.mtf_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">SEQ Count:</span>
-                                <span>{topic.metaData.seqCount}</span>
+                                <span>{topic.metaData.seq_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">FITB Count:</span>
-                                <span>{topic.metaData.fitbCount}</span>
+                                <span>{topic.metaData.fitb_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">PIC Count:</span>
-                                <span>{topic.metaData.picCount}</span>
+                                <span>{topic.metaData.pic_count}</span>
                               </div>
                             </div>
                             <div className="space-y-2">
                               <div className="flex justify-between">
                                 <span className="font-medium">Short Count:</span>
-                                <span>{topic.metaData.shortCount}</span>
+                                <span>{topic.metaData.short_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">Essay Count:</span>
-                                <span>{topic.metaData.essayCount}</span>
+                                <span>{topic.metaData.essay_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">Num Count:</span>
-                                <span>{topic.metaData.numCount}</span>
+                                <span>{topic.metaData.num_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">Mnemonics Count:</span>
-                                <span>{topic.metaData.mnemonicsCount}</span>
+                                <span>{topic.metaData.mnemonics_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">Video Count:</span>
-                                <span>{topic.metaData.videoCount}</span>
+                                <span>{topic.metaData.video_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">Link Count:</span>
-                                <span>{topic.metaData.linkCount}</span>
+                                <span>{topic.metaData.link_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">Stmt Count:</span>
-                                <span>{topic.metaData.stmtCount}</span>
+                                <span>{topic.metaData.stmt_count}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-medium">Pairs Count:</span>
-                                <span>{topic.metaData.pairsCount}</span>
+                                <span>{topic.metaData.pairs_count}</span>
                               </div>
                             </div>
                             <div className="col-span-2 pt-4 border-t">
