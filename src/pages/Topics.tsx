@@ -424,9 +424,27 @@ export default function Topics() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm max-w-32 truncate">
-                        {topic.topicAncestors.length > 0 ? JSON.stringify(topic.topicAncestors) : '-'}
-                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Topic Ancestors - {topic.topicTitle}</DialogTitle>
+                          </DialogHeader>
+                          <div className="py-4">
+                            {topic.topicAncestors.length > 0 ? (
+                              <pre className="bg-muted p-4 rounded-lg text-sm overflow-auto">
+                                {JSON.stringify(topic.topicAncestors, null, 2)}
+                              </pre>
+                            ) : (
+                              <p className="text-muted-foreground">No topic ancestors available</p>
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </TableCell>
                     {visibleColumns.trackNum && (
                       <TableCell>
