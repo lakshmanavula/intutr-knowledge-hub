@@ -10,6 +10,7 @@ import {
   FileDown,
   Database,
 } from "lucide-react";
+import QuizRenderer from "@/components/lob/QuizRenderer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -694,9 +695,15 @@ export default function Topics() {
                       
                       <div>
                         <span className="font-medium text-xs">Content:</span>
-                        <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
-                          {lob.lobData.content}
-                        </div>
+                        {lob.lobType === 'QUIZ' ? (
+                          <div className="mt-1">
+                            <QuizRenderer content={lob.lobData.content} isPreview={true} />
+                          </div>
+                        ) : (
+                          <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
+                            {lob.lobData.content}
+                          </div>
+                        )}
                       </div>
                       
                       <div className="text-xs text-muted-foreground">
