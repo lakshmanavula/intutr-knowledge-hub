@@ -100,8 +100,9 @@ export default function Topics() {
   const [tracksLoading, setTracksLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [downloading, setDownloading] = useState(false);
-  const [lobData, setLobData] = useState<{ [topicId: string]: LobFountMaster[] }>({});
-  const [lobLoading, setLobLoading] = useState<{ [topicId: string]: boolean }>({});
+  const [allLobData, setAllLobData] = useState<LobFountMaster[]>([]);
+  const [lobLoading, setLobLoading] = useState(false);
+  const [showAllLobs, setShowAllLobs] = useState(false);
   
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState({
@@ -216,11 +217,12 @@ export default function Topics() {
     }
   };
 
-  const handleFetchLobData = async (topicId: string) => {
+  const handleFetchAllLobData = async () => {
     try {
-      setLobLoading(prev => ({ ...prev, [topicId]: true }));
-      const response = await lobFountMasterApi.getByTopicId(topicId);
-      setLobData(prev => ({ ...prev, [topicId]: response.content }));
+      setLobLoading(true);
+      setShowAllLobs(true);
+      const response = await lobFountMasterApi.getPaginated(0, 1000); // Get a large number to show all
+      setAllLobData(response.content);
     } catch (error) {
       toast({
         title: "Error",
@@ -229,20 +231,21 @@ export default function Topics() {
       });
       console.error("Error fetching LOB data:", error);
     } finally {
-      setLobLoading(prev => ({ ...prev, [topicId]: false }));
+      setLobLoading(false);
     }
   };
 
-  const handleDownloadLobData = async (topicId: string, topicTitle: string) => {
+  const handleDownloadAllLobData = async () => {
     try {
-      const blob = await lobFountMasterApi.downloadLobs(topicId);
+      setDownloading(true);
+      const blob = await lobFountMasterApi.downloadLobs(); // Download all LOBs
       
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `lob-data-${topicTitle.replace(/[^a-zA-Z0-9]/g, '-')}.json`;
+      a.download = `all-lob-data-${course?.name.replace(/[^a-zA-Z0-9]/g, '-') || 'course'}.xlsx`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -250,7 +253,7 @@ export default function Topics() {
       
       toast({
         title: "Success",
-        description: `LOB data downloaded successfully for "${topicTitle}".`,
+        description: "All LOB data downloaded successfully.",
       });
     } catch (error) {
       toast({
@@ -259,6 +262,8 @@ export default function Topics() {
         variant: "destructive",
       });
       console.error("Error downloading LOB data:", error);
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -291,14 +296,32 @@ export default function Topics() {
             View and download KMap topics for "{course?.courseLabel || 'Loading...'}"
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={handleDownloadKmapData}
-          disabled={downloading || !course}
-        >
-          <Download className="w-4 h-4 mr-2" />
-          {downloading ? "Downloading..." : "Download KMap Data"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleDownloadKmapData}
+            disabled={downloading || !course}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {downloading ? "Downloading..." : "Download KMap Data"}
+          </Button>
+          <Button 
+            onClick={handleFetchAllLobData} 
+            disabled={lobLoading}
+            variant="outline"
+          >
+            <Database className="mr-2 h-4 w-4" />
+            {lobLoading ? "Loading..." : "View All LOBs"}
+          </Button>
+          <Button 
+            onClick={handleDownloadAllLobData} 
+            disabled={downloading}
+            variant="outline"
+          >
+            <FileDown className="mr-2 h-4 w-4" />
+            {downloading ? "Downloading..." : "Download All LOBs"}
+          </Button>
+        </div>
       </div>
 
       {/* Course Info Card */}
@@ -449,7 +472,6 @@ export default function Topics() {
                   {visibleColumns.topicSequence && <TableHead>Topic Sequence</TableHead>}
                   {visibleColumns.quizSequence && <TableHead>Quiz Sequence</TableHead>}
                   <TableHead>Meta Data</TableHead>
-                  <TableHead>LOB Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -607,76 +629,6 @@ export default function Topics() {
                         </DialogContent>
                       </Dialog>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleFetchLobData(topic.id)}
-                              disabled={lobLoading[topic.id]}
-                            >
-                              <Database className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
-                            <DialogHeader>
-                              <DialogTitle>LOB Data - {topic.topicTitle}</DialogTitle>
-                            </DialogHeader>
-                            <div className="py-4">
-                              {lobLoading[topic.id] ? (
-                                <div className="flex items-center justify-center h-32">
-                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                </div>
-                              ) : lobData[topic.id] && lobData[topic.id].length > 0 ? (
-                                <div className="space-y-4">
-                                  {lobData[topic.id].map((lob, index) => (
-                                    <div key={lob.id} className="border rounded-lg p-4">
-                                      <div className="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                          <strong>LOB Type:</strong> {lob.lobType}
-                                        </div>
-                                        <div>
-                                          <strong>Track Number:</strong> {lob.trackNum}
-                                        </div>
-                                        <div>
-                                          <strong>Topic Sequence:</strong> {lob.topicSeqNum}
-                                        </div>
-                                        <div>
-                                          <strong>Quiz Sequence:</strong> {lob.quizSeqNum}
-                                        </div>
-                                        <div>
-                                          <strong>LOB Chunk Index:</strong> {lob.lobChunkIdx}
-                                        </div>
-                                        <div>
-                                          <strong>Active:</strong> {lob.isActive ? 'Yes' : 'No'}
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <strong>Content:</strong>
-                                        <pre className="bg-muted p-3 rounded mt-2 text-sm overflow-auto">
-                                          {lob.lobData.content}
-                                        </pre>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              ) : (
-                                <p className="text-muted-foreground">No LOB data available for this topic</p>
-                              )}
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleDownloadLobData(topic.id, topic.topicTitle)}
-                        >
-                          <FileDown className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -692,6 +644,72 @@ export default function Topics() {
           )}
         </CardContent>
       </Card>
+
+      {/* All LOBs Dialog */}
+      <Dialog open={showAllLobs} onOpenChange={setShowAllLobs}>
+        <DialogContent className="max-w-7xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>All LOB Data</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            {lobLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : allLobData.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {allLobData.map((lob) => (
+                  <Card key={lob.id} className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-start">
+                        <h4 className="font-semibold text-sm truncate">{lob.topicTitle}</h4>
+                        <Badge variant={lob.isActive ? "default" : "secondary"}>
+                          {lob.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="font-medium">Type:</span> {lob.lobType}
+                        </div>
+                        <div>
+                          <span className="font-medium">Track:</span> {lob.trackNum}
+                        </div>
+                        <div>
+                          <span className="font-medium">Seq:</span> {lob.topicSeqNum}
+                        </div>
+                        <div>
+                          <span className="font-medium">Quiz:</span> {lob.quizSeqNum}
+                        </div>
+                        <div>
+                          <span className="font-medium">Level:</span> {lob.topicLevel}
+                        </div>
+                        <div>
+                          <span className="font-medium">Chunk:</span> {lob.lobChunkIdx}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <span className="font-medium text-xs">Content:</span>
+                        <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
+                          {lob.lobData.content}
+                        </div>
+                      </div>
+                      
+                      <div className="text-xs text-muted-foreground">
+                        <div>Created: {new Date(lob.createdDate).toLocaleDateString()}</div>
+                        <div>By: {lob.createdByName}</div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">No LOB data available</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
