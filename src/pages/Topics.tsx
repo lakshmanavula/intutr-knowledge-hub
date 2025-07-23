@@ -201,29 +201,19 @@ export default function Topics() {
     }
   }, [viewMode]);
 
-  const handleDownloadData = async () => {
+  const handleDownloadKmapData = async () => {
     if (!courseId || !course) return;
     
     try {
       setDownloading(true);
-      
-      let blob: Blob;
-      let filename: string;
-      
-      if (viewMode === 'topics') {
-        blob = await courseApi.downloadKmapExcel(courseId);
-        filename = `kmap-data-${course.name.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`;
-      } else {
-        blob = await lobFountMasterApi.downloadCourseExcel(courseId);
-        filename = `lob-data-${course.name.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`;
-      }
+      const blob = await courseApi.downloadKmapExcel(courseId);
       
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = filename;
+      a.download = `kmap-data-${course.name.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -231,16 +221,51 @@ export default function Topics() {
       
       toast({
         title: "Success",
-        description: `${viewMode === 'topics' ? 'KMap' : 'LOB'} data downloaded successfully for "${course.name}".`,
+        description: `KMap data downloaded successfully for "${course.name}".`,
       });
     } catch (error) {
-      const errorMessage = error.message || `Failed to download ${viewMode === 'topics' ? 'KMap' : 'LOB'} data. Please try again.`;
+      const errorMessage = error.message || "Failed to download KMap data. Please try again.";
       toast({
         title: "Error",
         description: errorMessage,
         variant: "destructive",
       });
-      console.error(`Error downloading ${viewMode} data:`, error);
+      console.error("Error downloading KMap data:", error);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDownloadLobData = async () => {
+    if (!courseId || !course) return;
+    
+    try {
+      setDownloading(true);
+      const blob = await lobFountMasterApi.downloadCourseExcel(courseId);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `lob-data-${course.name.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Success",
+        description: `LOB data downloaded successfully for "${course.name}".`,
+      });
+    } catch (error) {
+      const errorMessage = error.message || "Failed to download LOB data. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      console.error("Error downloading LOB data:", error);
     } finally {
       setDownloading(false);
     }
@@ -285,11 +310,19 @@ export default function Topics() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={handleDownloadData}
+            onClick={handleDownloadKmapData}
             disabled={downloading || !course}
           >
             <Download className="w-4 h-4 mr-2" />
-            {downloading ? "Downloading..." : `Download ${viewMode === 'topics' ? 'KMap' : 'LOB'} Data`}
+            {downloading ? "Downloading..." : "Download KMap Data"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleDownloadLobData}
+            disabled={downloading || !course}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {downloading ? "Downloading..." : "Download LOB Data"}
           </Button>
         </div>
       </div>
