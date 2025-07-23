@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -320,7 +320,7 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useState(() => {
+  useEffect(() => {
     try {
       const parsed = JSON.parse(content);
       setQuizData(parsed);
@@ -328,8 +328,9 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
     } catch (err) {
       setError("Failed to parse quiz data");
       console.error("Quiz parsing error:", err);
+      console.log("Raw content:", content);
     }
-  });
+  }, [content]);
 
   if (error) {
     return (
