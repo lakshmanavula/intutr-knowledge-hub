@@ -71,6 +71,7 @@ const getQuestionTypeIcon = (type: string) => {
       return <Edit3 className="w-4 h-4" />;
     case 'mtf':
     case 'match-the-following':
+    case 'pairs':
       return <ArrowUpDown className="w-4 h-4" />;
     case 'seq':
     case 'sequencing':
@@ -107,6 +108,7 @@ const getQuestionTypeBadgeColor = (type: string) => {
       return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
     case 'mtf':
     case 'match-the-following':
+    case 'pairs':
       return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
     case 'seq':
     case 'sequencing':
@@ -232,6 +234,45 @@ const QuestionRenderer = ({ question, index }: { question: QuizQuestion; index: 
                 </div>
               )}
             </div>
+          </div>
+        );
+
+      case 'pairs':
+        return (
+          <div className="space-y-4">
+            {/* Show the pairs first */}
+            <div className="space-y-2">
+              <h4 className="font-medium">Pairs to Match:</h4>
+              {(question as any).pairs?.map((pair: any, idx: number) => (
+                <div key={idx} className="grid grid-cols-2 gap-4 p-2 border rounded">
+                  <div className="font-medium">{pair.item}</div>
+                  <div className="text-muted-foreground">→ {pair.pair}</div>
+                </div>
+              )) || (
+                <div className="p-2 border rounded bg-muted">
+                  <span>No pairs data available</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Then show the multiple choice options */}
+            {question.options && question.options.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium">Select the correct statement:</h4>
+                {question.options.map((option, idx) => (
+                  <div key={idx} className="flex items-center space-x-2 p-2 border rounded">
+                    <span className="font-medium">{String.fromCharCode(65 + idx)}.</span>
+                    <span>{option}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {question.correctAnswer && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                <strong>Correct Answer:</strong> {question.correctAnswer}
+              </div>
+            )}
           </div>
         );
 
@@ -399,7 +440,8 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
           'short_answer': 'short',
           'essay': 'essay',
           'numerical': 'num',
-          'multiple_select': 'mcqm'
+          'multiple_select': 'mcqm',
+          'pairs': 'pairs'
         };
         
         const questionType = typeMapping[parsed.type] || parsed.type;
