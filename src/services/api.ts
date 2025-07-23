@@ -1209,6 +1209,16 @@ export const lobFountMasterApi = {
     }
   },
 
+  // Get LOBs by course and track
+  getByCourseAndTrack: async (courseId: string, trackNumber: string): Promise<LobFountMaster[]> => {
+    try {
+      const response = await getApiClient().get(`/api/lob-fount-master/by-course/${courseId}/track/${trackNumber}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to fetch LOBs for course and track');
+    }
+  },
+
   // Download LOBs as file
   downloadLobs: async (topicId?: string): Promise<Blob> => {
     try {
@@ -1222,6 +1232,21 @@ export const lobFountMasterApi = {
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to download LOBs');
+    }
+  },
+
+  // Download LOBs for specific course as Excel
+  downloadCourseExcel: async (courseId: string): Promise<Blob> => {
+    try {
+      const response = await getApiClient().get(`/api/lob-fount-master/download-excel/${courseId}`, {
+        responseType: 'blob',
+        headers: {
+          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to download course LOB data');
     }
   },
 };

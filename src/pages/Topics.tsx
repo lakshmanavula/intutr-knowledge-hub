@@ -7,8 +7,6 @@ import {
   Download,
   Eye,
   Settings,
-  FileDown,
-  Database,
 } from "lucide-react";
 import QuizRenderer from "@/components/lob/QuizRenderer";
 import { Button } from "@/components/ui/button";
@@ -40,7 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { courseApi, lobFountMasterApi } from "@/services/api";
-import type { Course, LobFountMaster, PaginatedResponse } from "@/types/api";
+import type { Course, LobFountMaster } from "@/types/api";
 
 // Track interface
 interface Track {
@@ -97,13 +95,12 @@ export default function Topics() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [selectedTrack, setSelectedTrack] = useState<string>("");
   const [kmapTopics, setKmapTopics] = useState<KMapTopic[]>([]);
+  const [lobData, setLobData] = useState<LobFountMaster[]>([]);
   const [loading, setLoading] = useState(true);
   const [tracksLoading, setTracksLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [downloading, setDownloading] = useState(false);
-  const [allLobData, setAllLobData] = useState<LobFountMaster[]>([]);
-  const [lobLoading, setLobLoading] = useState(false);
-  const [showAllLobs, setShowAllLobs] = useState(false);
+  const [viewMode, setViewMode] = useState<'topics' | 'lobs'>('topics');
   
   // Column visibility state
   const [visibleColumns, setVisibleColumns] = useState({
@@ -131,11 +128,11 @@ export default function Topics() {
       const tracksArray = Array.isArray(tracksResponse) ? tracksResponse : [];
       setTracks(tracksArray);
       
-      // Select first track by default and fetch its topics
+      // Select first track by default and fetch its data
       if (tracksArray.length > 0) {
         const firstTrack = tracksArray[0].trackNumber;
         setSelectedTrack(firstTrack);
-        await fetchTopicsForTrack(firstTrack);
+        await fetchDataForTrack(firstTrack);
       }
       
     } catch (error) {
@@ -150,23 +147,31 @@ export default function Topics() {
     }
   };
 
-  const fetchTopicsForTrack = async (trackNum: string) => {
+  const fetchDataForTrack = async (trackNum: string) => {
     if (!courseId || !trackNum) return;
     
     try {
       setTracksLoading(true);
       
-      // Fetch topics for selected track
-      console.log('Fetching topics for courseId:', courseId, 'trackNum:', trackNum);
-      const topicsResponse = await courseApi.getTopicsByTrack(courseId, trackNum);
-      console.log('Topics for track response:', topicsResponse);
-      setKmapTopics(Array.isArray(topicsResponse) ? topicsResponse : []);
+      if (viewMode === 'topics') {
+        // Fetch topics for selected track
+        console.log('Fetching topics for courseId:', courseId, 'trackNum:', trackNum);
+        const topicsResponse = await courseApi.getTopicsByTrack(courseId, trackNum);
+        console.log('Topics for track response:', topicsResponse);
+        setKmapTopics(Array.isArray(topicsResponse) ? topicsResponse : []);
+      } else {
+        // Fetch LOB data for selected track
+        console.log('Fetching LOB data for courseId:', courseId, 'trackNum:', trackNum);
+        const lobResponse = await lobFountMasterApi.getByCourseAndTrack(courseId, trackNum);
+        console.log('LOB data for track response:', lobResponse);
+        setLobData(Array.isArray(lobResponse) ? lobResponse : []);
+      }
       
     } catch (error) {
-      console.error("Error fetching topics for track:", error);
+      console.error("Error fetching data for track:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch topics for selected track. Please try again.",
+        description: `Failed to fetch ${viewMode} for selected track. Please try again.`,
         variant: "destructive",
       });
     } finally {
@@ -176,26 +181,49 @@ export default function Topics() {
 
   const handleTrackSelect = async (trackNumber: string) => {
     setSelectedTrack(trackNumber);
-    await fetchTopicsForTrack(trackNumber);
+    await fetchDataForTrack(trackNumber);
+  };
+
+  const handleViewModeToggle = async (mode: 'topics' | 'lobs') => {
+    setViewMode(mode);
+    if (selectedTrack) {
+      await fetchDataForTrack(selectedTrack);
+    }
   };
 
   useEffect(() => {
     fetchCourseAndTracks();
   }, [courseId]);
 
-  const handleDownloadKmapData = async () => {
+  useEffect(() => {
+    if (selectedTrack) {
+      fetchDataForTrack(selectedTrack);
+    }
+  }, [viewMode]);
+
+  const handleDownloadData = async () => {
     if (!courseId || !course) return;
     
     try {
       setDownloading(true);
-      const blob = await courseApi.downloadKmapExcel(courseId);
+      
+      let blob: Blob;
+      let filename: string;
+      
+      if (viewMode === 'topics') {
+        blob = await courseApi.downloadKmapExcel(courseId);
+        filename = `kmap-data-${course.name.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`;
+      } else {
+        blob = await lobFountMasterApi.downloadCourseExcel(courseId);
+        filename = `lob-data-${course.name.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`;
+      }
       
       // Create download link
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `kmap-data-${course.name.replace(/[^a-zA-Z0-9]/g, '-')}.xlsx`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -203,69 +231,16 @@ export default function Topics() {
       
       toast({
         title: "Success",
-        description: `KMap data downloaded successfully for "${course.name}".`,
+        description: `${viewMode === 'topics' ? 'KMap' : 'LOB'} data downloaded successfully for "${course.name}".`,
       });
     } catch (error) {
-      const errorMessage = error.message || "Failed to download KMap data. Please try again.";
+      const errorMessage = error.message || `Failed to download ${viewMode === 'topics' ? 'KMap' : 'LOB'} data. Please try again.`;
       toast({
         title: "Error",
         description: errorMessage,
         variant: "destructive",
       });
-      console.error("Error downloading KMap data:", error);
-    } finally {
-      setDownloading(false);
-    }
-  };
-
-  const handleFetchAllLobData = async () => {
-    try {
-      setLobLoading(true);
-      setShowAllLobs(true);
-      console.log('Fetching all LOB data...');
-      const response = await lobFountMasterApi.getPaginated(0, 1000); // Get a large number to show all
-      console.log('LOB response:', response);
-      console.log('LOB content:', response.content);
-      setAllLobData(response.content || []);
-    } catch (error) {
-      console.error('Error fetching LOB data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch LOB data. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLobLoading(false);
-    }
-  };
-
-  const handleDownloadAllLobData = async () => {
-    try {
-      setDownloading(true);
-      const blob = await lobFountMasterApi.downloadLobs(); // Download all LOBs
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `all-lob-data-${course?.name.replace(/[^a-zA-Z0-9]/g, '-') || 'course'}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast({
-        title: "Success",
-        description: "All LOB data downloaded successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to download LOB data. Please try again.",
-        variant: "destructive",
-      });
-      console.error("Error downloading LOB data:", error);
+      console.error(`Error downloading ${viewMode} data:`, error);
     } finally {
       setDownloading(false);
     }
@@ -275,6 +250,11 @@ export default function Topics() {
     topic.topicTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (topic.description && topic.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (topic.keywords && topic.keywords.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const filteredLobData = (Array.isArray(lobData) ? lobData : []).filter(lob =>
+    lob.topicTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (lob.lobData && JSON.stringify(lob.lobData).toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getTotalContentCount = (metaData: KMapTopic['metaData']) => {
@@ -295,35 +275,21 @@ export default function Topics() {
           Back to Courses
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-foreground">KMap Topics</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            {viewMode === 'topics' ? 'KMap Topics' : 'LOB Data'}
+          </h1>
           <p className="text-muted-foreground">
-            View and download KMap topics for "{course?.courseLabel || 'Loading...'}"
+            View and download {viewMode === 'topics' ? 'KMap topics' : 'LOB data'} for "{course?.courseLabel || 'Loading...'}"
           </p>
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={handleDownloadKmapData}
+            onClick={handleDownloadData}
             disabled={downloading || !course}
           >
             <Download className="w-4 h-4 mr-2" />
-            {downloading ? "Downloading..." : "Download KMap Data"}
-          </Button>
-          <Button 
-            onClick={handleFetchAllLobData} 
-            disabled={lobLoading}
-            variant="outline"
-          >
-            <Database className="mr-2 h-4 w-4" />
-            {lobLoading ? "Loading..." : "View All LOBs"}
-          </Button>
-          <Button 
-            onClick={handleDownloadAllLobData} 
-            disabled={downloading}
-            variant="outline"
-          >
-            <FileDown className="mr-2 h-4 w-4" />
-            {downloading ? "Downloading..." : "Download All LOBs"}
+            {downloading ? "Downloading..." : `Download ${viewMode === 'topics' ? 'KMap' : 'LOB'} Data`}
           </Button>
         </div>
       </div>
@@ -349,7 +315,10 @@ export default function Topics() {
                     {course.status}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {filteredKmapTopics.length} KMap topics
+                    {viewMode === 'topics' 
+                      ? `${filteredKmapTopics.length} KMap topics` 
+                      : `${filteredLobData.length} LOB items`
+                    }
                   </span>
                 </div>
               </div>
@@ -357,6 +326,31 @@ export default function Topics() {
           </CardContent>
         </Card>
       )}
+
+      {/* View Mode Toggle */}
+      <Card>
+        <CardHeader>
+          <CardTitle>View Mode</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === 'topics' ? "default" : "outline"}
+              onClick={() => handleViewModeToggle('topics')}
+              disabled={tracksLoading}
+            >
+              KMap Topics
+            </Button>
+            <Button
+              variant={viewMode === 'lobs' ? "default" : "outline"}
+              onClick={() => handleViewModeToggle('lobs')}
+              disabled={tracksLoading}
+            >
+              LOB Data
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Track Selection */}
       {tracks.length > 0 && (
@@ -389,79 +383,86 @@ export default function Topics() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search KMap topics by title, description, or keywords..."
+                placeholder={`Search ${viewMode === 'topics' ? 'KMap topics by title, description, or keywords' : 'LOB data by title or content'}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Columns
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.id}
-                  onCheckedChange={(checked) => 
-                    setVisibleColumns(prev => ({ ...prev, id: checked }))
-                  }
-                >
-                  ID
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.trackNum}
-                  onCheckedChange={(checked) => 
-                    setVisibleColumns(prev => ({ ...prev, trackNum: checked }))
-                  }
-                >
-                  Track Number
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.topicLevel}
-                  onCheckedChange={(checked) => 
-                    setVisibleColumns(prev => ({ ...prev, topicLevel: checked }))
-                  }
-                >
-                  Topic Level
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.topicSequence}
-                  onCheckedChange={(checked) => 
-                    setVisibleColumns(prev => ({ ...prev, topicSequence: checked }))
-                  }
-                >
-                  Topic Sequence
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={visibleColumns.quizSequence}
-                  onCheckedChange={(checked) => 
-                    setVisibleColumns(prev => ({ ...prev, quizSequence: checked }))
-                  }
-                >
-                  Quiz Sequence
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {viewMode === 'topics' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Columns
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.id}
+                    onCheckedChange={(checked) => 
+                      setVisibleColumns(prev => ({ ...prev, id: checked }))
+                    }
+                  >
+                    ID
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.trackNum}
+                    onCheckedChange={(checked) => 
+                      setVisibleColumns(prev => ({ ...prev, trackNum: checked }))
+                    }
+                  >
+                    Track Number
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.topicLevel}
+                    onCheckedChange={(checked) => 
+                      setVisibleColumns(prev => ({ ...prev, topicLevel: checked }))
+                    }
+                  >
+                    Topic Level
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.topicSequence}
+                    onCheckedChange={(checked) => 
+                      setVisibleColumns(prev => ({ ...prev, topicSequence: checked }))
+                    }
+                  >
+                    Topic Sequence
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={visibleColumns.quizSequence}
+                    onCheckedChange={(checked) => 
+                      setVisibleColumns(prev => ({ ...prev, quizSequence: checked }))
+                    }
+                  >
+                    Quiz Sequence
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* KMap Topics Table */}
+      {/* Content Table */}
       <Card>
         <CardHeader>
-          <CardTitle>KMap Topics ({filteredKmapTopics.length})</CardTitle>
+          <CardTitle>
+            {viewMode === 'topics' 
+              ? `KMap Topics (${filteredKmapTopics.length})` 
+              : `LOB Data (${filteredLobData.length})`
+            }
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {loading || tracksLoading ? (
             <div className="flex items-center justify-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
-          ) : (
+          ) : viewMode === 'topics' ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -637,89 +638,78 @@ export default function Topics() {
                 ))}
               </TableBody>
             </Table>
+          ) : (
+            // LOB Data Grid View
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {filteredLobData.map((lob) => (
+                <Card key={lob.id} className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-semibold text-sm truncate">{lob.topicTitle}</h4>
+                      <Badge variant={lob.isActive ? "default" : "secondary"}>
+                        {lob.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="font-medium">Type:</span> {lob.lobType}
+                      </div>
+                      <div>
+                        <span className="font-medium">Track:</span> {lob.trackNum}
+                      </div>
+                      <div>
+                        <span className="font-medium">Seq:</span> {lob.topicSeqNum}
+                      </div>
+                      <div>
+                        <span className="font-medium">Quiz:</span> {lob.quizSeqNum}
+                      </div>
+                      <div>
+                        <span className="font-medium">Level:</span> {lob.topicLevel}
+                      </div>
+                      <div>
+                        <span className="font-medium">Chunk:</span> {lob.lobChunkIdx}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <span className="font-medium text-xs">Content:</span>
+                      {lob.lobType === 'QUIZ' ? (
+                        <div className="mt-1">
+                          <QuizRenderer content={typeof lob.lobData?.content === 'string' ? lob.lobData.content : JSON.stringify(lob.lobData || {})} isPreview={true} />
+                        </div>
+                      ) : (
+                        <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
+                          {lob.lobData.content}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="text-xs text-muted-foreground">
+                      <div>Created: {new Date(lob.createdDate).toLocaleDateString()}</div>
+                      <div>By: {lob.createdByName}</div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           )}
 
-          {!loading && filteredKmapTopics.length === 0 && (
+          {!loading && !tracksLoading && (
+            (viewMode === 'topics' && filteredKmapTopics.length === 0) ||
+            (viewMode === 'lobs' && filteredLobData.length === 0)
+          ) && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
-                {searchTerm ? "No KMap topics found matching your search." : "No KMap topics available for this course."}
+                {searchTerm 
+                  ? `No ${viewMode === 'topics' ? 'KMap topics' : 'LOB data'} found matching your search.` 
+                  : `No ${viewMode === 'topics' ? 'KMap topics' : 'LOB data'} available for this course.`
+                }
               </p>
             </div>
           )}
         </CardContent>
       </Card>
-
-      {/* All LOBs Dialog */}
-      <Dialog open={showAllLobs} onOpenChange={setShowAllLobs}>
-        <DialogContent className="max-w-7xl max-h-[90vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle>All LOB Data</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            {lobLoading ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : allLobData && allLobData.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {allLobData?.map((lob) => (
-                  <Card key={lob.id} className="p-4">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-semibold text-sm truncate">{lob.topicTitle}</h4>
-                        <Badge variant={lob.isActive ? "default" : "secondary"}>
-                          {lob.isActive ? "Active" : "Inactive"}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="font-medium">Type:</span> {lob.lobType}
-                        </div>
-                        <div>
-                          <span className="font-medium">Track:</span> {lob.trackNum}
-                        </div>
-                        <div>
-                          <span className="font-medium">Seq:</span> {lob.topicSeqNum}
-                        </div>
-                        <div>
-                          <span className="font-medium">Quiz:</span> {lob.quizSeqNum}
-                        </div>
-                        <div>
-                          <span className="font-medium">Level:</span> {lob.topicLevel}
-                        </div>
-                        <div>
-                          <span className="font-medium">Chunk:</span> {lob.lobChunkIdx}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <span className="font-medium text-xs">Content:</span>
-                        {lob.lobType === 'QUIZ' ? (
-                          <div className="mt-1">
-                            <QuizRenderer content={typeof lob.lobData?.content === 'string' ? lob.lobData.content : JSON.stringify(lob.lobData || {})} isPreview={true} />
-                          </div>
-                        ) : (
-                          <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
-                            {lob.lobData.content}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="text-xs text-muted-foreground">
-                        <div>Created: {new Date(lob.createdDate).toLocaleDateString()}</div>
-                        <div>By: {lob.createdByName}</div>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">No LOB data available</p>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
