@@ -387,6 +387,8 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
       // Check if this is a single question or a full quiz
       if (parsed.type && parsed.question_text) {
         // Single question format - convert to quiz format
+        console.log("Raw parsed data:", parsed);
+        
         // Map the actual API types to our internal types
         const typeMapping: { [key: string]: string } = {
           'multiple_choice': 'mcq',
@@ -401,6 +403,8 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
         };
         
         const questionType = typeMapping[parsed.type] || parsed.type;
+        console.log("Mapped question type:", questionType);
+        console.log("Original type:", parsed.type);
         
         const singleQuizData: QuizData = {
           title: "Quiz Question",
@@ -418,9 +422,13 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
             image: parsed.image,
             pairs: parsed.pairs,
             sequence: parsed.sequence,
-            fillInBlanks: parsed.fill_in_blanks
-          }]
+            fillInBlanks: parsed.fill_in_blanks,
+            // Add the new match_the_following fields
+            ...(parsed.items && { items: parsed.items }),
+            ...(parsed.matches && { matches: parsed.matches })
+          } as any]
         };
+        console.log("Final quiz data:", singleQuizData);
         setQuizData(singleQuizData);
       } else {
         // Full quiz format
