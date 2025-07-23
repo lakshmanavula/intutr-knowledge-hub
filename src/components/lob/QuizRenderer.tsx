@@ -2,11 +2,6 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   HelpCircle,
   CheckCircle2,
@@ -133,60 +128,78 @@ const getQuestionTypeBadgeColor = (type: string) => {
 };
 
 const QuestionRenderer = ({ question, index }: { question: QuizQuestion; index: number }) => {
-  const [selectedAnswer, setSelectedAnswer] = useState<string | string[]>("");
   const [showExplanation, setShowExplanation] = useState(false);
 
   const renderQuestionContent = () => {
     switch (question.type.toLowerCase()) {
       case 'mcq':
-      case 'multiple-choice':
-        return (
-          <RadioGroup value={selectedAnswer as string} onValueChange={setSelectedAnswer}>
-            {question.options?.map((option, idx) => (
-              <div key={idx} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={`q${index}-${idx}`} />
-                <Label htmlFor={`q${index}-${idx}`}>{option}</Label>
-              </div>
-            ))}
-          </RadioGroup>
-        );
-
-      case 'mcqm':
-      case 'multiple-select':
+      case 'multiple_choice':
         return (
           <div className="space-y-2">
             {question.options?.map((option, idx) => (
-              <div key={idx} className="flex items-center space-x-2">
-                <Checkbox id={`q${index}-${idx}`} />
-                <Label htmlFor={`q${index}-${idx}`}>{option}</Label>
+              <div key={idx} className="flex items-center space-x-2 p-2 border rounded">
+                <span className="font-medium">{String.fromCharCode(65 + idx)}.</span>
+                <span>{option}</span>
               </div>
             ))}
+            {question.correctAnswer && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                <strong>Correct Answer:</strong> {question.correctAnswer}
+              </div>
+            )}
+          </div>
+        );
+
+      case 'mcqm':
+      case 'multiple_select':
+        return (
+          <div className="space-y-2">
+            {question.options?.map((option, idx) => (
+              <div key={idx} className="flex items-center space-x-2 p-2 border rounded">
+                <span className="font-medium">{String.fromCharCode(65 + idx)}.</span>
+                <span>{option}</span>
+              </div>
+            ))}
+            {question.correctAnswer && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                <strong>Correct Answers:</strong> {Array.isArray(question.correctAnswer) ? question.correctAnswer.join(', ') : question.correctAnswer}
+              </div>
+            )}
           </div>
         );
 
       case 'tof':
       case 'true-false':
         return (
-          <RadioGroup value={selectedAnswer as string} onValueChange={setSelectedAnswer}>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="true" id={`q${index}-true`} />
-              <Label htmlFor={`q${index}-true`}>True</Label>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2 p-2 border rounded">
+              <span className="font-medium">A.</span>
+              <span>True</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="false" id={`q${index}-false`} />
-              <Label htmlFor={`q${index}-false`}>False</Label>
+            <div className="flex items-center space-x-2 p-2 border rounded">
+              <span className="font-medium">B.</span>
+              <span>False</span>
             </div>
-          </RadioGroup>
+            {question.correctAnswer && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                <strong>Correct Answer:</strong> {question.correctAnswer}
+              </div>
+            )}
+          </div>
         );
 
       case 'fitb':
       case 'fill-in-blanks':
         return (
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Fill in the blanks:</p>
-            {question.fillInBlanks?.blanks.map((blank, idx) => (
-              <Input key={idx} placeholder={`Blank ${idx + 1}`} className="max-w-xs" />
-            ))}
+            <div className="p-2 border rounded bg-muted">
+              <span>Fill in the blanks question</span>
+            </div>
+            {question.correctAnswer && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                <strong>Answer:</strong> {Array.isArray(question.correctAnswer) ? question.correctAnswer.join(', ') : question.correctAnswer}
+              </div>
+            )}
           </div>
         );
 
@@ -213,11 +226,10 @@ const QuestionRenderer = ({ question, index }: { question: QuizQuestion; index: 
       case 'sequencing':
         return (
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Arrange in correct order:</p>
+            <p className="text-sm text-muted-foreground">Sequence the following items:</p>
             {question.sequence?.map((item, idx) => (
-              <div key={idx} className="p-2 border rounded flex items-center justify-between">
+              <div key={idx} className="p-2 border rounded">
                 <span>{item}</span>
-                <Button variant="ghost" size="sm">↕</Button>
               </div>
             ))}
           </div>
@@ -225,17 +237,47 @@ const QuestionRenderer = ({ question, index }: { question: QuizQuestion; index: 
 
       case 'short':
       case 'short-answer':
-        return <Input placeholder="Enter your short answer..." />;
+        return (
+          <div className="space-y-2">
+            <div className="p-2 border rounded bg-muted">
+              <span>Short answer question</span>
+            </div>
+            {question.correctAnswer && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                <strong>Answer:</strong> {question.correctAnswer}
+              </div>
+            )}
+          </div>
+        );
 
       case 'essay':
-        return <Textarea placeholder="Write your essay answer..." className="min-h-32" />;
+        return (
+          <div className="p-2 border rounded bg-muted">
+            <span>Essay question</span>
+          </div>
+        );
 
       case 'num':
       case 'numerical':
-        return <Input type="number" placeholder="Enter numerical answer..." className="max-w-xs" />;
+        return (
+          <div className="space-y-2">
+            <div className="p-2 border rounded bg-muted">
+              <span>Numerical answer question</span>
+            </div>
+            {question.correctAnswer && (
+              <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                <strong>Answer:</strong> {question.correctAnswer}
+              </div>
+            )}
+          </div>
+        );
 
       default:
-        return <Input placeholder="Enter your answer..." />;
+        return (
+          <div className="p-2 border rounded bg-muted">
+            <span>Question content</span>
+          </div>
+        );
     }
   };
 
