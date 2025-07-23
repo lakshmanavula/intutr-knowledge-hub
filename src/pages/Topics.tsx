@@ -697,7 +697,7 @@ export default function Topics() {
                         <span className="font-medium text-xs">Content:</span>
                         {lob.lobType === 'QUIZ' ? (
                           <div className="mt-1">
-                            <QuizRenderer content={lob.lobData.content} isPreview={true} />
+                            <QuizRenderer content={typeof lob.lobData?.content === 'string' ? lob.lobData.content : JSON.stringify(lob.lobData || {})} isPreview={true} />
                           </div>
                         ) : (
                           <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
