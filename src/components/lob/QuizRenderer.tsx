@@ -328,7 +328,31 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
     
     try {
       const parsed = JSON.parse(content);
-      setQuizData(parsed);
+      
+      // Check if this is a single question or a full quiz
+      if (parsed.type && parsed.question_text) {
+        // Single question format - convert to quiz format
+        const singleQuizData: QuizData = {
+          title: "Quiz Question",
+          questions: [{
+            id: "1",
+            type: parsed.type,
+            question: parsed.question_text,
+            options: parsed.options?.map((opt: any) => Object.values(opt)[0]) || [],
+            correctAnswer: parsed.correct_answer,
+            explanation: parsed.explanation,
+            points: parsed.points || 1,
+            difficulty: parsed.difficulty,
+            timeLimit: parsed.time_limit,
+            hint: parsed.hint,
+            image: parsed.image
+          }]
+        };
+        setQuizData(singleQuizData);
+      } else {
+        // Full quiz format
+        setQuizData(parsed);
+      }
       setError(null);
     } catch (err) {
       setError("Failed to parse quiz data");
