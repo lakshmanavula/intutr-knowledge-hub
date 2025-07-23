@@ -210,21 +210,25 @@ const QuestionRenderer = ({ question, index }: { question: QuizQuestion; index: 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <h4 className="font-medium">Column A</h4>
-              {question.pairs?.map((pair, idx) => (
+              {(question as any).items?.map((item: string, idx: number) => (
+                <div key={idx} className="p-2 border rounded">{item}</div>
+              )) || question.pairs?.map((pair, idx) => (
                 <div key={idx} className="p-2 border rounded">{pair.left}</div>
               )) || (
                 <div className="p-2 border rounded bg-muted">
-                  <span>No pairs data available</span>
+                  <span>No items data available</span>
                 </div>
               )}
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Column B</h4>
-              {question.pairs?.map((pair, idx) => (
+              {(question as any).matches?.map((match: string, idx: number) => (
+                <div key={idx} className="p-2 border rounded">{match}</div>
+              )) || question.pairs?.map((pair, idx) => (
                 <div key={idx} className="p-2 border rounded">{pair.right}</div>
               )) || (
                 <div className="p-2 border rounded bg-muted">
-                  <span>No pairs data available</span>
+                  <span>No matches data available</span>
                 </div>
               )}
             </div>
