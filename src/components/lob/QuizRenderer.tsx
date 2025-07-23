@@ -205,19 +205,28 @@ const QuestionRenderer = ({ question, index }: { question: QuizQuestion; index: 
 
       case 'mtf':
       case 'match-the-following':
+      case 'match_the_following':
         return (
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <h4 className="font-medium">Column A</h4>
               {question.pairs?.map((pair, idx) => (
                 <div key={idx} className="p-2 border rounded">{pair.left}</div>
-              ))}
+              )) || (
+                <div className="p-2 border rounded bg-muted">
+                  <span>No pairs data available</span>
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Column B</h4>
               {question.pairs?.map((pair, idx) => (
                 <div key={idx} className="p-2 border rounded">{pair.right}</div>
-              ))}
+              )) || (
+                <div className="p-2 border rounded bg-muted">
+                  <span>No pairs data available</span>
+                </div>
+              )}
             </div>
           </div>
         );
