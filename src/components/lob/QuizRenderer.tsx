@@ -321,6 +321,11 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!content || content === 'undefined') {
+      setError("No quiz data available");
+      return;
+    }
+    
     try {
       const parsed = JSON.parse(content);
       setQuizData(parsed);
