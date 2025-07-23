@@ -374,11 +374,26 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
       // Check if this is a single question or a full quiz
       if (parsed.type && parsed.question_text) {
         // Single question format - convert to quiz format
+        // Map the actual API types to our internal types
+        const typeMapping: { [key: string]: string } = {
+          'multiple_choice': 'mcq',
+          'true_false': 'tof',
+          'fill_in_blanks': 'fitb',
+          'match_the_following': 'mtf',
+          'sequencing': 'seq',
+          'short_answer': 'short',
+          'essay': 'essay',
+          'numerical': 'num',
+          'multiple_select': 'mcqm'
+        };
+        
+        const questionType = typeMapping[parsed.type] || parsed.type;
+        
         const singleQuizData: QuizData = {
           title: "Quiz Question",
           questions: [{
             id: "1",
-            type: parsed.type,
+            type: questionType,
             question: parsed.question_text,
             options: parsed.options?.map((opt: any) => Object.values(opt)[0]) || [],
             correctAnswer: parsed.correct_answer,
@@ -387,7 +402,10 @@ export default function QuizRenderer({ content, isPreview = true }: QuizRenderer
             difficulty: parsed.difficulty,
             timeLimit: parsed.time_limit,
             hint: parsed.hint,
-            image: parsed.image
+            image: parsed.image,
+            pairs: parsed.pairs,
+            sequence: parsed.sequence,
+            fillInBlanks: parsed.fill_in_blanks
           }]
         };
         setQuizData(singleQuizData);
