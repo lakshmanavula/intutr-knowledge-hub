@@ -69,9 +69,9 @@ const Subscriptions = () => {
 
   // Search parameters
   const searchParams = {
-    ...(searchQuery && { userEmail: searchQuery }),
+    ...(searchQuery && { userId: searchQuery }),
     ...(statusFilter && { status: statusFilter }),
-    ...(paymentMethodFilter && { paymentMethod: paymentMethodFilter }),
+    ...(paymentMethodFilter && { gatewayType: paymentMethodFilter }),
   };
 
   // Fetch subscriptions
@@ -133,7 +133,7 @@ const Subscriptions = () => {
   const handleFilterChange = (filterType: string, value: string) => {
     if (filterType === 'status') {
       setStatusFilter(value === 'all' ? '' : value);
-    } else if (filterType === 'paymentMethod') {
+    } else if (filterType === 'gatewayType') {
       setPaymentMethodFilter(value === 'all' ? '' : value);
     }
     setCurrentPage(0);
@@ -230,7 +230,7 @@ const Subscriptions = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by user email..."
+                  placeholder="Search by user ID..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10"
@@ -250,17 +250,16 @@ const Subscriptions = () => {
                 <SelectItem value={SubscriptionStatus.SUSPENDED}>Suspended</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={paymentMethodFilter || 'all'} onValueChange={(value) => handleFilterChange('paymentMethod', value)}>
+            <Select value={paymentMethodFilter || 'all'} onValueChange={(value) => handleFilterChange('gatewayType', value)}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="All Methods" />
+                <SelectValue placeholder="All Gateways" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Methods</SelectItem>
-                <SelectItem value={PaymentMethod.STRIPE}>Stripe</SelectItem>
-                <SelectItem value={PaymentMethod.RAZORPAY}>Razorpay</SelectItem>
-                <SelectItem value={PaymentMethod.GOOGLE_PAY}>Google Pay</SelectItem>
-                <SelectItem value={PaymentMethod.APPLE_PAY}>Apple Pay</SelectItem>
-                <SelectItem value={PaymentMethod.MANUAL}>Manual</SelectItem>
+                <SelectItem value="all">All Gateways</SelectItem>
+                <SelectItem value="GOOGLE_PLAY">Google Play</SelectItem>
+                <SelectItem value="APPLE_APP_STORE">Apple App Store</SelectItem>
+                <SelectItem value="STRIPE">Stripe</SelectItem>
+                <SelectItem value="RAZORPAY">Razorpay</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -281,42 +280,48 @@ const Subscriptions = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Payment</TableHead>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                     <TableHead>User ID</TableHead>
+                     <TableHead>Product ID</TableHead>
+                     <TableHead>Gateway</TableHead>
+                     <TableHead>Status</TableHead>
+                     <TableHead>Auto Renew</TableHead>
+                     <TableHead>Start Date</TableHead>
+                     <TableHead>End Date</TableHead>
+                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {subscriptions.map((subscription) => (
                     <TableRow key={subscription.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{subscription.userName}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {subscription.userEmail}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{subscription.productName}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {subscription.productType}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(subscription.amount, subscription.currency)}
-                      </TableCell>
-                      <TableCell>{getStatusBadge(subscription.status)}</TableCell>
-                      <TableCell>{getPaymentMethodBadge(subscription.paymentMethod)}</TableCell>
-                      <TableCell>{formatDate(subscription.startDate)}</TableCell>
-                      <TableCell>{formatDate(subscription.endDate)}</TableCell>
+                       <TableCell>
+                         <div>
+                           <div className="font-medium">{subscription.userId}</div>
+                           <div className="text-sm text-muted-foreground">
+                             {subscription.createdByName || 'N/A'}
+                           </div>
+                         </div>
+                       </TableCell>
+                       <TableCell>
+                         <div>
+                           <div className="font-medium">{subscription.productId}</div>
+                           <div className="text-sm text-muted-foreground">
+                             {subscription.gatewaySubscriptionId || 'N/A'}
+                           </div>
+                         </div>
+                       </TableCell>
+                       <TableCell>
+                         <Badge variant="outline">
+                           {subscription.gatewayType}
+                         </Badge>
+                       </TableCell>
+                       <TableCell>{getStatusBadge(subscription.status)}</TableCell>
+                       <TableCell>
+                         <Badge variant={subscription.autoRenewEnabled ? "default" : "secondary"}>
+                           {subscription.autoRenewEnabled ? "Yes" : "No"}
+                         </Badge>
+                       </TableCell>
+                       <TableCell>{formatDate(subscription.startDate)}</TableCell>
+                       <TableCell>{formatDate(subscription.endDate)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
@@ -353,7 +358,7 @@ const Subscriptions = () => {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Delete Subscription</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to delete this subscription for "{subscription.userName}"? This action cannot be undone.
+                                  Are you sure you want to delete this subscription for user "{subscription.userId}"? This action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
