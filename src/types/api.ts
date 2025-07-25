@@ -469,6 +469,72 @@ export interface UpdateSubscriptionRequest {
   razorpaySubscriptionId?: string;
 }
 
+// ============= TRANSACTION INTERFACES =============
+export enum TransactionType {
+  PAYMENT = 'PAYMENT',
+  REFUND = 'REFUND',
+  SUBSCRIPTION = 'SUBSCRIPTION',
+  PURCHASE = 'PURCHASE'
+}
+
+export enum TransactionStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED'
+}
+
+export interface Transaction {
+  id: string;
+  userId: string;
+  userName?: string;
+  userEmail?: string;
+  subscriptionId?: string;
+  productId?: string;
+  productName?: string;
+  type: TransactionType;
+  status: TransactionStatus;
+  amount: number;
+  currency: string;
+  paymentMethod: PaymentMethod;
+  transactionReference?: string;
+  stripeTransactionId?: string;
+  razorpayTransactionId?: string;
+  description?: string;
+  failureReason?: string;
+  createdBy: string;
+  createdByName: string;
+  modifiedBy: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+}
+
+export interface CreateTransactionRequest {
+  userId: string;
+  subscriptionId?: string;
+  productId?: string;
+  type: TransactionType;
+  amount: number;
+  currency: string;
+  paymentMethod: PaymentMethod;
+  transactionReference?: string;
+  stripeTransactionId?: string;
+  razorpayTransactionId?: string;
+  description?: string;
+}
+
+export interface UpdateTransactionRequest {
+  status?: TransactionStatus;
+  transactionReference?: string;
+  stripeTransactionId?: string;
+  razorpayTransactionId?: string;
+  description?: string;
+  failureReason?: string;
+}
+
 export interface PaginatedResponse<T> {
   content: T[];
   totalElements: number;

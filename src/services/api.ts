@@ -28,6 +28,9 @@ import type {
   Subscription,
   CreateSubscriptionRequest,
   UpdateSubscriptionRequest,
+  Transaction,
+  CreateTransactionRequest,
+  UpdateTransactionRequest,
   PaginatedResponse,
   LoginRequest,
   LoginResponse,
@@ -1330,6 +1333,39 @@ export const subscriptionApi = {
   renew: async (id: string): Promise<Subscription> => {
     const response = await getApiClient().patch(`/api/subscriptions/${id}/renew`);
     return response.data;
+  },
+};
+
+// Transaction API
+export const transactionApi = {
+  search: async (searchParams: { page?: number; size?: number; [key: string]: any } = {}): Promise<PaginatedResponse<Transaction>> => {
+    const response = await getApiClient().get('/api/transactions/paged', {
+      params: {
+        page: 0,
+        size: 10,
+        ...searchParams,
+      },
+    });
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<Transaction> => {
+    const response = await getApiClient().get(`/api/transactions/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateTransactionRequest): Promise<Transaction> => {
+    const response = await getApiClient().post('/api/transactions', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: UpdateTransactionRequest): Promise<Transaction> => {
+    const response = await getApiClient().put(`/api/transactions/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await getApiClient().delete(`/api/transactions/${id}`);
   },
 };
 

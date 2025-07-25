@@ -34,6 +34,7 @@ const menuItems = [
   { title: "Courses", url: "/courses", icon: BookOpen },
   { title: "Products", url: "/products", icon: Package },
   { title: "Subscriptions", url: "/subscriptions", icon: CreditCard },
+  { title: "Transactions", url: "/transactions", icon: CreditCard },
   { title: "Users", url: "/users", icon: Users },
   { title: "Reviews & Ratings", url: "/reviews", icon: Star },
   { title: "Coupons", url: "/coupons", icon: Ticket },
