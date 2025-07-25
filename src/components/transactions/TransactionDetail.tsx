@@ -8,10 +8,12 @@ interface TransactionDetailProps {
 }
 
 export function TransactionDetail({ transaction }: TransactionDetailProps) {
-  const formatCurrency = (amount: number, currency: string = "USD") => {
+  const formatCurrency = (amount: number, currency?: string) => {
+    // Validate currency code and use fallback
+    const validCurrency = currency && typeof currency === 'string' && currency.length === 3 ? currency : "USD";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: currency || "USD",
+      currency: validCurrency,
     }).format(amount);
   };
 
