@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Courses from "./pages/Courses";
 import Products from "./pages/Products";
+import Subscriptions from "./pages/Subscriptions";
 import Topics from "./pages/Topics";
 import Users from "./pages/Users";
 import Reviews from "./pages/Reviews";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="categories" element={<Categories />} />
               <Route path="courses" element={<Courses />} />
               <Route path="products" element={<Products />} />
+              <Route path="subscriptions" element={<Subscriptions />} />
               <Route path="topics/:courseId" element={<Topics />} />
               <Route path="users" element={<Users />} />
               <Route path="reviews" element={<Reviews />} />

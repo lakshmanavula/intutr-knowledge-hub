@@ -25,6 +25,9 @@ import type {
   Product,
   CreateProductRequest,
   UpdateProductRequest,
+  Subscription,
+  CreateSubscriptionRequest,
+  UpdateSubscriptionRequest,
   PaginatedResponse,
   LoginRequest,
   LoginResponse,
@@ -1284,6 +1287,49 @@ export const productApi = {
 
   delete: async (id: string): Promise<void> => {
     await getApiClient().delete(`/api/products/${id}`);
+  },
+};
+
+// Subscription API
+export const subscriptionApi = {
+  search: async (searchParams: any = {}, page = 0, size = 10): Promise<PaginatedResponse<Subscription>> => {
+    const response = await getApiClient().get('/api/subscriptions/paged', {
+      params: {
+        page,
+        size,
+        ...searchParams,
+      },
+    });
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<Subscription> => {
+    const response = await getApiClient().get(`/api/subscriptions/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateSubscriptionRequest): Promise<Subscription> => {
+    const response = await getApiClient().post('/api/subscriptions', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: UpdateSubscriptionRequest): Promise<Subscription> => {
+    const response = await getApiClient().put(`/api/subscriptions/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await getApiClient().delete(`/api/subscriptions/${id}`);
+  },
+
+  cancel: async (id: string): Promise<Subscription> => {
+    const response = await getApiClient().patch(`/api/subscriptions/${id}/cancel`);
+    return response.data;
+  },
+
+  renew: async (id: string): Promise<Subscription> => {
+    const response = await getApiClient().patch(`/api/subscriptions/${id}/renew`);
+    return response.data;
   },
 };
 

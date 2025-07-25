@@ -52,26 +52,23 @@ export interface UpdateCourseRequest {
   tags: string;
 }
 
-export interface UpdateCourseCategoryRequest {
-  categoryName: string;
-  description: string;
-  isActive: boolean;
-}
-
 export interface Course {
   id: string;
   name: string;
   courseLabel: string;
   description: string;
-  rating: number;
   fees: number;
-  duration: number; // in days
+  duration: number;
   thumbnail: string;
   status: 'CREATED' | 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
   xlsxFilePath: string;
   categoryId: string;
   categoryName: string;
   tags: string;
+  totalTopics: number;
+  totalLOBs: number;
+  averageRating: number;
+  totalReviews: number;
   createdBy: string;
   createdByName: string;
   modifiedBy: string;
@@ -85,11 +82,12 @@ export interface CourseTopic {
   id: string;
   topicName: string;
   description: string;
+  orderIndex: number;
   courseId: string;
   courseName: string;
-  orderIndex: number;
-  duration: number; // in minutes
   isActive: boolean;
+  totalLOBs: number;
+  completedLOBs: number;
   createdBy: string;
   createdByName: string;
   modifiedBy: string;
@@ -102,32 +100,31 @@ export interface CourseTopic {
 export interface CreateCourseTopicRequest {
   topicName: string;
   description: string;
-  courseId: string;
   orderIndex: number;
-  duration: number;
+  courseId: string;
   isActive: boolean;
 }
 
 export interface UpdateCourseTopicRequest {
   topicName: string;
   description: string;
-  courseId: string;
   orderIndex: number;
-  duration: number;
   isActive: boolean;
 }
 
 export interface LobData {
   id: string;
+  lobName: string;
+  lobType: 'QUESTION' | 'EXPLANATION' | 'EXAMPLE' | 'EXERCISE';
+  content: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  estimatedTimeMinutes: number;
+  orderIndex: number;
   topicId: string;
   topicName: string;
-  lobName: string;
-  lobDescription: string;
-  lobType: 'CONTENT' | 'EXERCISE' | 'ASSESSMENT' | 'VIDEO' | 'DOCUMENT';
-  orderIndex: number;
-  duration: number; // in minutes
-  resourceUrl: string;
   isActive: boolean;
+  tags: string[];
+  metadata: Record<string, any>;
   createdBy: string;
   createdByName: string;
   modifiedBy: string;
@@ -135,52 +132,55 @@ export interface LobData {
   createdDate: string;
   modifiedDate: string;
   deleted: boolean;
+}
+
+export interface CreateLobDataRequest {
+  lobName: string;
+  lobType: 'QUESTION' | 'EXPLANATION' | 'EXAMPLE' | 'EXERCISE';
+  content: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  estimatedTimeMinutes: number;
+  orderIndex: number;
+  topicId: string;
+  isActive: boolean;
+  tags: string[];
+  metadata: Record<string, any>;
+}
+
+export interface UpdateLobDataRequest {
+  lobName: string;
+  lobType: 'QUESTION' | 'EXPLANATION' | 'EXAMPLE' | 'EXERCISE';
+  content: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  estimatedTimeMinutes: number;
+  orderIndex: number;
+  isActive: boolean;
+  tags: string[];
+  metadata: Record<string, any>;
 }
 
 export interface LobFountMaster {
   id: string;
+  courseId: string;
+  courseName: string;
+  topicId: string;
+  topicName: string;
+  trackNumber: string;
+  lobName: string;
+  lobType: string;
+  content: string;
+  difficulty: string;
+  estimatedTimeMinutes: number;
+  orderIndex: number;
+  isActive: boolean;
+  tags: string;
   createdBy: string;
-  modifiedBy: string;
   createdByName: string;
+  modifiedBy: string;
   modifiedByName: string;
   createdDate: string;
   modifiedDate: string;
   deleted: boolean;
-  courseId: string;
-  topicId: string;
-  topicTitle: string;
-  lobType: string;
-  trackNum: string;
-  topicSeqNum: string;
-  topicLevel: number;
-  quizSeqNum: string;
-  lobChunkIdx: number;
-  lobData: {
-    content: string;
-  };
-  isActive: boolean;
-}
-
-export interface CreateLobDataRequest {
-  topicId: string;
-  lobName: string;
-  lobDescription: string;
-  lobType: 'CONTENT' | 'EXERCISE' | 'ASSESSMENT' | 'VIDEO' | 'DOCUMENT';
-  orderIndex: number;
-  duration: number;
-  resourceUrl: string;
-  isActive: boolean;
-}
-
-export interface UpdateLobDataRequest {
-  topicId: string;
-  lobName: string;
-  lobDescription: string;
-  lobType: 'CONTENT' | 'EXERCISE' | 'ASSESSMENT' | 'VIDEO' | 'DOCUMENT';
-  orderIndex: number;
-  duration: number;
-  resourceUrl: string;
-  isActive: boolean;
 }
 
 export interface UserProfile {
@@ -280,7 +280,6 @@ export interface CreateCouponRequest {
 }
 
 export interface UpdateCouponRequest {
-  code: string;
   description: string;
   discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
   discountValue: number;
@@ -322,59 +321,40 @@ export interface CreateReviewRequest {
   rating: number;
   title: string;
   comment: string;
-  isApproved: boolean;
   isPublic: boolean;
 }
 
 export interface UpdateReviewRequest {
-  courseId: string;
-  userId: string;
   rating: number;
   title: string;
   comment: string;
-  isApproved: boolean;
   isPublic: boolean;
 }
 
-// API Response types
-export interface PaginatedResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-  first: boolean;
-  last: boolean;
-}
-
-// Authentication types
-export interface LoginRequest {
-  username: string;
-  password: string;
-  rememberMe?: boolean;
-}
-
-export interface LoginResponse {
-  token: string;
-  user: UserProfile;
-  expiresIn: number;
-}
-
-export interface AuthUser {
+export interface Product {
   id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  isActive: boolean;
+  name: string;
+  description: string;
+  type: ProductType;
+  price: number;
+  currency: string;
+  durationDays?: number;
+  associatedCourseIds?: string[];
+  platformProductIdGoogle?: string;
+  platformProductIdApple?: string;
+  stripePriceId?: string;
+  razorpayPlanId?: string;
+  razorpayProductId?: string;
+  status: ProductStatus;
+  createdBy: string;
+  modifiedBy: string;
+  createdByName: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
 }
 
-export interface ApiError {
-  message: string;
-  status: number;
-  timestamp: string;
-}
-
-// Product types
 export enum ProductType {
   SUBSCRIPTION = 'SUBSCRIPTION',
   ONE_TIME = 'ONE_TIME'
@@ -385,30 +365,6 @@ export enum ProductStatus {
   INACTIVE = 'INACTIVE'
 }
 
-export interface Product {
-  id: string;
-  createdBy: string;
-  modifiedBy: string;
-  createdByName: string;
-  modifiedByName: string;
-  createdDate: string;
-  modifiedDate: string;
-  deleted: boolean;
-  name: string;
-  description: string;
-  type: ProductType;
-  price: number;
-  currency: string;
-  durationDays?: number;
-  associatedCourseIds: string[];
-  platformProductIdGoogle?: string;
-  platformProductIdApple?: string;
-  stripePriceId?: string;
-  razorpayPlanId?: string;
-  razorpayProductId?: string;
-  status: ProductStatus;
-}
-
 export interface CreateProductRequest {
   name: string;
   description: string;
@@ -416,7 +372,7 @@ export interface CreateProductRequest {
   price: number;
   currency: string;
   durationDays?: number;
-  associatedCourseIds: string[];
+  associatedCourseIds?: string[];
   platformProductIdGoogle?: string;
   platformProductIdApple?: string;
   stripePriceId?: string;
@@ -439,4 +395,133 @@ export interface UpdateProductRequest {
   razorpayPlanId?: string;
   razorpayProductId?: string;
   status?: ProductStatus;
+}
+
+// Subscription types
+export interface Subscription {
+  id: string;
+  userId: string;
+  productId: string;
+  userEmail: string;
+  userName: string;
+  productName: string;
+  productType: ProductType;
+  startDate: string;
+  endDate: string;
+  status: SubscriptionStatus;
+  paymentMethod: PaymentMethod;
+  amount: number;
+  currency: string;
+  autoRenewal: boolean;
+  platformSubscriptionId?: string;
+  stripeSubscriptionId?: string;
+  razorpaySubscriptionId?: string;
+  createdBy: string;
+  modifiedBy: string;
+  createdByName: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+}
+
+export enum SubscriptionStatus {
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
+  PENDING = 'PENDING',
+  SUSPENDED = 'SUSPENDED'
+}
+
+export enum PaymentMethod {
+  STRIPE = 'STRIPE',
+  RAZORPAY = 'RAZORPAY',
+  GOOGLE_PAY = 'GOOGLE_PAY',
+  APPLE_PAY = 'APPLE_PAY',
+  MANUAL = 'MANUAL'
+}
+
+export interface CreateSubscriptionRequest {
+  userId: string;
+  productId: string;
+  startDate: string;
+  endDate: string;
+  status: SubscriptionStatus;
+  paymentMethod: PaymentMethod;
+  amount: number;
+  currency: string;
+  autoRenewal: boolean;
+  platformSubscriptionId?: string;
+  stripeSubscriptionId?: string;
+  razorpaySubscriptionId?: string;
+}
+
+export interface UpdateSubscriptionRequest {
+  startDate?: string;
+  endDate?: string;
+  status?: SubscriptionStatus;
+  paymentMethod?: PaymentMethod;
+  amount?: number;
+  currency?: string;
+  autoRenewal?: boolean;
+  platformSubscriptionId?: string;
+  stripeSubscriptionId?: string;
+  razorpaySubscriptionId?: string;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+  size: number;
+  number: number;
+  numberOfElements?: number;
+  pageable?: {
+    offset: number;
+    sort: any[];
+    unpaged: boolean;
+    paged: boolean;
+    pageNumber: number;
+    pageSize: number;
+  };
+  sort?: any[];
+  empty?: boolean;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  gender: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  profilePicture: string;
+  isActive: boolean;
+  lastLoggedIn: string;
+  createdBy: string;
+  createdByName: string;
+  modifiedBy: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
+}
+
+export interface LoginResponse {
+  token: string;
+  expiresIn: number;
+  user: AuthUser;
 }
