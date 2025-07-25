@@ -1321,25 +1321,46 @@ export const productApi = {
 // Subscription API
 export const subscriptionApi = {
   search: async (searchParams: any = {}, page = 0, size = 10): Promise<PaginatedResponse<Subscription>> => {
-    const response = await getApiClient().get<ApiResponse<Subscription[]>>('/api/subscriptions/paged', {
-      params: {
-        page,
-        size,
-        ...searchParams,
-      },
-    });
-    
-    // Transform ApiResponse to PaginatedResponse
-    const apiData = response.data;
-    return {
-      content: apiData.data,
-      totalElements: apiData.metadata?.totalElements || 0,
-      totalPages: apiData.metadata?.totalPages || 0,
-      first: apiData.metadata?.first || true,
-      last: apiData.metadata?.last || true,
-      size: apiData.metadata?.size || size,
-      number: apiData.metadata?.page || page,
-    };
+    try {
+      console.log('🔍 Fetching subscriptions with params:', { page, size, searchParams });
+      
+      const response = await getApiClient().get<ApiResponse<Subscription[]>>('/api/subscriptions/paged', {
+        params: {
+          page,
+          size,
+          ...searchParams,
+        },
+      });
+      
+      console.log('📡 Subscriptions API response:', response.data);
+      
+      // Transform ApiResponse to PaginatedResponse
+      const apiData = response.data;
+      const result = {
+        content: apiData.data || [],
+        totalElements: apiData.metadata?.totalElements || 0,
+        totalPages: apiData.metadata?.totalPages || 0,
+        first: apiData.metadata?.first || true,
+        last: apiData.metadata?.last || true,
+        size: apiData.metadata?.size || size,
+        number: apiData.metadata?.page || page,
+      };
+      
+      console.log('✅ Transformed subscriptions result:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error fetching subscriptions:', error);
+      return {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        first: true,
+        last: true,
+        size: size,
+        number: page,
+      };
+    }
+
   },
 
   getById: async (id: string): Promise<Subscription> => {
