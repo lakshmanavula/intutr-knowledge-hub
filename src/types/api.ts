@@ -387,6 +387,13 @@ export enum ProductStatus {
 
 export interface Product {
   id: string;
+  createdBy: string;
+  modifiedBy: string;
+  createdByName: string;
+  modifiedByName: string;
+  createdDate: string;
+  modifiedDate: string;
+  deleted: boolean;
   name: string;
   description: string;
   type: ProductType;
@@ -400,8 +407,6 @@ export interface Product {
   razorpayPlanId?: string;
   razorpayProductId?: string;
   status: ProductStatus;
-  createdByName: string;
-  modifiedByName: string;
 }
 
 export interface CreateProductRequest {

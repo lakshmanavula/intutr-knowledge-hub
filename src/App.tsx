@@ -9,6 +9,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Courses from "./pages/Courses";
+import Products from "./pages/Products";
 import Topics from "./pages/Topics";
 import Users from "./pages/Users";
 import Reviews from "./pages/Reviews";
@@ -36,6 +37,7 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="categories" element={<Categories />} />
               <Route path="courses" element={<Courses />} />
+              <Route path="products" element={<Products />} />
               <Route path="topics/:courseId" element={<Topics />} />
               <Route path="users" element={<Users />} />
               <Route path="reviews" element={<Reviews />} />
