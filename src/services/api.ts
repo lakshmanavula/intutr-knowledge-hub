@@ -32,6 +32,7 @@ import type {
   CreateTransactionRequest,
   UpdateTransactionRequest,
   PaginatedResponse,
+  ApiResponse,
   LoginRequest,
   LoginResponse,
   AuthUser
@@ -1263,14 +1264,25 @@ export const lobFountMasterApi = {
 // Product API
 export const productApi = {
   search: async (searchParams: any = {}, page = 0, size = 10): Promise<PaginatedResponse<Product>> => {
-    const response = await getApiClient().get('/api/products/paged', {
+    const response = await getApiClient().get<ApiResponse<Product[]>>('/api/products/paged', {
       params: {
         page,
         size,
         ...searchParams,
       },
     });
-    return response.data;
+    
+    // Transform ApiResponse to PaginatedResponse
+    const apiData = response.data;
+    return {
+      content: apiData.data,
+      totalElements: apiData.metadata?.totalElements || 0,
+      totalPages: apiData.metadata?.totalPages || 0,
+      first: apiData.metadata?.first || true,
+      last: apiData.metadata?.last || true,
+      size: apiData.metadata?.size || size,
+      number: apiData.metadata?.page || page,
+    };
   },
 
   getById: async (id: string): Promise<Product> => {
@@ -1296,14 +1308,25 @@ export const productApi = {
 // Subscription API
 export const subscriptionApi = {
   search: async (searchParams: any = {}, page = 0, size = 10): Promise<PaginatedResponse<Subscription>> => {
-    const response = await getApiClient().get('/api/subscriptions/paged', {
+    const response = await getApiClient().get<ApiResponse<Subscription[]>>('/api/subscriptions/paged', {
       params: {
         page,
         size,
         ...searchParams,
       },
     });
-    return response.data;
+    
+    // Transform ApiResponse to PaginatedResponse
+    const apiData = response.data;
+    return {
+      content: apiData.data,
+      totalElements: apiData.metadata?.totalElements || 0,
+      totalPages: apiData.metadata?.totalPages || 0,
+      first: apiData.metadata?.first || true,
+      last: apiData.metadata?.last || true,
+      size: apiData.metadata?.size || size,
+      number: apiData.metadata?.page || page,
+    };
   },
 
   getById: async (id: string): Promise<Subscription> => {
@@ -1339,14 +1362,25 @@ export const subscriptionApi = {
 // Transaction API
 export const transactionApi = {
   search: async (searchParams: { page?: number; size?: number; [key: string]: any } = {}): Promise<PaginatedResponse<Transaction>> => {
-    const response = await getApiClient().get('/api/transactions/paged', {
+    const response = await getApiClient().get<ApiResponse<Transaction[]>>('/api/transactions/paged', {
       params: {
         page: 0,
         size: 10,
         ...searchParams,
       },
     });
-    return response.data;
+    
+    // Transform ApiResponse to PaginatedResponse
+    const apiData = response.data;
+    return {
+      content: apiData.data,
+      totalElements: apiData.metadata?.totalElements || 0,
+      totalPages: apiData.metadata?.totalPages || 0,
+      first: apiData.metadata?.first || true,
+      last: apiData.metadata?.last || true,
+      size: apiData.metadata?.size || searchParams.size || 10,
+      number: apiData.metadata?.page || searchParams.page || 0,
+    };
   },
 
   getById: async (id: string): Promise<Transaction> => {

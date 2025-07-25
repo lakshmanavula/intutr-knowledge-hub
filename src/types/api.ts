@@ -535,6 +535,22 @@ export interface UpdateTransactionRequest {
   failureReason?: string;
 }
 
+export interface ApiResponse<T> {
+  status: string;
+  statusCode: number;
+  message: string;
+  data: T;
+  timestamp: string;
+  metadata?: {
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    first: boolean;
+    last: boolean;
+  };
+}
+
 export interface PaginatedResponse<T> {
   content: T[];
   totalElements: number;
