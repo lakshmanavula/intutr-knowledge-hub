@@ -1267,7 +1267,7 @@ export const productApi = {
     try {
       console.log('🔍 Fetching products with params:', { page, size, searchParams });
       
-      const response = await getApiClient().get<ApiResponse<any[]>>('/api/products/paged', {
+      const response = await getApiClient().get<ApiResponse<Product[]>>('/api/products/paged', {
         params: {
           page,
           size,
@@ -1277,31 +1277,10 @@ export const productApi = {
       
       console.log('📡 Products API response:', response.data);
       
-      // Check if the response contains subscription data instead of product data
+      // Transform ApiResponse to PaginatedResponse
       const apiData = response.data;
-      const rawData = apiData.data || [];
-      
-      // If the API returns subscription data (detected by userId, gatewayType fields),
-      // we can't display this as products
-      if (rawData.length > 0 && rawData[0].userId && rawData[0].gatewayType) {
-        console.warn('⚠️ /api/products/paged is returning subscription data instead of product data');
-        console.warn('⚠️ This indicates a backend routing issue');
-        
-        // For now, return empty results since this isn't product data
-        return {
-          content: [],
-          totalElements: 0,
-          totalPages: 0,
-          first: true,
-          last: true,
-          size: size,
-          number: page,
-        };
-      }
-      
-      // If it's actual product data, process it normally
       const result = {
-        content: rawData,
+        content: apiData.data || [],
         totalElements: apiData.metadata?.totalElements || 0,
         totalPages: apiData.metadata?.totalPages || 0,
         first: apiData.metadata?.first || true,
