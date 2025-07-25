@@ -186,7 +186,7 @@ const Subscriptions = () => {
   const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency,
+      currency: currency || 'USD',
     }).format(amount);
   };
 
