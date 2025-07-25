@@ -34,10 +34,13 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
     return new Date(dateString).toLocaleString();
   };
 
-  const formatCurrency = (amount: number, currency: string) => {
+  const formatCurrency = (amount?: number, currency?: string) => {
+    if (!amount || !currency) {
+      return 'N/A';
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency,
+      currency: currency || 'USD',
     }).format(amount);
   };
 
@@ -50,26 +53,26 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
             <div>
               <CardTitle>Subscription Details</CardTitle>
               <CardDescription className="mt-2">
-                Subscription for {subscription.userName}
+                Subscription ID: {subscription.id}
               </CardDescription>
             </div>
             <div className="flex gap-2">
               {getStatusBadge(subscription.status)}
-              {getPaymentMethodBadge(subscription.paymentMethod)}
+              <Badge variant="outline">{subscription.gatewayType}</Badge>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Amount</h4>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Gateway Type</h4>
               <p className="text-lg font-semibold">
-                {formatCurrency(subscription.amount, subscription.currency)}
+                {subscription.gatewayType}
               </p>
             </div>
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Auto Renewal</h4>
-              <p>{subscription.autoRenewal ? 'Enabled' : 'Disabled'}</p>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Auto Renew</h4>
+              <p>{subscription.autoRenewEnabled ? 'Enabled' : 'Disabled'}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Start Date</h4>
@@ -79,6 +82,12 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
               <h4 className="font-medium text-sm text-muted-foreground mb-1">End Date</h4>
               <p>{formatDate(subscription.endDate)}</p>
             </div>
+            {subscription.nextRenewalDate && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Next Renewal</h4>
+                <p>{formatDate(subscription.nextRenewalDate)}</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -91,16 +100,16 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Name</h4>
-              <p>{subscription.userName}</p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Email</h4>
-              <p className="font-mono text-sm">{subscription.userEmail}</p>
-            </div>
-            <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">User ID</h4>
               <p className="font-mono text-sm">{subscription.userId}</p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Created By</h4>
+              <p>{subscription.createdByName || 'N/A'}</p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Modified By</h4>
+              <p>{subscription.modifiedByName || 'N/A'}</p>
             </div>
           </div>
         </CardContent>
@@ -114,17 +123,19 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Product Name</h4>
-              <p>{subscription.productName}</p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Product Type</h4>
-              <p>{subscription.productType}</p>
-            </div>
-            <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">Product ID</h4>
               <p className="font-mono text-sm">{subscription.productId}</p>
             </div>
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Gateway Subscription ID</h4>
+              <p className="font-mono text-sm">{subscription.gatewaySubscriptionId || 'N/A'}</p>
+            </div>
+            {subscription.originalTransactionId && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">Original Transaction ID</h4>
+                <p className="font-mono text-sm">{subscription.originalTransactionId}</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -135,25 +146,31 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
           <CardTitle className="text-lg">Payment Integration</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">Platform Subscription ID</h4>
-              <p className="text-sm font-mono bg-muted p-2 rounded">
-                {subscription.platformSubscriptionId || 'Not configured'}
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">Stripe Subscription ID</h4>
-              <p className="text-sm font-mono bg-muted p-2 rounded">
-                {subscription.stripeSubscriptionId || 'Not configured'}
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">Razorpay Subscription ID</h4>
-              <p className="text-sm font-mono bg-muted p-2 rounded">
-                {subscription.razorpaySubscriptionId || 'Not configured'}
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {subscription.purchaseToken && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Purchase Token</h4>
+                <p className="text-sm font-mono bg-muted p-2 rounded break-all">
+                  {subscription.purchaseToken}
+                </p>
+              </div>
+            )}
+            {subscription.latestReceiptData && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Latest Receipt Data</h4>
+                <p className="text-sm font-mono bg-muted p-2 rounded break-all">
+                  {subscription.latestReceiptData}
+                </p>
+              </div>
+            )}
+            {subscription.cancellationReason && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Cancellation Reason</h4>
+                <p className="text-sm bg-muted p-2 rounded">
+                  {subscription.cancellationReason}
+                </p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -165,20 +182,24 @@ export function SubscriptionDetail({ subscription }: SubscriptionDetailProps) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">Created</h4>
-              <div className="space-y-1">
-                <p className="text-sm">{formatDate(subscription.createdDate)}</p>
-                <p className="text-sm text-muted-foreground">by {subscription.createdByName}</p>
+            {subscription.createdDate && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Created</h4>
+                <div className="space-y-1">
+                  <p className="text-sm">{formatDate(subscription.createdDate)}</p>
+                  <p className="text-sm text-muted-foreground">by {subscription.createdByName || 'N/A'}</p>
+                </div>
               </div>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">Last Modified</h4>
-              <div className="space-y-1">
-                <p className="text-sm">{formatDate(subscription.modifiedDate)}</p>
-                <p className="text-sm text-muted-foreground">by {subscription.modifiedByName}</p>
+            )}
+            {subscription.modifiedDate && (
+              <div>
+                <h4 className="font-medium text-sm text-muted-foreground mb-2">Last Modified</h4>
+                <div className="space-y-1">
+                  <p className="text-sm">{formatDate(subscription.modifiedDate)}</p>
+                  <p className="text-sm text-muted-foreground">by {subscription.modifiedByName || 'N/A'}</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           <Separator className="my-4" />
