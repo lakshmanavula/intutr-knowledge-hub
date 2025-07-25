@@ -103,24 +103,6 @@ const Subscriptions = () => {
     },
   });
 
-  // Cancel mutation
-  const cancelMutation = useMutation({
-    mutationFn: subscriptionApi.cancel,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
-      toast({
-        title: 'Success',
-        description: 'Subscription cancelled successfully.',
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to cancel subscription.',
-        variant: 'destructive',
-      });
-    },
-  });
 
   const subscriptions = subscriptionsData?.content || [];
   const totalPages = subscriptionsData?.totalPages || 0;
@@ -151,10 +133,6 @@ const Subscriptions = () => {
 
   const handleDelete = (subscription: Subscription) => {
     deleteMutation.mutate(subscription.id);
-  };
-
-  const handleCancel = (subscription: Subscription) => {
-    cancelMutation.mutate(subscription.id);
   };
 
   const getStatusBadge = (status: SubscriptionStatus) => {
@@ -338,16 +316,6 @@ const Subscriptions = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          {subscription.status === SubscriptionStatus.ACTIVE && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleCancel(subscription)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              Cancel
-                            </Button>
-                          )}
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="sm">
