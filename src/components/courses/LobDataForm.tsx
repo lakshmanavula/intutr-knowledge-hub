@@ -30,13 +30,15 @@ import type { LobData, CreateLobDataRequest, UpdateLobDataRequest } from "@/type
 
 const lobDataSchema = z.object({
   lobName: z.string().min(1, "Content name is required").max(200, "Content name must be less than 200 characters"),
-  lobDescription: z.string().min(1, "Description is required").max(1000, "Description must be less than 1000 characters"),
-  lobType: z.enum(["CONTENT", "EXERCISE", "ASSESSMENT", "VIDEO", "DOCUMENT"], {
+  content: z.string().min(1, "Content is required"),
+  lobType: z.enum(["QUESTION", "EXPLANATION", "EXAMPLE", "EXERCISE"], {
     required_error: "Please select a content type",
   }),
   orderIndex: z.number().min(0, "Order index must be 0 or greater"),
-  duration: z.number().min(1, "Duration must be at least 1 minute"),
-  resourceUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  estimatedTimeMinutes: z.number().min(1, "Duration must be at least 1 minute"),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD"], {
+    required_error: "Please select difficulty",
+  }),
   isActive: z.boolean(),
 });
 
@@ -50,11 +52,16 @@ interface LobDataFormProps {
 }
 
 const LOB_TYPES = [
-  { value: "CONTENT", label: "Content", description: "Text-based learning content" },
-  { value: "VIDEO", label: "Video", description: "Video lessons and tutorials" },
-  { value: "DOCUMENT", label: "Document", description: "PDFs, slides, and documents" },
-  { value: "EXERCISE", label: "Exercise", description: "Practice exercises and activities" },
-  { value: "ASSESSMENT", label: "Assessment", description: "Quizzes, tests, and evaluations" },
+  { value: "QUESTION", label: "Question", description: "Learning questions" },
+  { value: "EXPLANATION", label: "Explanation", description: "Detailed explanations" },
+  { value: "EXAMPLE", label: "Example", description: "Examples and demonstrations" },
+  { value: "EXERCISE", label: "Exercise", description: "Practice exercises" },
+];
+
+const DIFFICULTIES = [
+  { value: "EASY", label: "Easy" },
+  { value: "MEDIUM", label: "Medium" },
+  { value: "HARD", label: "Hard" },
 ];
 
 export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFormProps) {
@@ -65,11 +72,11 @@ export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFo
     resolver: zodResolver(lobDataSchema),
     defaultValues: {
       lobName: lobData?.lobName || "",
-      lobDescription: lobData?.lobDescription || "",
-      lobType: lobData?.lobType || "CONTENT",
-      orderIndex: lobData?.orderIndex || 1,
-      duration: lobData?.duration || 30,
-      resourceUrl: lobData?.resourceUrl || "",
+       content: lobData?.content || "",
+       lobType: lobData?.lobType || "QUESTION",
+       orderIndex: lobData?.orderIndex || 1,
+       estimatedTimeMinutes: lobData?.estimatedTimeMinutes || 30,
+       difficulty: lobData?.difficulty || "EASY",
       isActive: lobData?.isActive ?? true,
     },
   });
@@ -80,16 +87,17 @@ export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFo
       
       if (lobData) {
         // Update existing lob data
-        const updateData: UpdateLobDataRequest = {
-          topicId,
-          lobName: data.lobName,
-          lobDescription: data.lobDescription,
-          lobType: data.lobType,
-          orderIndex: data.orderIndex,
-          duration: data.duration,
-          resourceUrl: data.resourceUrl || "",
-          isActive: data.isActive,
-        };
+         const updateData: UpdateLobDataRequest = {
+           lobName: data.lobName,
+           content: data.content,
+           lobType: data.lobType,
+           orderIndex: data.orderIndex,
+           estimatedTimeMinutes: data.estimatedTimeMinutes,
+           difficulty: data.difficulty,
+           isActive: data.isActive,
+           tags: [],
+           metadata: {},
+         };
         await lobDataApi.update(lobData.id, updateData);
         toast({
           title: "Success",
@@ -97,16 +105,18 @@ export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFo
         });
       } else {
         // Create new lob data
-        const createData: CreateLobDataRequest = {
-          topicId,
-          lobName: data.lobName,
-          lobDescription: data.lobDescription,
-          lobType: data.lobType,
-          orderIndex: data.orderIndex,
-          duration: data.duration,
-          resourceUrl: data.resourceUrl || "",
-          isActive: data.isActive,
-        };
+         const createData: CreateLobDataRequest = {
+           topicId,
+           lobName: data.lobName,
+           content: data.content,
+           lobType: data.lobType,
+           orderIndex: data.orderIndex,
+           estimatedTimeMinutes: data.estimatedTimeMinutes,
+           difficulty: data.difficulty,
+           isActive: data.isActive,
+           tags: [],
+           metadata: {},
+         };
         await lobDataApi.create(createData);
         toast({
           title: "Success",
@@ -199,13 +209,13 @@ export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFo
 
               <FormField
                 control={form.control}
-                name="lobDescription"
+                name="content"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description *</FormLabel>
+                    <FormLabel>Content *</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Enter content description"
+                        placeholder="Enter content text"
                         rows={4}
                         {...field} 
                       />
@@ -240,7 +250,7 @@ export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFo
 
                 <FormField
                   control={form.control}
-                  name="duration"
+                  name="estimatedTimeMinutes"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Duration (minutes) *</FormLabel>
@@ -255,6 +265,31 @@ export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFo
                       <FormDescription>
                         Estimated completion time
                       </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="difficulty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Difficulty *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select difficulty" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {DIFFICULTIES.map((diff) => (
+                            <SelectItem key={diff.value} value={diff.value}>
+                              {diff.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -282,25 +317,6 @@ export function LobDataForm({ lobData, topicId, onSuccess, onCancel }: LobDataFo
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="resourceUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Resource URL</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="https://example.com/resource" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Link to external resource, video, document, etc.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               {/* Form Actions */}
               <div className="flex justify-end gap-3 pt-6 border-t">

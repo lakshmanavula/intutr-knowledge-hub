@@ -291,7 +291,7 @@ export function CourseTopicsManager({ course, onBack }: CourseTopicsManagerProps
                     <TableCell>
                       <div className="flex items-center">
                         <Clock className="w-3 h-3 mr-1" />
-                        {formatDuration(topic.duration)}
+                        {topic.totalLOBs} LOBs
                       </div>
                     </TableCell>
                     <TableCell>

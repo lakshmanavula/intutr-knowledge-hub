@@ -48,7 +48,7 @@ export function CourseTopicForm({ topic, courseId, onSuccess, onCancel }: Course
       topicName: topic?.topicName || "",
       description: topic?.description || "",
       orderIndex: topic?.orderIndex || 1,
-      duration: topic?.duration || 60,
+      duration: 60,
       isActive: topic?.isActive ?? true,
     },
   });
@@ -62,9 +62,7 @@ export function CourseTopicForm({ topic, courseId, onSuccess, onCancel }: Course
         const updateData: UpdateCourseTopicRequest = {
           topicName: data.topicName,
           description: data.description,
-          courseId,
-          orderIndex: data.orderIndex,
-          duration: data.duration,
+           orderIndex: data.orderIndex,
           isActive: data.isActive,
         };
         await courseTopicApi.update(topic.id, updateData);
@@ -78,8 +76,7 @@ export function CourseTopicForm({ topic, courseId, onSuccess, onCancel }: Course
           topicName: data.topicName,
           description: data.description,
           courseId,
-          orderIndex: data.orderIndex,
-          duration: data.duration,
+           orderIndex: data.orderIndex,
           isActive: data.isActive,
         };
         await courseTopicApi.create(createData);

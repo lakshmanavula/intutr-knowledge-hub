@@ -783,7 +783,7 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                 </div>
                 <div>
                   <p className="font-medium text-muted-foreground">Current Rating</p>
-                  <p>{course.rating} ⭐</p>
+                  <p>{course.averageRating} ⭐</p>
                 </div>
                 <div>
                   <p className="font-medium text-muted-foreground">Created By</p>

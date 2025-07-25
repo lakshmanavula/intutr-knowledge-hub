@@ -278,8 +278,8 @@ export default function Topics() {
   );
 
   const filteredLobData = (Array.isArray(lobData) ? lobData : []).filter(lob =>
-    lob.topicTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (lob.lobData && JSON.stringify(lob.lobData).toLowerCase().includes(searchTerm.toLowerCase()))
+     lob.topicName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     (lob.content && lob.content.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getTotalContentCount = (metaData: KMapTopic['metaData']) => {
@@ -678,7 +678,7 @@ export default function Topics() {
                 <Card key={lob.id} className="p-4">
                   <div className="space-y-3">
                     <div className="flex justify-between items-start">
-                      <h4 className="font-semibold text-sm truncate">{lob.topicTitle}</h4>
+                      <h4 className="font-semibold text-sm truncate">{lob.topicName}</h4>
                       <Badge variant={lob.isActive ? "default" : "secondary"}>
                         {lob.isActive ? "Active" : "Inactive"}
                       </Badge>
@@ -689,19 +689,19 @@ export default function Topics() {
                         <span className="font-medium">Type:</span> {lob.lobType}
                       </div>
                       <div>
-                        <span className="font-medium">Track:</span> {lob.trackNum}
-                      </div>
-                      <div>
-                        <span className="font-medium">Seq:</span> {lob.topicSeqNum}
-                      </div>
-                      <div>
-                        <span className="font-medium">Quiz:</span> {lob.quizSeqNum}
-                      </div>
-                      <div>
-                        <span className="font-medium">Level:</span> {lob.topicLevel}
-                      </div>
-                      <div>
-                        <span className="font-medium">Chunk:</span> {lob.lobChunkIdx}
+                         <span className="font-medium">Track:</span> {lob.trackNumber}
+                       </div>
+                       <div>
+                         <span className="font-medium">Type:</span> {lob.lobType}
+                       </div>
+                       <div>
+                         <span className="font-medium">Difficulty:</span> {lob.difficulty}
+                       </div>
+                       <div>
+                         <span className="font-medium">Time:</span> {lob.estimatedTimeMinutes}m
+                       </div>
+                       <div>
+                         <span className="font-medium">Order:</span> {lob.orderIndex}
                       </div>
                     </div>
                     
@@ -709,11 +709,11 @@ export default function Topics() {
                       <span className="font-medium text-xs">Content:</span>
                       {lob.lobType === 'QUIZ' ? (
                         <div className="mt-1">
-                          <QuizRenderer content={typeof lob.lobData?.content === 'string' ? lob.lobData.content : JSON.stringify(lob.lobData || {})} isPreview={true} />
-                        </div>
-                      ) : (
-                        <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
-                          {lob.lobData.content}
+                           <QuizRenderer content={lob.content} isPreview={true} />
+                         </div>
+                       ) : (
+                         <div className="bg-muted p-2 rounded mt-1 text-xs max-h-32 overflow-auto">
+                           {lob.content}
                         </div>
                       )}
                     </div>

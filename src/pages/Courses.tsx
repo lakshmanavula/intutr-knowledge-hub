@@ -345,7 +345,7 @@ export default function Courses() {
       'Category': categories.find(cat => cat.id === course.categoryId)?.categoryName || 'N/A',
       'Status': course.status,
       'Fees': course.fees,
-      'Rating': course.rating,
+      'Rating': course.averageRating,
       'Duration (Days)': course.duration,
       'Created Date': new Date(course.createdDate).toLocaleDateString(),
       'Tags': course.tags || '',
@@ -774,7 +774,7 @@ export default function Courses() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{renderStarRating(course.rating)}</TableCell>
+                    <TableCell>{renderStarRating(course.averageRating)}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <DollarSign className="w-3 h-3 mr-1" />

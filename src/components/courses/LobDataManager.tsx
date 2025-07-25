@@ -140,7 +140,7 @@ export function LobDataManager({ topic, onBack }: LobDataManagerProps) {
 
   const filteredLobData = lobData.filter(lob =>
     lob.lobName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lob.lobDescription.toLowerCase().includes(searchTerm.toLowerCase())
+    lob.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatDuration = (minutes: number) => {
@@ -217,7 +217,7 @@ export function LobDataManager({ topic, onBack }: LobDataManagerProps) {
                   {topic.isActive ? "Active" : "Inactive"}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
-                  Order: {topic.orderIndex} • Duration: {formatDuration(topic.duration)} • {lobData.length} content items
+                  Order: {topic.orderIndex} • {topic.totalLOBs} total LOBs • {lobData.length} content items
                 </span>
               </div>
             </div>
@@ -277,7 +277,7 @@ export function LobDataManager({ topic, onBack }: LobDataManagerProps) {
                       <div>
                         <div className="font-medium">{lob.lobName}</div>
                         <div className="text-sm text-muted-foreground">
-                          {lob.lobDescription}
+                          {lob.content.substring(0, 100)}...
                         </div>
                       </div>
                     </TableCell>
@@ -292,7 +292,7 @@ export function LobDataManager({ topic, onBack }: LobDataManagerProps) {
                     <TableCell>
                       <div className="flex items-center">
                         <Clock className="w-3 h-3 mr-1" />
-                        {formatDuration(lob.duration)}
+                        {formatDuration(lob.estimatedTimeMinutes)}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -301,18 +301,11 @@ export function LobDataManager({ topic, onBack }: LobDataManagerProps) {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {lob.resourceUrl ? (
-                        <a
-                          href={lob.resourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline text-sm"
-                        >
-                          View Resource
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">No resource</span>
-                      )}
+                       {lob.content ? (
+                         <div className="text-sm text-muted-foreground">Has content</div>
+                       ) : (
+                         <span className="text-muted-foreground text-sm">No content</span>
+                       )}
                     </TableCell>
                     <TableCell>{lob.createdByName}</TableCell>
                     <TableCell className="text-right">
