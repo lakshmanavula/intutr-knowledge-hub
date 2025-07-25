@@ -557,7 +557,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 

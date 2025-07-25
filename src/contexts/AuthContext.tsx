@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (username: string, password: string, rememberMe?: boolean) => {
-    const response = await authApi.login({ email: username, password });
+    const response = await authApi.login({ username, password });
     setUser(response.user);
   };
 
