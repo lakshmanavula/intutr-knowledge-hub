@@ -373,3 +373,65 @@ export interface ApiError {
   status: number;
   timestamp: string;
 }
+
+// Product types
+export enum ProductType {
+  SUBSCRIPTION = 'SUBSCRIPTION',
+  ONE_TIME = 'ONE_TIME'
+}
+
+export enum ProductStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  type: ProductType;
+  price: number;
+  currency: string;
+  durationDays?: number;
+  associatedCourseIds: string[];
+  platformProductIdGoogle?: string;
+  platformProductIdApple?: string;
+  stripePriceId?: string;
+  razorpayPlanId?: string;
+  razorpayProductId?: string;
+  status: ProductStatus;
+  createdByName: string;
+  modifiedByName: string;
+}
+
+export interface CreateProductRequest {
+  name: string;
+  description: string;
+  type: ProductType;
+  price: number;
+  currency: string;
+  durationDays?: number;
+  associatedCourseIds: string[];
+  platformProductIdGoogle?: string;
+  platformProductIdApple?: string;
+  stripePriceId?: string;
+  razorpayPlanId?: string;
+  razorpayProductId?: string;
+  status: ProductStatus;
+}
+
+export interface UpdateProductRequest {
+  name?: string;
+  description?: string;
+  type?: ProductType;
+  price?: number;
+  currency?: string;
+  durationDays?: number;
+  associatedCourseIds?: string[];
+  platformProductIdGoogle?: string;
+  platformProductIdApple?: string;
+  stripePriceId?: string;
+  razorpayPlanId?: string;
+  razorpayProductId?: string;
+  status?: ProductStatus;
+}

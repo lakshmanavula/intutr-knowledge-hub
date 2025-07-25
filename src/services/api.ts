@@ -22,6 +22,9 @@ import type {
   Review,
   CreateReviewRequest,
   UpdateReviewRequest,
+  Product,
+  CreateProductRequest,
+  UpdateProductRequest,
   PaginatedResponse,
   LoginRequest,
   LoginResponse,
@@ -1248,6 +1251,39 @@ export const lobFountMasterApi = {
     } catch (error: any) {
       throw new Error(error.message || 'Failed to download course LOB data');
     }
+  },
+};
+
+// Product API
+export const productApi = {
+  search: async (searchParams: any = {}, page = 0, size = 10): Promise<PaginatedResponse<Product>> => {
+    const response = await getApiClient().get('/api/products/paged', {
+      params: {
+        page,
+        size,
+        ...searchParams,
+      },
+    });
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<Product> => {
+    const response = await getApiClient().get(`/api/products/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateProductRequest): Promise<Product> => {
+    const response = await getApiClient().post('/api/products', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: UpdateProductRequest): Promise<Product> => {
+    const response = await getApiClient().put(`/api/products/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await getApiClient().delete(`/api/products/${id}`);
   },
 };
 
