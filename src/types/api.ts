@@ -339,20 +339,21 @@ export interface Product {
   price: number;
   currency: string;
   durationDays?: number;
-  associatedCourseIds?: string[];
   platformProductIdGoogle?: string;
   platformProductIdApple?: string;
   stripePriceId?: string;
   razorpayPlanId?: string;
   razorpayProductId?: string;
   status: ProductStatus;
-  createdBy: string;
-  modifiedBy: string;
-  createdByName: string;
-  modifiedByName: string;
-  createdDate: string;
-  modifiedDate: string;
-  deleted: boolean;
+  createdByName?: string;
+  modifiedByName?: string;
+  // Optional fields that may not be in all API responses
+  associatedCourseIds?: string[];
+  createdBy?: string;
+  modifiedBy?: string;
+  createdDate?: string;
+  modifiedDate?: string;
+  deleted?: boolean;
 }
 
 export enum ProductType {
