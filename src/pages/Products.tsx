@@ -113,9 +113,9 @@ const Products = () => {
 
   const handleFilterChange = (filterType: string, value: string) => {
     if (filterType === 'status') {
-      setStatusFilter(value);
+      setStatusFilter(value === 'all' ? '' : value);
     } else if (filterType === 'type') {
-      setTypeFilter(value);
+      setTypeFilter(value === 'all' ? '' : value);
     }
     setCurrentPage(0);
   };
@@ -188,22 +188,22 @@ const Products = () => {
                 />
               </div>
             </div>
-            <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
+            <Select value={statusFilter || 'all'} onValueChange={(value) => handleFilterChange('status', value)}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value={ProductStatus.ACTIVE}>Active</SelectItem>
                 <SelectItem value={ProductStatus.INACTIVE}>Inactive</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={typeFilter} onValueChange={(value) => handleFilterChange('type', value)}>
+            <Select value={typeFilter || 'all'} onValueChange={(value) => handleFilterChange('type', value)}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value={ProductType.SUBSCRIPTION}>Subscription</SelectItem>
                 <SelectItem value={ProductType.ONE_TIME}>One Time</SelectItem>
               </SelectContent>
