@@ -1265,7 +1265,9 @@ export const lobFountMasterApi = {
 export const productApi = {
   search: async (searchParams: any = {}, page = 0, size = 10): Promise<PaginatedResponse<Product>> => {
     try {
-      const response = await getApiClient().get<ApiResponse<Product[]>>('/api/products/paged', {
+      console.log('🔍 Fetching products with params:', { page, size, searchParams });
+      
+      const response = await getApiClient().get<ApiResponse<any[]>>('/api/products/paged', {
         params: {
           page,
           size,
@@ -1273,10 +1275,33 @@ export const productApi = {
         },
       });
       
-      // Transform ApiResponse to PaginatedResponse
+      console.log('📡 Products API response:', response.data);
+      
+      // Check if the response contains subscription data instead of product data
       const apiData = response.data;
-      return {
-        content: apiData.data,
+      const rawData = apiData.data || [];
+      
+      // If the API returns subscription data (detected by userId, gatewayType fields),
+      // we can't display this as products
+      if (rawData.length > 0 && rawData[0].userId && rawData[0].gatewayType) {
+        console.warn('⚠️ /api/products/paged is returning subscription data instead of product data');
+        console.warn('⚠️ This indicates a backend routing issue');
+        
+        // For now, return empty results since this isn't product data
+        return {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          first: true,
+          last: true,
+          size: size,
+          number: page,
+        };
+      }
+      
+      // If it's actual product data, process it normally
+      const result = {
+        content: rawData,
         totalElements: apiData.metadata?.totalElements || 0,
         totalPages: apiData.metadata?.totalPages || 0,
         first: apiData.metadata?.first || true,
@@ -1284,8 +1309,11 @@ export const productApi = {
         size: apiData.metadata?.size || size,
         number: apiData.metadata?.page || page,
       };
+      
+      console.log('✅ Transformed products result:', result);
+      return result;
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('❌ Error fetching products:', error);
       return {
         content: [],
         totalElements: 0,
