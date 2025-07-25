@@ -1338,26 +1338,33 @@ export const subscriptionApi = {
     try {
       console.log('🔍 Fetching subscriptions with params:', { page, size, searchParams });
       
-      const response = await getApiClient().get<ApiResponse<Subscription[]>>('/api/subscriptions/paged', {
+      // Bypass the interceptor to get raw response with metadata
+      const apiClient = getApiClient();
+      const response = await apiClient.get('/api/subscriptions/paged', {
         params: {
           page,
           size,
           ...searchParams,
         },
+        transformResponse: [(data) => data], // Keep raw response
       });
       
-      console.log('📡 Subscriptions API response:', response.data);
+      // Parse the raw response
+      const rawData = JSON.parse(response.data);
+      console.log('📡 Subscriptions API raw response:', rawData);
       
-      // Transform ApiResponse to PaginatedResponse
-      const apiData = response.data;
+      // Extract data and metadata
+      const subscriptionData = rawData.data || [];
+      const metadata = rawData.metadata || {};
+      
       const result = {
-        content: apiData.data || [],
-        totalElements: apiData.metadata?.totalElements || 0,
-        totalPages: apiData.metadata?.totalPages || 0,
-        first: apiData.metadata?.first || true,
-        last: apiData.metadata?.last || true,
-        size: apiData.metadata?.size || size,
-        number: apiData.metadata?.page || page,
+        content: subscriptionData,
+        totalElements: metadata.totalElements || subscriptionData.length,
+        totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || subscriptionData.length) / size),
+        first: metadata.first !== undefined ? metadata.first : true,
+        last: metadata.last !== undefined ? metadata.last : true,
+        size: metadata.size || size,
+        number: metadata.page !== undefined ? metadata.page : page,
       };
       
       console.log('✅ Transformed subscriptions result:', result);
