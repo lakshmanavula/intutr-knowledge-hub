@@ -1417,24 +1417,33 @@ export const subscriptionApi = {
 // Transaction API
 export const transactionApi = {
   search: async (searchParams: { page?: number; size?: number; [key: string]: any } = {}): Promise<PaginatedResponse<Transaction>> => {
-    const response = await getApiClient().get<ApiResponse<Transaction[]>>('/api/transactions/paged', {
+    // Bypass the interceptor to get raw response with metadata
+    const apiClient = getApiClient();
+    const response = await apiClient.get('/api/transactions/paged', {
       params: {
         page: 0,
         size: 10,
         ...searchParams,
       },
+      transformResponse: [(data) => data], // Keep raw response
     });
     
-    // Transform ApiResponse to PaginatedResponse
-    const apiData = response.data;
+    // Parse the raw response
+    const rawData = JSON.parse(response.data);
+    console.log('📡 Transactions API raw response:', rawData);
+    
+    // Extract data and metadata
+    const transactionData = rawData.data || [];
+    const metadata = rawData.metadata || {};
+    
     return {
-      content: apiData.data,
-      totalElements: apiData.metadata?.totalElements || 0,
-      totalPages: apiData.metadata?.totalPages || 0,
-      first: apiData.metadata?.first || true,
-      last: apiData.metadata?.last || true,
-      size: apiData.metadata?.size || searchParams.size || 10,
-      number: apiData.metadata?.page || searchParams.page || 0,
+      content: transactionData,
+      totalElements: metadata.totalElements || transactionData.length,
+      totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || transactionData.length) / (searchParams.size || 10)),
+      first: metadata.first !== undefined ? metadata.first : true,
+      last: metadata.last !== undefined ? metadata.last : true,
+      size: metadata.size || searchParams.size || 10,
+      number: metadata.page !== undefined ? metadata.page : searchParams.page || 0,
     };
   },
 
