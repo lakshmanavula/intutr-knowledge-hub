@@ -1264,31 +1264,25 @@ export const lobFountMasterApi = {
 // Product API
 export const productApi = {
   search: async (searchParams: any = {}, page = 0, size = 10): Promise<PaginatedResponse<Product>> => {
-    // Note: The /api/products/paged endpoint is currently returning subscription data instead of product data
-    // This suggests either a backend routing issue or that products are represented differently
-    console.warn('WARNING: /api/products/paged endpoint returns subscription data instead of product data');
-    
     try {
-      // First, let's try the raw response to understand the structure
-      const apiClient = getApiClient();
-      const response = await apiClient.get('/api/products/paged', {
-        params: { page, size, ...searchParams },
-        transformResponse: [(data) => data], // Keep raw response
+      const response = await getApiClient().get<ApiResponse<Product[]>>('/api/products/paged', {
+        params: {
+          page,
+          size,
+          ...searchParams,
+        },
       });
       
-      const rawData = JSON.parse(response.data);
-      console.log('🔍 Raw products API response:', rawData);
-      
-      // The API is returning subscription data instead of product data
-      // For now, return empty results with proper structure
+      // Transform ApiResponse to PaginatedResponse
+      const apiData = response.data;
       return {
-        content: [],
-        totalElements: 0,
-        totalPages: 0,
-        first: true,
-        last: true,
-        size: size,
-        number: page,
+        content: apiData.data,
+        totalElements: apiData.metadata?.totalElements || 0,
+        totalPages: apiData.metadata?.totalPages || 0,
+        first: apiData.metadata?.first || true,
+        last: apiData.metadata?.last || true,
+        size: apiData.metadata?.size || size,
+        number: apiData.metadata?.page || page,
       };
     } catch (error) {
       console.error('Error fetching products:', error);
