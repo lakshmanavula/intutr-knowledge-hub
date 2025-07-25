@@ -112,7 +112,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <CardTitle className="text-lg">Associated Courses</CardTitle>
         </CardHeader>
         <CardContent>
-          {product.associatedCourseIds.length > 0 ? (
+          {product.associatedCourseIds && product.associatedCourseIds.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {product.associatedCourseIds.map((courseId, index) => (
                 <Badge key={index} variant="outline" className="font-mono">
