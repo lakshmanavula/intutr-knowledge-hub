@@ -403,27 +403,36 @@ export interface Subscription {
   id: string;
   userId: string;
   productId: string;
-  userEmail: string;
-  userName: string;
-  productName: string;
-  productType: ProductType;
+  gatewaySubscriptionId?: string;
+  gatewayType: 'GOOGLE_PLAY' | 'APPLE_APP_STORE' | 'STRIPE' | 'RAZORPAY';
+  status: SubscriptionStatus;
   startDate: string;
   endDate: string;
-  status: SubscriptionStatus;
-  paymentMethod: PaymentMethod;
-  amount: number;
-  currency: string;
-  autoRenewal: boolean;
+  nextRenewalDate?: string;
+  autoRenewEnabled: boolean;
+  originalTransactionId?: string;
+  purchaseToken?: string;
+  latestReceiptData?: string;
+  cancellationReason?: string;
+  createdByName?: string;
+  modifiedByName?: string;
+  // Optional fields that may not be in all API responses
+  userEmail?: string;
+  userName?: string;
+  productName?: string;
+  productType?: ProductType;
+  paymentMethod?: PaymentMethod;
+  amount?: number;
+  currency?: string;
+  autoRenewal?: boolean;
   platformSubscriptionId?: string;
   stripeSubscriptionId?: string;
   razorpaySubscriptionId?: string;
-  createdBy: string;
-  modifiedBy: string;
-  createdByName: string;
-  modifiedByName: string;
-  createdDate: string;
-  modifiedDate: string;
-  deleted: boolean;
+  createdBy?: string;
+  modifiedBy?: string;
+  createdDate?: string;
+  modifiedDate?: string;
+  deleted?: boolean;
 }
 
 export enum SubscriptionStatus {
