@@ -144,9 +144,9 @@ export const authApi = {
   // Login user
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const config = getConfig();
-    console.log('🔐 Attempting login to:', `${config.apiBaseUrl}/api/auth/login`);
+    console.log('🔐 Attempting login to:', `${config.apiBaseUrl}/auth/login`);
     
-    const response = await getApiClient().post<any>('/api/auth/login', credentials);
+    const response = await getApiClient().post<any>('/auth/login', credentials);
     
     console.log('✅ Login successful:', response.data);
     
@@ -190,7 +190,7 @@ export const authApi = {
   // Logout user
   logout: async (): Promise<void> => {
     try {
-      await getApiClient().post('/api/auth/logout');
+      await getApiClient().post('/auth/logout');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -233,7 +233,7 @@ export const authApi = {
 
   // Refresh token (if your API supports it)
   refreshToken: async (): Promise<LoginResponse> => {
-    const response = await getApiClient().post<LoginResponse>('/api/auth/refresh');
+    const response = await getApiClient().post<LoginResponse>('/auth/refresh');
     
     if (response.data.token) {
       localStorage.setItem('authToken', response.data.token);
@@ -249,7 +249,7 @@ export const courseCategoryApi = {
   getAll: async (): Promise<CourseCategory[]> => {
     try {
       console.log('🔗 Making API call to get categories...');
-      const response = await getApiClient().get<CourseCategory[]>('/api/course-categories');
+      const response = await getApiClient().get<CourseCategory[]>('/course-categories');
       console.log('📡 Raw API response:', response);
       console.log('📋 Response data:', response.data);
       console.log('🔍 Data type:', typeof response.data, 'Is array:', Array.isArray(response.data));
@@ -269,7 +269,7 @@ export const courseCategoryApi = {
       console.log('🔍 Fetching paginated categories:', { page, size });
       
       const apiClient = getApiClient();
-      const response = await apiClient.get(`/api/course-categories/paged?page=${page}&size=${size}`);
+      const response = await apiClient.get(`/course-categories/paged?page=${page}&size=${size}`);
       
       console.log('📡 Categories pagination raw response:', response.data);
       
@@ -283,7 +283,7 @@ export const courseCategoryApi = {
         // OR the API might be returning only the current page but without metadata
         
         // Let's try to get the total count from all categories
-        const allCategoriesResponse = await apiClient.get('/api/course-categories');
+        const allCategoriesResponse = await apiClient.get('/course-categories');
         const allCategories = allCategoriesResponse.data || [];
         const totalElements = allCategories.length;
         const totalPages = Math.ceil(totalElements / size);
@@ -336,25 +336,25 @@ export const courseCategoryApi = {
 
   // Get category by ID
   getById: async (id: string): Promise<CourseCategory> => {
-    const response = await getApiClient().get<CourseCategory>(`/api/course-categories/${id}`);
+    const response = await getApiClient().get<CourseCategory>(`/course-categories/${id}`);
     return response.data;
   },
 
   // Create new category
   create: async (category: CreateCourseCategoryRequest): Promise<CourseCategory> => {
-    const response = await getApiClient().post<CourseCategory>('/api/course-categories', category);
+    const response = await getApiClient().post<CourseCategory>('/course-categories', category);
     return response.data;
   },
 
   // Update existing category
   update: async (id: string, category: UpdateCourseCategoryRequest): Promise<CourseCategory> => {
-    const response = await getApiClient().put<CourseCategory>(`/api/course-categories/${id}`, category);
+    const response = await getApiClient().put<CourseCategory>(`/course-categories/${id}`, category);
     return response.data;
   },
 
   // Delete category
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/api/course-categories/${id}`);
+    await getApiClient().delete(`/course-categories/${id}`);
   },
 
   // Search categories
@@ -365,7 +365,7 @@ export const courseCategoryApi = {
     size?: number; 
   }): Promise<PaginatedResponse<CourseCategory>> => {
     const response = await getApiClient().post<PaginatedResponse<CourseCategory>>(
-      '/api/course-categories/search', 
+      '/course-categories/search', 
       criteria
     );
     return response.data;
@@ -373,12 +373,12 @@ export const courseCategoryApi = {
 
   // Bulk delete categories
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await getApiClient().post('/api/course-categories/bulk-delete', { ids });
+    await getApiClient().post('/course-categories/bulk-delete', { ids });
   },
 
   // Toggle active status
   toggleActive: async (id: string): Promise<CourseCategory> => {
-    const response = await getApiClient().patch<CourseCategory>(`/api/course-categories/${id}/toggle-active`);
+    const response = await getApiClient().patch<CourseCategory>(`/course-categories/${id}/toggle-active`);
     return response.data;
   },
 };
@@ -387,7 +387,7 @@ export const courseApi = {
   // Get all courses
   getAll: async (): Promise<Course[]> => {
     try {
-      const response = await getApiClient().get<Course[]>('/api/lob-fount-courses');
+      const response = await getApiClient().get<Course[]>('/lob-fount-courses');
       // Response data is already processed by interceptor
       return response.data || [];
     } catch (error: any) {
@@ -401,7 +401,7 @@ export const courseApi = {
   // Get paginated courses (simulating pagination from the array)
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
     try {
-      const response = await getApiClient().get<Course[]>('/api/lob-fount-courses');
+      const response = await getApiClient().get<Course[]>('/lob-fount-courses');
       
       // Response data is already processed by interceptor
       const allCourses = response.data || [];
@@ -428,25 +428,25 @@ export const courseApi = {
 
   // Get course by ID
   getById: async (id: string): Promise<Course> => {
-    const response = await getApiClient().get<Course>(`/api/lob-fount-courses/${id}`);
+    const response = await getApiClient().get<Course>(`/lob-fount-courses/${id}`);
     return response.data;
   },
 
   // Create new course
   create: async (course: CreateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().post<Course>('/api/lob-fount-courses', course);
+    const response = await getApiClient().post<Course>('/lob-fount-courses', course);
     return response.data;
   },
 
   // Update existing course
   update: async (id: string, course: UpdateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().put<Course>(`/api/lob-fount-courses/${id}`, course);
+    const response = await getApiClient().put<Course>(`/lob-fount-courses/${id}`, course);
     return response.data;
   },
 
   // Delete course
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/api/lob-fount-courses/${id}`);
+    await getApiClient().delete(`/lob-fount-courses/${id}`);
   },
 
   // Search courses
@@ -463,7 +463,7 @@ export const courseApi = {
     size?: number; 
   }): Promise<PaginatedResponse<Course>> => {
     const response = await getApiClient().post<PaginatedResponse<Course>>(
-      '/api/lob-fount-courses/search', 
+      '/lob-fount-courses/search', 
       criteria
     );
     return response.data;
@@ -471,18 +471,18 @@ export const courseApi = {
 
   // Bulk delete courses
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await getApiClient().post('/api/lob-fount-courses/bulk-delete', { ids });
+    await getApiClient().post('/lob-fount-courses/bulk-delete', { ids });
   },
 
   // Update course status
   updateStatus: async (id: string, status: Course['status']): Promise<Course> => {
-    const response = await getApiClient().put<Course>(`/api/lob-fount-courses/${id}/status/${status}`);
+    const response = await getApiClient().put<Course>(`/lob-fount-courses/${id}/status/${status}`);
     return response.data;
   },
 
   // Get courses by category
   getByCategory: async (categoryId: string): Promise<Course[]> => {
-    const response = await getApiClient().get<Course[]>(`/api/lob-fount-courses/category/${categoryId}`);
+    const response = await getApiClient().get<Course[]>(`/lob-fount-courses/category/${categoryId}`);
     return response.data;
   },
 
@@ -492,7 +492,7 @@ export const courseApi = {
     formData.append('file', file);
     
     const response = await getApiClient().post<{ url: string }>(
-      `/api/lob-fount-courses/${courseId}/upload-thumbnail`, 
+      `/lob-fount-courses/${courseId}/upload-thumbnail`, 
       formData,
       {
         headers: {
@@ -509,7 +509,7 @@ export const courseApi = {
     formData.append('file', file);
     
     const response = await getApiClient().post<{ url: string }>(
-      `/api/lob-fount-courses/${courseId}/upload-kmap-excel`, 
+      `/lob-fount-courses/${courseId}/upload-kmap-excel`, 
       formData,
       {
         headers: {
@@ -523,7 +523,7 @@ export const courseApi = {
   // Download KMap data as Excel
   downloadKmapExcel: async (courseId: string): Promise<Blob> => {
     const response = await getApiClient().get(
-      `/api/lob-fount-kmap-course-topics/download-excel/${courseId}`,
+      `/lob-fount-kmap-course-topics/download-excel/${courseId}`,
       {
         responseType: 'blob',
         headers: {
@@ -536,19 +536,19 @@ export const courseApi = {
 
   // Get all KMap topics for a course
   getKmapTopics: async (courseId: string): Promise<any[]> => {
-    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/${courseId}`);
+    const response = await getApiClient().get(`/lob-fount-kmap-course-topics/${courseId}`);
     return response.data;
   },
 
   // Get track names and numbers for a course
   getTrackNames: async (courseId: string): Promise<any[]> => {
-    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/track-name-and-number/${courseId}`);
+    const response = await getApiClient().get(`/lob-fount-kmap-course-topics/track-name-and-number/${courseId}`);
     return response.data;
   },
 
   // Get topics by course and track
   getTopicsByTrack: async (courseId: string, trackNum: string): Promise<any[]> => {
-    const response = await getApiClient().get(`/api/lob-fount-kmap-course-topics/by-course/${courseId}/${trackNum}`);
+    const response = await getApiClient().get(`/lob-fount-kmap-course-topics/by-course/${courseId}/${trackNum}`);
     return response.data;
   },
 };
@@ -710,7 +710,7 @@ export const userProfileApi = {
   // Get all users
   getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     const response = await getApiClient().get<PaginatedResponse<UserProfile>>(
-      `/api/user-profiles/paged?page=${page}&size=${size}`
+      `/user-profiles/paged?page=${page}&size=${size}`
     );
     return response.data;
   },
@@ -719,7 +719,7 @@ export const userProfileApi = {
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     // Bypass the interceptor to get raw response with metadata
     const apiClient = getApiClient();
-    const response = await apiClient.get(`/api/user-profiles/paged?page=${page}&size=${size}`, {
+    const response = await apiClient.get(`/user-profiles/paged?page=${page}&size=${size}`, {
       transformResponse: [(data) => data], // Keep raw response
     });
     
@@ -844,11 +844,11 @@ export const couponApi = {
   // Get paginated coupons
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Coupon>> => {
     try {
-      console.log(`🔍 Making API call to: /api/v1/coupons/paged?page=${page}&size=${size}`);
+      console.log(`🔍 Making API call to: /coupons/paged?page=${page}&size=${size}`);
       
       // Bypass the interceptor to get raw response with metadata
       const apiClient = getApiClient();
-      const response = await apiClient.get(`/api/v1/coupons/paged?page=${page}&size=${size}`, {
+      const response = await apiClient.get(`/coupons/paged?page=${page}&size=${size}`, {
         transformResponse: [(data) => data], // Keep raw response
       });
       
@@ -1044,7 +1044,7 @@ export const courseRatingApi = {
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Review>> => {
     // Bypass the interceptor to get raw response with nested metadata
     const apiClient = getApiClient();
-    const response = await apiClient.get(`/api/course-ratings/paged?page=${page}&size=${size}`, {
+    const response = await apiClient.get(`/course-ratings/paged?page=${page}&size=${size}`, {
       transformResponse: [(data) => data], // Keep raw response
     });
     
@@ -1097,31 +1097,31 @@ export const courseRatingApi = {
 
   // Get course rating by ID
   getById: async (id: string): Promise<Review> => {
-    const response = await getApiClient().get(`/api/course-ratings/${id}`);
+    const response = await getApiClient().get(`/course-ratings/${id}`);
     return response.data;
   },
 
   // Create new course rating
   create: async (rating: { courseId: string; userId: string; rating: number; comment?: string }): Promise<Review> => {
-    const response = await getApiClient().post('/api/course-ratings', rating);
+    const response = await getApiClient().post('/course-ratings', rating);
     return response.data;
   },
 
   // Update existing course rating
   update: async (id: string, rating: { rating: number; comment?: string }): Promise<Review> => {
-    const response = await getApiClient().put(`/api/course-ratings/${id}`, rating);
+    const response = await getApiClient().put(`/course-ratings/${id}`, rating);
     return response.data;
   },
 
   // Delete course rating
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/api/course-ratings/${id}`);
+    await getApiClient().delete(`/course-ratings/${id}`);
   },
 
   // Get ratings by course
   getByCourse: async (courseId: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<Review>> => {
     const apiClient = getApiClient();
-    const response = await apiClient.get(`/api/course-ratings/course/${courseId}?page=${page}&size=${size}`, {
+    const response = await apiClient.get(`/course-ratings/course/${courseId}?page=${page}&size=${size}`, {
       transformResponse: [(data) => data],
     });
     
@@ -1164,7 +1164,7 @@ export const courseRatingApi = {
 
   // Bulk delete course ratings
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await getApiClient().post('/api/course-ratings/bulk-delete', { ids });
+    await getApiClient().post('/course-ratings/bulk-delete', { ids });
   },
 };
 
@@ -1174,7 +1174,7 @@ export const lobFountMasterApi = {
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<LobFountMaster>> => {
     try {
       const apiClient = getApiClient();
-      const response = await apiClient.get(`/api/lob-fount-master/paged?page=${page}&size=${size}`, {
+      const response = await apiClient.get(`/lob-fount-master/paged?page=${page}&size=${size}`, {
         transformResponse: [(data) => data],
       });
       
@@ -1202,7 +1202,7 @@ export const lobFountMasterApi = {
   // Get LOBs by topic ID
   getByTopicId: async (topicId: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<LobFountMaster>> => {
     try {
-      const response = await getApiClient().get(`/api/lob-fount-master/topic/${topicId}?page=${page}&size=${size}`);
+      const response = await getApiClient().get(`/lob-fount-master/topic/${topicId}?page=${page}&size=${size}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to fetch LOBs for topic');
@@ -1212,7 +1212,7 @@ export const lobFountMasterApi = {
   // Get LOB by ID
   getById: async (id: string): Promise<LobFountMaster> => {
     try {
-      const response = await getApiClient().get(`/api/lob-fount-master/${id}`);
+      const response = await getApiClient().get(`/lob-fount-master/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to fetch LOB');
@@ -1222,7 +1222,7 @@ export const lobFountMasterApi = {
   // Get LOBs by course and track
   getByCourseAndTrack: async (courseId: string, trackNumber: string): Promise<LobFountMaster[]> => {
     try {
-      const response = await getApiClient().get(`/api/lob-fount-master/by-course/${courseId}/track/${trackNumber}`);
+      const response = await getApiClient().get(`/lob-fount-master/by-course/${courseId}/track/${trackNumber}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to fetch LOBs for course and track');
@@ -1232,7 +1232,7 @@ export const lobFountMasterApi = {
   // Download LOBs as file
   downloadLobs: async (topicId?: string): Promise<Blob> => {
     try {
-      const url = topicId ? `/api/lob-fount-master/download?topicId=${topicId}` : '/api/lob-fount-master/download';
+      const url = topicId ? `/lob-fount-master/download?topicId=${topicId}` : '/lob-fount-master/download';
       const response = await getApiClient().get(url, {
         responseType: 'blob',
         headers: {
@@ -1248,7 +1248,7 @@ export const lobFountMasterApi = {
   // Download LOBs for specific course as Excel
   downloadCourseExcel: async (courseId: string): Promise<Blob> => {
     try {
-      const response = await getApiClient().get(`/api/lob-fount-master/download-excel/${courseId}`, {
+      const response = await getApiClient().get(`/lob-fount-master/download-excel/${courseId}`, {
         responseType: 'blob',
         headers: {
           'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -1269,7 +1269,7 @@ export const productApi = {
       
       // Bypass the interceptor to get raw response with metadata
       const apiClient = getApiClient();
-      const response = await apiClient.get('/api/products/paged', {
+      const response = await apiClient.get('/products/paged', {
         params: {
           page,
           size,
@@ -1313,22 +1313,22 @@ export const productApi = {
   },
 
   getById: async (id: string): Promise<Product> => {
-    const response = await getApiClient().get<ApiResponse<Product>>(`/api/products/${id}`);
+    const response = await getApiClient().get<ApiResponse<Product>>(`/products/${id}`);
     return response.data.data;
   },
 
   create: async (data: CreateProductRequest): Promise<Product> => {
-    const response = await getApiClient().post<ApiResponse<Product>>('/api/products', data);
+    const response = await getApiClient().post<ApiResponse<Product>>('/products', data);
     return response.data.data;
   },
 
   update: async (id: string, data: UpdateProductRequest): Promise<Product> => {
-    const response = await getApiClient().put<ApiResponse<Product>>(`/api/products/${id}`, data);
+    const response = await getApiClient().put<ApiResponse<Product>>(`/products/${id}`, data);
     return response.data.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/api/products/${id}`);
+    await getApiClient().delete(`/products/${id}`);
   },
 };
 
@@ -1340,7 +1340,7 @@ export const subscriptionApi = {
       
       // Bypass the interceptor to get raw response with metadata
       const apiClient = getApiClient();
-      const response = await apiClient.get('/api/subscriptions/paged', {
+      const response = await apiClient.get('/subscriptions/paged', {
         params: {
           page,
           size,
@@ -1385,31 +1385,31 @@ export const subscriptionApi = {
   },
 
   getById: async (id: string): Promise<Subscription> => {
-    const response = await getApiClient().get(`/api/subscriptions/${id}`);
+    const response = await getApiClient().get(`/subscriptions/${id}`);
     return response.data;
   },
 
   create: async (data: CreateSubscriptionRequest): Promise<Subscription> => {
-    const response = await getApiClient().post('/api/subscriptions', data);
+    const response = await getApiClient().post('/subscriptions', data);
     return response.data;
   },
 
   update: async (id: string, data: UpdateSubscriptionRequest): Promise<Subscription> => {
-    const response = await getApiClient().put(`/api/subscriptions/${id}`, data);
+    const response = await getApiClient().put(`/subscriptions/${id}`, data);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/api/subscriptions/${id}`);
+    await getApiClient().delete(`/subscriptions/${id}`);
   },
 
   cancel: async (id: string): Promise<Subscription> => {
-    const response = await getApiClient().patch(`/api/subscriptions/${id}/cancel`);
+    const response = await getApiClient().patch(`/subscriptions/${id}/cancel`);
     return response.data;
   },
 
   renew: async (id: string): Promise<Subscription> => {
-    const response = await getApiClient().patch(`/api/subscriptions/${id}/renew`);
+    const response = await getApiClient().patch(`/subscriptions/${id}/renew`);
     return response.data;
   },
 };
@@ -1419,7 +1419,7 @@ export const transactionApi = {
   search: async (searchParams: { page?: number; size?: number; [key: string]: any } = {}): Promise<PaginatedResponse<Transaction>> => {
     // Bypass the interceptor to get raw response with metadata
     const apiClient = getApiClient();
-    const response = await apiClient.get('/api/transactions/paged', {
+    const response = await apiClient.get('/transactions/paged', {
       params: {
         page: 0,
         size: 10,
@@ -1448,22 +1448,22 @@ export const transactionApi = {
   },
 
   getById: async (id: string): Promise<Transaction> => {
-    const response = await getApiClient().get(`/api/transactions/${id}`);
+    const response = await getApiClient().get(`/transactions/${id}`);
     return response.data;
   },
 
   create: async (data: CreateTransactionRequest): Promise<Transaction> => {
-    const response = await getApiClient().post('/api/transactions', data);
+    const response = await getApiClient().post('/transactions', data);
     return response.data;
   },
 
   update: async (id: string, data: UpdateTransactionRequest): Promise<Transaction> => {
-    const response = await getApiClient().put(`/api/transactions/${id}`, data);
+    const response = await getApiClient().put(`/transactions/${id}`, data);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/api/transactions/${id}`);
+    await getApiClient().delete(`/transactions/${id}`);
   },
 };
 
