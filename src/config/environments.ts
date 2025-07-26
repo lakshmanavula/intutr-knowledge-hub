@@ -15,7 +15,7 @@ export interface EnvironmentConfig {
 export const environments: Record<string, EnvironmentConfig> = {
   local: {
     name: 'Local Development',
-    apiBaseUrl: 'https://intutr-kmap-app.onrender.com',
+    apiBaseUrl: 'https://intutr-kmap-app.onrender.com/api/v1',
     timeout: 30000,
     enableLogging: true,
     retryAttempts: 1,
@@ -28,7 +28,7 @@ export const environments: Record<string, EnvironmentConfig> = {
   },
   dev: {
     name: 'Development',
-    apiBaseUrl: 'https://intutr-kmap-app.onrender.com',
+    apiBaseUrl: 'https://intutr-kmap-app.onrender.com/api/v1',
     timeout: 15000,
     enableLogging: true,
     retryAttempts: 2,
@@ -41,7 +41,7 @@ export const environments: Record<string, EnvironmentConfig> = {
   },
   qa: {
     name: 'Quality Assurance',
-    apiBaseUrl: 'https://api-qa.yourapp.com',
+    apiBaseUrl: 'https://api-qa.yourapp.com/api/v1',
     timeout: 15000,
     enableLogging: true,
     retryAttempts: 3,
@@ -54,7 +54,7 @@ export const environments: Record<string, EnvironmentConfig> = {
   },
   prod: {
     name: 'Production',
-    apiBaseUrl: 'https://api.yourapp.com',
+    apiBaseUrl: 'https://api.yourapp.com/api/v1',
     timeout: 20000,
     enableLogging: false,
     retryAttempts: 3,
