@@ -16,6 +16,7 @@ export const environments: Record<string, EnvironmentConfig> = {
   local: {
     name: 'Local Development',
     apiBaseUrl: 'https://intutr-kmap-app.onrender.com/api/v1',
+    authBaseUrl: 'https://intutr-kmap-app.onrender.com/api/',
     timeout: 30000,
     enableLogging: true,
     retryAttempts: 1,
@@ -29,6 +30,7 @@ export const environments: Record<string, EnvironmentConfig> = {
   dev: {
     name: 'Development',
     apiBaseUrl: 'https://intutr-kmap-app.onrender.com/api/v1',
+    authBaseUrl: 'https://intutr-kmap-app.onrender.com/api/',
     timeout: 15000,
     enableLogging: true,
     retryAttempts: 2,
