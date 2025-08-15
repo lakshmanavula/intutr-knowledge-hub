@@ -387,7 +387,7 @@ export const courseApi = {
   // Get all courses
   getAll: async (): Promise<Course[]> => {
     try {
-      const response = await getApiClient().get<Course[]>('/lob-fount-courses');
+      const response = await getApiClient().get<Course[]>('/course/paged');
       // Response data is already processed by interceptor
       return response.data || [];
     } catch (error: any) {
@@ -401,7 +401,7 @@ export const courseApi = {
   // Get paginated courses (simulating pagination from the array)
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
     try {
-      const response = await getApiClient().get<Course[]>('/lob-fount-courses');
+      const response = await getApiClient().get<Course[]>('/course/paged');
       
       // Response data is already processed by interceptor
       const allCourses = response.data || [];
@@ -428,25 +428,25 @@ export const courseApi = {
 
   // Get course by ID
   getById: async (id: string): Promise<Course> => {
-    const response = await getApiClient().get<Course>(`/lob-fount-courses/${id}`);
+    const response = await getApiClient().get<Course>(`/course/paged/${id}`);
     return response.data;
   },
 
   // Create new course
   create: async (course: CreateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().post<Course>('/lob-fount-courses', course);
+    const response = await getApiClient().post<Course>('/course/paged', course);
     return response.data;
   },
 
   // Update existing course
   update: async (id: string, course: UpdateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().put<Course>(`/lob-fount-courses/${id}`, course);
+    const response = await getApiClient().put<Course>(`/course/paged/${id}`, course);
     return response.data;
   },
 
   // Delete course
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/lob-fount-courses/${id}`);
+    await getApiClient().delete(`/course/paged/${id}`);
   },
 
   // Search courses
@@ -463,7 +463,7 @@ export const courseApi = {
     size?: number; 
   }): Promise<PaginatedResponse<Course>> => {
     const response = await getApiClient().post<PaginatedResponse<Course>>(
-      '/lob-fount-courses/search', 
+      '/course/paged/search', 
       criteria
     );
     return response.data;
@@ -471,18 +471,18 @@ export const courseApi = {
 
   // Bulk delete courses
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await getApiClient().post('/lob-fount-courses/bulk-delete', { ids });
+    await getApiClient().post('/course/paged/bulk-delete', { ids });
   },
 
   // Update course status
   updateStatus: async (id: string, status: Course['status']): Promise<Course> => {
-    const response = await getApiClient().put<Course>(`/lob-fount-courses/${id}/status/${status}`);
+    const response = await getApiClient().put<Course>(`/course/paged/${id}/status/${status}`);
     return response.data;
   },
 
   // Get courses by category
   getByCategory: async (categoryId: string): Promise<Course[]> => {
-    const response = await getApiClient().get<Course[]>(`/lob-fount-courses/category/${categoryId}`);
+    const response = await getApiClient().get<Course[]>(`/course/paged/category/${categoryId}`);
     return response.data;
   },
 
@@ -492,7 +492,7 @@ export const courseApi = {
     formData.append('file', file);
     
     const response = await getApiClient().post<{ url: string }>(
-      `/lob-fount-courses/${courseId}/upload-thumbnail`, 
+      `/course/paged/${courseId}/upload-thumbnail`, 
       formData,
       {
         headers: {
@@ -509,7 +509,7 @@ export const courseApi = {
     formData.append('file', file);
     
     const response = await getApiClient().post<{ url: string }>(
-      `/lob-fount-courses/${courseId}/upload-kmap-excel`, 
+      `/course/paged/${courseId}/upload-kmap-excel`, 
       formData,
       {
         headers: {
