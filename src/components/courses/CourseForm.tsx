@@ -464,84 +464,80 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                         <FormItem>
                           <FormLabel>Thumbnail Image</FormLabel>
                           <FormControl>
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-2">
-                                <input
-                                  ref={thumbnailInputRef}
-                                  type="file"
-                                  accept="image/*"
-                                  style={{ display: 'none' }}
-                                  onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    console.log('File selected:', file);
-                                    if (file) {
-                                      console.log('Course ID:', course?.id);
-                                      if (course?.id) {
-                                         try {
-                                           console.log('Starting thumbnail upload for existing course...');
-                                           setIsSubmitting(true);
-                                            const uploadResult = await courseApi.uploadThumbnail(course.id, file);
-                                            console.log('Thumbnail upload response:', uploadResult);
-                                            console.log('Upload result type:', typeof uploadResult);
-                                            console.log('Upload result keys:', Object.keys(uploadResult));
-                                            
-                                             // Handle different response structures
-                                             const thumbnailUrl = uploadResult.url;
-                                             console.log('Extracted thumbnail URL:', thumbnailUrl);
-                                             field.onChange(thumbnailUrl);
-                                             
-                                             // Store file name for display
-                                             selectedThumbnailFile.current = file;
-                                             console.log('Stored file reference:', file.name);
-                                             
+                             <div className="space-y-4">
+                               <div className="flex items-center gap-2">
+                                 <label htmlFor="thumbnail-upload" className="cursor-pointer">
+                                   <input
+                                     id="thumbnail-upload"
+                                     ref={thumbnailInputRef}
+                                     type="file"
+                                     accept="image/*"
+                                     className="sr-only"
+                                     onChange={async (e) => {
+                                       const file = e.target.files?.[0];
+                                       console.log('File selected:', file);
+                                       if (file) {
+                                         console.log('Course ID:', course?.id);
+                                         if (course?.id) {
+                                            try {
+                                              console.log('Starting thumbnail upload for existing course...');
+                                              setIsSubmitting(true);
+                                               const uploadResult = await courseApi.uploadThumbnail(course.id, file);
+                                               console.log('Thumbnail upload response:', uploadResult);
+                                               console.log('Upload result type:', typeof uploadResult);
+                                               console.log('Upload result keys:', Object.keys(uploadResult));
+                                               
+                                                // Handle different response structures
+                                                const thumbnailUrl = uploadResult.url;
+                                                console.log('Extracted thumbnail URL:', thumbnailUrl);
+                                                field.onChange(thumbnailUrl);
+                                                
+                                                // Store file name for display
+                                                selectedThumbnailFile.current = file;
+                                                console.log('Stored file reference:', file.name);
+                                                
+                                                toast({
+                                                  title: "Success", 
+                                                  description: `Thumbnail "${file.name}" uploaded successfully!`,
+                                                });
+                                           } catch (error: any) {
+                                             console.error('Thumbnail upload error:', error);
+                                             console.error('Error details:', error.response?.data);
                                              toast({
-                                               title: "Success", 
-                                               description: `Thumbnail "${file.name}" uploaded successfully!`,
+                                               title: "Upload Error", 
+                                               description: error.response?.data?.message || error.message || "Failed to upload thumbnail. The upload endpoint may not be available yet.",
+                                               variant: "destructive",
                                              });
-                                        } catch (error: any) {
-                                          console.error('Thumbnail upload error:', error);
-                                          console.error('Error details:', error.response?.data);
-                                          toast({
-                                            title: "Upload Error", 
-                                            description: error.response?.data?.message || error.message || "Failed to upload thumbnail. The upload endpoint may not be available yet.",
-                                            variant: "destructive",
-                                          });
-                                        } finally {
-                                          setIsSubmitting(false);
-                                        }
-                                      } else {
-                                        console.log('Storing file for new course...');
-                                        // For new courses, store file reference and show file name
-                                        selectedThumbnailFile.current = file;
-                                        field.onChange(`pending-upload-${file.name}`);
-                                        toast({
-                                          title: "File Selected",
-                                          description: "File will be uploaded when you save the course.",
-                                        });
-                                      }
-                                    }
-                                  }}
-                                />
-                                <Button 
-                                  type="button" 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => {
-                                    console.log('Thumbnail button clicked');
-                                    console.log('thumbnailInputRef.current:', thumbnailInputRef.current);
-                                    if (thumbnailInputRef.current) {
-                                      console.log('Triggering file input click');
-                                      thumbnailInputRef.current.click();
-                                    } else {
-                                      console.error('thumbnailInputRef.current is null');
-                                    }
-                                  }}
-                                  disabled={isSubmitting}
-                                >
-                                  <Upload className="w-4 h-4 mr-2" />
-                                  {course?.id ? 'Upload Image' : 'Select Image'}
-                                </Button>
-                              </div>
+                                           } finally {
+                                             setIsSubmitting(false);
+                                           }
+                                         } else {
+                                           console.log('Storing file for new course...');
+                                           // For new courses, store file reference and show file name
+                                           selectedThumbnailFile.current = file;
+                                           field.onChange(`pending-upload-${file.name}`);
+                                           toast({
+                                             title: "File Selected",
+                                             description: "File will be uploaded when you save the course.",
+                                           });
+                                         }
+                                       }
+                                     }}
+                                   />
+                                   <Button 
+                                     type="button" 
+                                     variant="outline" 
+                                     size="sm"
+                                     disabled={isSubmitting}
+                                     asChild
+                                   >
+                                     <span>
+                                       <Upload className="w-4 h-4 mr-2" />
+                                       {course?.id ? 'Upload Image' : 'Select Image'}
+                                     </span>
+                                   </Button>
+                                 </label>
+                               </div>
                               {field.value && (
                                 <div className="mt-2">
                                   {field.value.startsWith('pending-upload-') ? (
@@ -589,77 +585,73 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                         <FormItem>
                           <FormLabel>Course Materials (Excel File)</FormLabel>
                           <FormControl>
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-2">
-                                <input
-                                  ref={excelInputRef}
-                                  type="file"
-                                  accept=".xlsx,.xls,.csv"
-                                  style={{ display: 'none' }}
-                                  onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    console.log('Excel file selected:', file);
-                                    if (file) {
-                                      console.log('Course ID for Excel:', course?.id);
-                                      if (course?.id) {
-                                        try {
-                                          console.log('Starting Excel upload for existing course...');
-                                          setIsSubmitting(true);
-                                          const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
-                                           const uploadedUrl = uploadResult.url;
-                                           field.onChange(uploadedUrl);
-                                           
-                                           // Store file name for display
+                             <div className="space-y-4">
+                               <div className="flex items-center gap-2">
+                                 <label htmlFor="excel-upload" className="cursor-pointer">
+                                   <input
+                                     id="excel-upload"
+                                     ref={excelInputRef}
+                                     type="file"
+                                     accept=".xlsx,.xls,.csv"
+                                     className="sr-only"
+                                     onChange={async (e) => {
+                                       const file = e.target.files?.[0];
+                                       console.log('Excel file selected:', file);
+                                       if (file) {
+                                         console.log('Course ID for Excel:', course?.id);
+                                         if (course?.id) {
+                                           try {
+                                             console.log('Starting Excel upload for existing course...');
+                                             setIsSubmitting(true);
+                                             const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
+                                              const uploadedUrl = uploadResult.url;
+                                              field.onChange(uploadedUrl);
+                                              
+                                              // Store file name for display
+                                              selectedExcelFile.current = file;
+                                              
+                                              toast({
+                                                title: "Success",
+                                                description: `Excel file "${file.name}" uploaded successfully!`,
+                                              });
+                                           } catch (error: any) {
+                                             console.error('Excel upload error:', error);
+                                             console.error('Excel error details:', error.response?.data);
+                                             toast({
+                                               title: "Upload Error",
+                                               description: error.response?.data?.message || error.message || "Failed to upload Excel file. The upload endpoint may not be available yet.",
+                                               variant: "destructive",
+                                             });
+                                           } finally {
+                                             setIsSubmitting(false);
+                                           }
+                                         } else {
+                                           console.log('Storing Excel file for new course...');
+                                           // For new courses, store file reference
                                            selectedExcelFile.current = file;
-                                           
+                                           field.onChange(`pending-upload-${file.name}`);
                                            toast({
-                                             title: "Success",
-                                             description: `Excel file "${file.name}" uploaded successfully!`,
+                                             title: "File Selected",
+                                             description: "File will be uploaded when you save the course.",
                                            });
-                                        } catch (error: any) {
-                                          console.error('Excel upload error:', error);
-                                          console.error('Excel error details:', error.response?.data);
-                                          toast({
-                                            title: "Upload Error",
-                                            description: error.response?.data?.message || error.message || "Failed to upload Excel file. The upload endpoint may not be available yet.",
-                                            variant: "destructive",
-                                          });
-                                        } finally {
-                                          setIsSubmitting(false);
-                                        }
-                                      } else {
-                                        console.log('Storing Excel file for new course...');
-                                        // For new courses, store file reference
-                                        selectedExcelFile.current = file;
-                                        field.onChange(`pending-upload-${file.name}`);
-                                        toast({
-                                          title: "File Selected",
-                                          description: "File will be uploaded when you save the course.",
-                                        });
-                                      }
-                                    }
-                                  }}
-                                />
-                                <Button 
-                                  type="button" 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => {
-                                    console.log('Excel button clicked');
-                                    console.log('excelInputRef.current:', excelInputRef.current);
-                                    if (excelInputRef.current) {
-                                      console.log('Triggering Excel file input click');
-                                      excelInputRef.current.click();
-                                    } else {
-                                      console.error('excelInputRef.current is null');
-                                    }
-                                  }}
-                                  disabled={isSubmitting}
-                                >
-                                  <Upload className="w-4 h-4 mr-2" />
-                                  {course?.id ? 'Upload File' : 'Select File'}
-                                </Button>
-                              </div>
+                                         }
+                                       }
+                                     }}
+                                   />
+                                   <Button 
+                                     type="button" 
+                                     variant="outline" 
+                                     size="sm"
+                                     disabled={isSubmitting}
+                                     asChild
+                                   >
+                                     <span>
+                                       <Upload className="w-4 h-4 mr-2" />
+                                       {course?.id ? 'Upload File' : 'Select File'}
+                                     </span>
+                                   </Button>
+                                 </label>
+                               </div>
                               {field.value && (
                                 <div className="mt-2">
                                   {field.value.startsWith('pending-upload-') ? (
