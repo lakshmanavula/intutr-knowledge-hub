@@ -494,7 +494,7 @@ export const courseApi = {
     formData.append('file', file);
     
     const response = await getApiClient().post<{ url: string }>(
-      `/api/v1/course/${courseId}/upload-thumbnail`, 
+      `/course/${courseId}/upload-thumbnail`, 
       formData,
       {
         headers: {
@@ -511,7 +511,7 @@ export const courseApi = {
     formData.append('file', file);
     
     const response = await getApiClient().post<{ url: string }>(
-      `/api/v1/course/${courseId}/upload-kmap-excel`, 
+      `/course/${courseId}/upload-kmap-excel`, 
       formData,
       {
         headers: {
