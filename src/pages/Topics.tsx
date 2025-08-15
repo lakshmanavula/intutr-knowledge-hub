@@ -272,13 +272,13 @@ export default function Topics() {
   };
 
   const filteredKmapTopics = (Array.isArray(kmapTopics) ? kmapTopics : []).filter(topic =>
-    topic.topicTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (topic.topicTitle && topic.topicTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (topic.description && topic.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (topic.keywords && topic.keywords.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const filteredLobData = (Array.isArray(lobData) ? lobData : []).filter(lob =>
-     lob.topicName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     (lob.topicName && lob.topicName.toLowerCase().includes(searchTerm.toLowerCase())) ||
      (lob.content && lob.content.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
