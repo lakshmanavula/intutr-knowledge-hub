@@ -471,7 +471,7 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     ref={thumbnailInputRef}
                                     type="file"
                                     accept="image/*"
-                                    className="hidden"
+                                    className="sr-only"
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('File selected:', file);
@@ -529,12 +529,9 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                       variant="outline" 
                                       size="sm"
                                       disabled={isSubmitting}
-                                      asChild
                                     >
-                                      <span>
-                                        <Upload className="w-4 h-4 mr-2" />
-                                        {course?.id ? 'Upload Image' : 'Select Image'}
-                                      </span>
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      {course?.id ? 'Upload Image' : 'Select Image'}
                                     </Button>
                                   </label>
                                 </div>
