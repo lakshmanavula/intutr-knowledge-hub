@@ -430,7 +430,7 @@ export const courseApi = {
 
   // Get course by ID
   getById: async (id: string): Promise<Course> => {
-    const response = await getApiClient().get<Course>(`/course/paged/${id}`);
+    const response = await getApiClient().get<Course>(`/course/${id}`);
     return response.data;
   },
 
@@ -442,13 +442,13 @@ export const courseApi = {
 
   // Update existing course
   update: async (id: string, course: UpdateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().put<Course>(`/course/paged/${id}`, course);
+    const response = await getApiClient().put<Course>(`/course/${id}`, course);
     return response.data;
   },
 
   // Delete course
   delete: async (id: string): Promise<void> => {
-    await getApiClient().delete(`/course/paged/${id}`);
+    await getApiClient().delete(`/course/${id}`);
   },
 
   // Search courses
@@ -478,13 +478,13 @@ export const courseApi = {
 
   // Update course status
   updateStatus: async (id: string, status: Course['status']): Promise<Course> => {
-    const response = await getApiClient().put<Course>(`/course/paged/${id}/status/${status}`);
+    const response = await getApiClient().put<Course>(`/course/${id}/status/${status}`);
     return response.data;
   },
 
   // Get courses by category
   getByCategory: async (categoryId: string): Promise<Course[]> => {
-    const response = await getApiClient().get<Course[]>(`/course/paged/category/${categoryId}`);
+    const response = await getApiClient().get<Course[]>(`/course/category/${categoryId}`);
     return response.data;
   },
 
