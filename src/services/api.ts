@@ -436,7 +436,7 @@ export const courseApi = {
 
   // Create new course
   create: async (course: CreateCourseRequest): Promise<Course> => {
-    const response = await getApiClient().post<Course>('/api/v1/course/paged', course);
+    const response = await getApiClient().post<Course>('/api/v1/course', course);
     return response.data;
   },
 
