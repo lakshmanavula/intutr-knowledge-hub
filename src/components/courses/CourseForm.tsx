@@ -470,7 +470,7 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                   ref={thumbnailInputRef}
                                   type="file"
                                   accept="image/*"
-                                  className="hidden"
+                                  style={{ display: 'none' }}
                                   onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     console.log('File selected:', file);
@@ -526,11 +526,15 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                   type="button" 
                                   variant="outline" 
                                   size="sm"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
+                                  onClick={() => {
                                     console.log('Thumbnail button clicked');
-                                    thumbnailInputRef.current?.click();
+                                    console.log('thumbnailInputRef.current:', thumbnailInputRef.current);
+                                    if (thumbnailInputRef.current) {
+                                      console.log('Triggering file input click');
+                                      thumbnailInputRef.current.click();
+                                    } else {
+                                      console.error('thumbnailInputRef.current is null');
+                                    }
                                   }}
                                   disabled={isSubmitting}
                                 >
@@ -591,7 +595,7 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                   ref={excelInputRef}
                                   type="file"
                                   accept=".xlsx,.xls,.csv"
-                                  className="hidden"
+                                  style={{ display: 'none' }}
                                   onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     console.log('Excel file selected:', file);
@@ -640,11 +644,15 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                   type="button" 
                                   variant="outline" 
                                   size="sm"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
+                                  onClick={() => {
                                     console.log('Excel button clicked');
-                                    excelInputRef.current?.click();
+                                    console.log('excelInputRef.current:', excelInputRef.current);
+                                    if (excelInputRef.current) {
+                                      console.log('Triggering Excel file input click');
+                                      excelInputRef.current.click();
+                                    } else {
+                                      console.error('excelInputRef.current is null');
+                                    }
                                   }}
                                   disabled={isSubmitting}
                                 >
