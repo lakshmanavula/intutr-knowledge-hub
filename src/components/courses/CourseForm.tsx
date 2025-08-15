@@ -586,71 +586,68 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                           <FormLabel>Course Materials (Excel File)</FormLabel>
                           <FormControl>
                              <div className="space-y-4">
-                               <div className="flex items-center gap-2">
-                                 <label htmlFor="excel-upload" className="cursor-pointer">
-                                   <input
-                                     id="excel-upload"
-                                     ref={excelInputRef}
-                                     type="file"
-                                     accept=".xlsx,.xls,.csv"
-                                     className="sr-only"
-                                     onChange={async (e) => {
-                                       const file = e.target.files?.[0];
-                                       console.log('Excel file selected:', file);
-                                       if (file) {
-                                         console.log('Course ID for Excel:', course?.id);
-                                         if (course?.id) {
-                                           try {
-                                             console.log('Starting Excel upload for existing course...');
-                                             setIsSubmitting(true);
-                                             const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
-                                              const uploadedUrl = uploadResult.url;
-                                              field.onChange(uploadedUrl);
-                                              
-                                              // Store file name for display
-                                              selectedExcelFile.current = file;
-                                              
-                                              toast({
-                                                title: "Success",
-                                                description: `Excel file "${file.name}" uploaded successfully!`,
-                                              });
-                                           } catch (error: any) {
-                                             console.error('Excel upload error:', error);
-                                             console.error('Excel error details:', error.response?.data);
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    id="excel-upload"
+                                    ref={excelInputRef}
+                                    type="file"
+                                    accept=".xlsx,.xls,.csv"
+                                    className="sr-only"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      console.log('Excel file selected:', file);
+                                      if (file) {
+                                        console.log('Course ID for Excel:', course?.id);
+                                        if (course?.id) {
+                                          try {
+                                            console.log('Starting Excel upload for existing course...');
+                                            setIsSubmitting(true);
+                                            const uploadResult = await courseApi.uploadKmapExcel(course.id, file);
+                                             const uploadedUrl = uploadResult.url;
+                                             field.onChange(uploadedUrl);
+                                             
+                                             // Store file name for display
+                                             selectedExcelFile.current = file;
+                                             
                                              toast({
-                                               title: "Upload Error",
-                                               description: error.response?.data?.message || error.message || "Failed to upload Excel file. The upload endpoint may not be available yet.",
-                                               variant: "destructive",
+                                               title: "Success",
+                                               description: `Excel file "${file.name}" uploaded successfully!`,
                                              });
-                                           } finally {
-                                             setIsSubmitting(false);
-                                           }
-                                         } else {
-                                           console.log('Storing Excel file for new course...');
-                                           // For new courses, store file reference
-                                           selectedExcelFile.current = file;
-                                           field.onChange(`pending-upload-${file.name}`);
-                                           toast({
-                                             title: "File Selected",
-                                             description: "File will be uploaded when you save the course.",
-                                           });
-                                         }
-                                       }
-                                     }}
-                                   />
-                                   <Button 
-                                     type="button" 
-                                     variant="outline" 
-                                     size="sm"
-                                     disabled={isSubmitting}
-                                     asChild
-                                   >
-                                     <span>
-                                       <Upload className="w-4 h-4 mr-2" />
-                                       {course?.id ? 'Upload File' : 'Select File'}
-                                     </span>
-                                   </Button>
-                                 </label>
+                                          } catch (error: any) {
+                                            console.error('Excel upload error:', error);
+                                            console.error('Excel error details:', error.response?.data);
+                                            toast({
+                                              title: "Upload Error",
+                                              description: error.response?.data?.message || error.message || "Failed to upload Excel file. The upload endpoint may not be available yet.",
+                                              variant: "destructive",
+                                            });
+                                          } finally {
+                                            setIsSubmitting(false);
+                                          }
+                                        } else {
+                                          console.log('Storing Excel file for new course...');
+                                          // For new courses, store file reference
+                                          selectedExcelFile.current = file;
+                                          field.onChange(`pending-upload-${file.name}`);
+                                          toast({
+                                            title: "File Selected",
+                                            description: "File will be uploaded when you save the course.",
+                                          });
+                                        }
+                                      }
+                                    }}
+                                  />
+                                  <label htmlFor="excel-upload" className="cursor-pointer">
+                                    <Button 
+                                      type="button" 
+                                      variant="outline" 
+                                      size="sm"
+                                      disabled={isSubmitting}
+                                    >
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      {course?.id ? 'Upload File' : 'Select File'}
+                                    </Button>
+                                  </label>
                                </div>
                               {field.value && (
                                 <div className="mt-2">
