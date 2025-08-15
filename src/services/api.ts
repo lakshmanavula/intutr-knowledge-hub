@@ -387,9 +387,11 @@ export const courseApi = {
   // Get all courses
   getAll: async (): Promise<Course[]> => {
     try {
-      const response = await getApiClient().get<Course[]>('/course/paged');
-      // Response data is already processed by interceptor
-      return response.data || [];
+      const response = await getApiClient().get('/course/paged', {
+        transformResponse: [(data) => data],
+      });
+      const rawData = JSON.parse(response.data);
+      return rawData.data?.content || [];
     } catch (error: any) {
       if (error.code === 'ECONNABORTED') {
         throw new Error('Network timeout. Please check your connection and try again.');
@@ -398,25 +400,25 @@ export const courseApi = {
     }
   },
 
-  // Get paginated courses (simulating pagination from the array)
+  // Get paginated courses
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<Course>> => {
     try {
-      const response = await getApiClient().get<Course[]>('/course/paged');
+      const apiClient = getApiClient();
+      const response = await apiClient.get(`/course/paged?page=${page}&size=${size}`, {
+        transformResponse: [(data) => data],
+      });
       
-      // Response data is already processed by interceptor
-      const allCourses = response.data || [];
-      const startIndex = page * size;
-      const endIndex = startIndex + size;
-      const paginatedCourses = allCourses.slice(startIndex, endIndex);
+      const rawData = JSON.parse(response.data);
+      const courseData = rawData.data || {};
       
       return {
-        content: paginatedCourses,
-        totalElements: allCourses.length,
-        totalPages: Math.ceil(allCourses.length / size),
-        size: size,
-        number: page,
-        first: page === 0,
-        last: endIndex >= allCourses.length,
+        content: courseData.content || [],
+        totalElements: courseData.totalElements || 0,
+        totalPages: courseData.totalPages || 0,
+        size: courseData.size || size,
+        number: courseData.number || page,
+        first: courseData.first !== undefined ? courseData.first : page === 0,
+        last: courseData.last !== undefined ? courseData.last : false,
       };
     } catch (error: any) {
       if (error.code === 'ECONNABORTED') {
