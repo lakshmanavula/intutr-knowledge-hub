@@ -89,6 +89,8 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
   const { toast } = useToast();
   const selectedThumbnailFile = useRef<File | null>(null);
   const selectedExcelFile = useRef<File | null>(null);
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const excelInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!course;
 
   console.log('🎯 CourseForm received categories:', categories);
@@ -465,10 +467,10 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                             <div className="space-y-4">
                               <div className="flex items-center gap-2">
                                 <input
+                                  ref={thumbnailInputRef}
                                   type="file"
                                   accept="image/*"
                                   className="hidden"
-                                  id="thumbnail-upload"
                                   onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     console.log('File selected:', file);
@@ -524,7 +526,12 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                   type="button" 
                                   variant="outline" 
                                   size="sm"
-                                  onClick={() => document.getElementById('thumbnail-upload')?.click()}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('Thumbnail button clicked');
+                                    thumbnailInputRef.current?.click();
+                                  }}
                                   disabled={isSubmitting}
                                 >
                                   <Upload className="w-4 h-4 mr-2" />
@@ -581,10 +588,10 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                             <div className="space-y-4">
                               <div className="flex items-center gap-2">
                                 <input
+                                  ref={excelInputRef}
                                   type="file"
                                   accept=".xlsx,.xls,.csv"
                                   className="hidden"
-                                  id="xlsx-upload"
                                   onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     console.log('Excel file selected:', file);
@@ -633,7 +640,12 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                   type="button" 
                                   variant="outline" 
                                   size="sm"
-                                  onClick={() => document.getElementById('xlsx-upload')?.click()}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('Excel button clicked');
+                                    excelInputRef.current?.click();
+                                  }}
                                   disabled={isSubmitting}
                                 >
                                   <Upload className="w-4 h-4 mr-2" />
