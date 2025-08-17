@@ -255,7 +255,30 @@ export default function Categories() {
   };
 
   const handleImportExcel = () => {
-    fileInputRef.current?.click();
+    console.log('Import button clicked');
+    console.log('File input ref:', fileInputRef.current);
+    
+    if (!fileInputRef.current) {
+      console.error('File input ref is null');
+      toast({
+        title: "Error",
+        description: "File input not available. Please refresh the page and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      fileInputRef.current.click();
+      console.log('File input click triggered');
+    } catch (error) {
+      console.error('Error clicking file input:', error);
+      toast({
+        title: "Error", 
+        description: "Unable to open file browser. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
