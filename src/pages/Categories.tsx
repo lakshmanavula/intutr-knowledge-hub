@@ -53,6 +53,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { courseCategoryApi } from "@/services/api";
+import { getConfig } from "@/config/environments";
 import type { CourseCategory } from "@/types/api";
 import { CategoryForm } from "@/components/categories/CategoryForm";
 import {
@@ -215,7 +216,8 @@ export default function Categories() {
 
   const handleExportExcel = async () => {
     try {
-      const response = await fetch('http://localhost:8081/api/course-categories/download-excel', {
+      const config = getConfig();
+      const response = await fetch(`${config.apiBaseUrl}/course-categories/download-excel`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -263,7 +265,8 @@ export default function Categories() {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:8081/api/course-categories/bulk-upload-excel', {
+      const config = getConfig();
+      const response = await fetch(`${config.apiBaseUrl}/course-categories/bulk-upload-excel`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
