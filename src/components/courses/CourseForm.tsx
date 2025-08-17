@@ -523,17 +523,16 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                       }
                                     }}
                                   />
-                                  <label htmlFor="thumbnail-upload" className="cursor-pointer">
-                                    <Button 
-                                      type="button" 
-                                      variant="outline" 
-                                      size="sm"
-                                      disabled={isSubmitting}
-                                    >
-                                      <Upload className="w-4 h-4 mr-2" />
-                                      {course?.id ? 'Upload Image' : 'Select Image'}
-                                    </Button>
-                                  </label>
+                                  <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm"
+                                    disabled={isSubmitting}
+                                    onClick={() => thumbnailInputRef.current?.click()}
+                                  >
+                                    <Upload className="w-4 h-4 mr-2" />
+                                    {course?.id ? 'Upload Image' : 'Select Image'}
+                                  </Button>
                                 </div>
                               {field.value && (
                                 <div className="mt-2">
@@ -634,17 +633,16 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                       }
                                     }}
                                   />
-                                  <label htmlFor="excel-upload" className="cursor-pointer">
-                                    <Button 
-                                      type="button" 
-                                      variant="outline" 
-                                      size="sm"
-                                      disabled={isSubmitting}
-                                    >
-                                      <Upload className="w-4 h-4 mr-2" />
-                                      {course?.id ? 'Upload File' : 'Select File'}
-                                    </Button>
-                                  </label>
+                                  <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm"
+                                    disabled={isSubmitting}
+                                    onClick={() => excelInputRef.current?.click()}
+                                  >
+                                    <Upload className="w-4 h-4 mr-2" />
+                                    {course?.id ? 'Upload File' : 'Select File'}
+                                  </Button>
                                </div>
                               {field.value && (
                                 <div className="mt-2">
