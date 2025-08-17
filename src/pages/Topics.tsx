@@ -119,6 +119,7 @@ export default function Topics() {
       
       // Fetch course details
       const courseResponse = await courseApi.getById(courseId);
+      console.log('Course details response:', courseResponse);
       setCourse(courseResponse);
       
       // Fetch track names
@@ -339,14 +340,20 @@ export default function Topics() {
                 <h3 className="text-xl font-semibold">{course.courseLabel}</h3>
                 <p className="text-muted-foreground">{course.description}</p>
                 <div className="flex items-center gap-4 mt-2">
-                  <Badge variant="outline">{course.categoryName}</Badge>
-                  <Badge className={
-                    course.status === 'PUBLISHED' ? 'bg-success text-success-foreground' :
-                    course.status === 'DRAFT' ? 'bg-warning text-warning-foreground' :
-                    'bg-muted text-muted-foreground'
-                  }>
-                    {course.status}
-                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-muted-foreground">Category:</span>
+                    <Badge variant="outline">{course.categoryName}</Badge>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-muted-foreground">Course Status:</span>
+                    <Badge className={
+                      course.status === 'PUBLISHED' ? 'bg-success text-success-foreground' :
+                      course.status === 'DRAFT' ? 'bg-warning text-warning-foreground' :
+                      'bg-muted text-muted-foreground'
+                    }>
+                      {course.status}
+                    </Badge>
+                  </div>
                   <span className="text-sm text-muted-foreground">
                     {viewMode === 'topics' 
                       ? `${filteredKmapTopics.length} KMap topics` 
