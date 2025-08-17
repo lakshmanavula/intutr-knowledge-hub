@@ -528,7 +528,9 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     variant="outline" 
                                     size="sm"
                                     disabled={isSubmitting}
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
                                       console.log('Upload Image button clicked');
                                       console.log('thumbnailInputRef.current:', thumbnailInputRef.current);
                                       if (thumbnailInputRef.current) {
@@ -647,7 +649,18 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     variant="outline" 
                                     size="sm"
                                     disabled={isSubmitting}
-                                    onClick={() => excelInputRef.current?.click()}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      console.log('Upload File button clicked');
+                                      console.log('excelInputRef.current:', excelInputRef.current);
+                                      if (excelInputRef.current) {
+                                        excelInputRef.current.click();
+                                        console.log('Excel input clicked');
+                                      } else {
+                                        console.error('excelInputRef.current is null');
+                                      }
+                                    }}
                                   >
                                     <Upload className="w-4 h-4 mr-2" />
                                     {course?.id ? 'Upload File' : 'Select File'}
