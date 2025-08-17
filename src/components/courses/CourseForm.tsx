@@ -528,7 +528,16 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     variant="outline" 
                                     size="sm"
                                     disabled={isSubmitting}
-                                    onClick={() => thumbnailInputRef.current?.click()}
+                                    onClick={() => {
+                                      console.log('Upload Image button clicked');
+                                      console.log('thumbnailInputRef.current:', thumbnailInputRef.current);
+                                      if (thumbnailInputRef.current) {
+                                        thumbnailInputRef.current.click();
+                                        console.log('File input clicked');
+                                      } else {
+                                        console.error('thumbnailInputRef.current is null');
+                                      }
+                                    }}
                                   >
                                     <Upload className="w-4 h-4 mr-2" />
                                     {course?.id ? 'Upload Image' : 'Select Image'}
