@@ -11,6 +11,7 @@ import {
   Eye,
   Download,
   Upload,
+  FileDown,
   RotateCcw,
   CheckSquare,
   Square,
@@ -299,6 +300,37 @@ export default function Categories() {
     }
   };
 
+  const handleDownloadTemplate = () => {
+    // Create template data with column headers and example row
+    const templateData = [
+      ['Category Name', 'Description', 'Active'],
+      ['Example Category', 'This is an example description for a course category', 'true'],
+      ['', '', '']  // Empty row for user to fill
+    ];
+
+    // Create workbook and worksheet
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(templateData);
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 25 }, // Category Name
+      { wch: 50 }, // Description  
+      { wch: 10 }  // Active
+    ];
+
+    // Add the worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Categories Template');
+
+    // Generate and download the file
+    XLSX.writeFile(workbook, 'course-categories-template.xlsx');
+
+    toast({
+      title: "Success",
+      description: "Template downloaded successfully.",
+    });
+  };
+
   const filteredCategories = (categories || []).filter(category =>
     category.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -340,6 +372,10 @@ export default function Categories() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={handleDownloadTemplate}>
+            <FileDown className="w-4 h-4 mr-2" />
+            Download Template
+          </Button>
           <Button variant="outline" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
             Export
