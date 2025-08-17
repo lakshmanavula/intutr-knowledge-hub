@@ -477,7 +477,17 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     ref={thumbnailInputRef}
                                     type="file"
                                     accept="image/*"
-                                    className="hidden"
+                                    style={{ 
+                                      position: 'absolute',
+                                      width: '1px',
+                                      height: '1px',
+                                      padding: 0,
+                                      margin: '-1px',
+                                      overflow: 'hidden',
+                                      clip: 'rect(0, 0, 0, 0)',
+                                      whiteSpace: 'nowrap',
+                                      borderWidth: 0
+                                    }}
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('File selected:', file);
@@ -590,7 +600,17 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     ref={excelInputRef}
                                     type="file"
                                     accept=".xlsx,.xls,.csv"
-                                    className="hidden"
+                                    style={{ 
+                                      position: 'absolute',
+                                      width: '1px',
+                                      height: '1px',
+                                      padding: 0,
+                                      margin: '-1px',
+                                      overflow: 'hidden',
+                                      clip: 'rect(0, 0, 0, 0)',
+                                      whiteSpace: 'nowrap',
+                                      borderWidth: 0
+                                    }}
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('Excel file selected:', file);
