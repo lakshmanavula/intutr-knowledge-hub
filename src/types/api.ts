@@ -4,7 +4,7 @@ export interface CourseCategory {
   id: string;
   categoryName: string;
   description: string;
-  isActive: boolean;
+  active: boolean;
   createdBy: string;
   createdByName: string;
   modifiedBy: string;

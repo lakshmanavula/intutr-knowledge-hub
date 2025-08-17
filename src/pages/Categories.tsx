@@ -184,7 +184,7 @@ export default function Categories() {
       await courseCategoryApi.toggleActive(category.id);
       toast({
         title: "Success",
-        description: `Category "${category.categoryName}" ${category.isActive ? 'deactivated' : 'activated'} successfully.`,
+        description: `Category "${category.categoryName}" ${category.active ? 'deactivated' : 'activated'} successfully.`,
       });
       fetchCategories();
     } catch (error: any) {
@@ -378,7 +378,7 @@ export default function Categories() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">
-              {(categories || []).filter(cat => cat.isActive).length}
+              {(categories || []).filter(cat => cat.active).length}
             </div>
             <p className="text-xs text-muted-foreground">
               Currently active
@@ -391,7 +391,7 @@ export default function Categories() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-warning">
-              {(categories || []).filter(cat => !cat.isActive).length}
+              {(categories || []).filter(cat => !cat.active).length}
             </div>
             <p className="text-xs text-muted-foreground">
               Currently inactive
@@ -527,8 +527,8 @@ export default function Categories() {
                       {category.description}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={category.isActive ? "default" : "secondary"}>
-                        {category.isActive ? "Active" : "Inactive"}
+                      <Badge variant={category.active ? "default" : "secondary"}>
+                        {category.active ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
                     <TableCell>{category.createdByName}</TableCell>
@@ -549,7 +549,7 @@ export default function Categories() {
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleToggleActive(category)}>
                             <Eye className="mr-2 h-4 w-4" />
-                            {category.isActive ? 'Deactivate' : 'Activate'}
+                            {category.active ? 'Deactivate' : 'Activate'}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem

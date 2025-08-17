@@ -51,7 +51,7 @@ export function CategoryForm({ category, onSuccess, onCancel }: CategoryFormProp
     defaultValues: {
       categoryName: category?.categoryName || "",
       description: category?.description || "",
-      isActive: category?.isActive ?? true,
+      isActive: category?.active ?? true,
     },
   });
 

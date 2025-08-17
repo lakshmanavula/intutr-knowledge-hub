@@ -140,7 +140,7 @@ export default function Courses() {
       console.log('📋 Response type:', typeof response, 'Is array:', Array.isArray(response));
       
       // response is already an array of CourseCategory[], no need to access .data
-      const activeCategories = Array.isArray(response) ? response.filter(cat => cat.isActive) : [];
+      const activeCategories = Array.isArray(response) ? response.filter(cat => cat.active) : [];
       console.log('✅ Active categories:', activeCategories);
       setCategories(activeCategories);
     } catch (error) {
