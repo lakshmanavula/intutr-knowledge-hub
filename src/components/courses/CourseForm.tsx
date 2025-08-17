@@ -466,27 +466,11 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                           <FormControl>
                               <div className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                  <Button 
-                                    type="button"
-                                    variant="outline" 
-                                    size="sm"
-                                    disabled={isSubmitting}
-                                    onClick={() => {
-                                      console.log('Button clicked - triggering file input');
-                                      const input = document.getElementById('thumbnail-upload') as HTMLInputElement;
-                                      if (input) {
-                                        input.click();
-                                      }
-                                    }}
-                                  >
-                                    <Upload className="w-4 h-4 mr-2" />
-                                    {course?.id ? 'Upload Image' : 'Select Image'}
-                                  </Button>
                                   <input 
                                     id="thumbnail-upload" 
                                     type="file" 
                                     accept="image/*"
-                                    style={{ display: 'none' }}
+                                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer"
                                         onChange={async (e) => {
                                           const file = e.target.files?.[0];
                                           console.log('File selected:', file);
@@ -588,27 +572,11 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                           <FormControl>
                              <div className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                  <Button 
-                                    type="button"
-                                    variant="outline" 
-                                    size="sm"
-                                    disabled={isSubmitting}
-                                    onClick={() => {
-                                      console.log('Excel Button clicked - triggering file input');
-                                      const input = document.getElementById('excel-upload') as HTMLInputElement;
-                                      if (input) {
-                                        input.click();
-                                      }
-                                    }}
-                                  >
-                                    <Upload className="w-4 h-4 mr-2" />
-                                    {course?.id ? 'Upload File' : 'Select File'}
-                                  </Button>
                                   <input
                                     id="excel-upload"
                                     type="file"
                                     accept=".xlsx,.xls,.csv"
-                                    style={{ display: 'none' }}
+                                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 cursor-pointer"
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('Excel file selected:', file);
