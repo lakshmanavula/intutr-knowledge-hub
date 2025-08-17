@@ -21,6 +21,7 @@ import {
   Image,
   BookOpen,
   List,
+  FileDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -372,6 +373,32 @@ export default function Courses() {
     fileInputRef.current?.click();
   };
 
+  const handleDownloadTemplate = () => {
+    const templateData = [
+      {
+        'Course Name': 'Sample Course',
+        'Description': 'Sample course description',
+        'Category': 'Programming',
+        'Status': 'DRAFT',
+        'Fees': 99.99,
+        'Duration (Days)': 30,
+        'Tags': 'programming,web',
+        'Course Label': 'beginner'
+      }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Courses Template');
+
+    XLSX.writeFile(wb, 'courses-template.xlsx');
+    
+    toast({
+      title: "Success",
+      description: "Course template downloaded successfully!",
+    });
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -484,6 +511,10 @@ export default function Courses() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={handleDownloadTemplate}>
+            <FileDown className="w-4 h-4 mr-2" />
+            Download Template
+          </Button>
           <Button variant="outline" onClick={handleExportExcel}>
             <Download className="w-4 h-4 mr-2" />
             Export
