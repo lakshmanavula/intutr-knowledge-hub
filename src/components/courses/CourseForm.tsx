@@ -471,7 +471,7 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     ref={thumbnailInputRef}
                                     type="file"
                                     accept="image/*"
-                                    className="sr-only"
+                                    style={{ display: 'none' }}
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('File selected:', file);
@@ -599,7 +599,7 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                     ref={excelInputRef}
                                     type="file"
                                     accept=".xlsx,.xls,.csv"
-                                    className="sr-only"
+                                    style={{ display: 'none' }}
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('Excel file selected:', file);
