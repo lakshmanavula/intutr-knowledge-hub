@@ -466,12 +466,18 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                           <FormControl>
                               <div className="space-y-4">
                                 <div className="flex items-center gap-2">
+                                  <label htmlFor="thumbnail-upload" className="cursor-pointer">
+                                    <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      {course?.id ? 'Upload Image' : 'Select Image'}
+                                    </div>
+                                  </label>
                                   <input
                                     id="thumbnail-upload"
                                     ref={thumbnailInputRef}
                                     type="file"
                                     accept="image/*"
-                                    style={{ display: 'none' }}
+                                    className="hidden"
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('File selected:', file);
@@ -523,27 +529,6 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                       }
                                     }}
                                   />
-                                  <Button 
-                                    type="button" 
-                                    variant="outline" 
-                                    size="sm"
-                                    disabled={isSubmitting}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      console.log('Upload Image button clicked');
-                                      console.log('thumbnailInputRef.current:', thumbnailInputRef.current);
-                                      if (thumbnailInputRef.current) {
-                                        thumbnailInputRef.current.click();
-                                        console.log('File input clicked');
-                                      } else {
-                                        console.error('thumbnailInputRef.current is null');
-                                      }
-                                    }}
-                                  >
-                                    <Upload className="w-4 h-4 mr-2" />
-                                    {course?.id ? 'Upload Image' : 'Select Image'}
-                                  </Button>
                                 </div>
                               {field.value && (
                                 <div className="mt-2">
@@ -594,12 +579,18 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                           <FormControl>
                              <div className="space-y-4">
                                 <div className="flex items-center gap-2">
+                                  <label htmlFor="excel-upload" className="cursor-pointer">
+                                    <div className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      {course?.id ? 'Upload File' : 'Select File'}
+                                    </div>
+                                  </label>
                                   <input
                                     id="excel-upload"
                                     ref={excelInputRef}
                                     type="file"
                                     accept=".xlsx,.xls,.csv"
-                                    style={{ display: 'none' }}
+                                    className="hidden"
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       console.log('Excel file selected:', file);
@@ -644,27 +635,6 @@ export function CourseForm({ course, categories, onSuccess, onCancel, onRefresh 
                                       }
                                     }}
                                   />
-                                  <Button 
-                                    type="button" 
-                                    variant="outline" 
-                                    size="sm"
-                                    disabled={isSubmitting}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      console.log('Upload File button clicked');
-                                      console.log('excelInputRef.current:', excelInputRef.current);
-                                      if (excelInputRef.current) {
-                                        excelInputRef.current.click();
-                                        console.log('Excel input clicked');
-                                      } else {
-                                        console.error('excelInputRef.current is null');
-                                      }
-                                    }}
-                                  >
-                                    <Upload className="w-4 h-4 mr-2" />
-                                    {course?.id ? 'Upload File' : 'Select File'}
-                                  </Button>
                                </div>
                               {field.value && (
                                 <div className="mt-2">
