@@ -720,41 +720,21 @@ export const userProfileApi = {
   // Get paginated users
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     try {
-      console.log(`🔗 Making user API call to: /user/paged?page=${page}&size=${size}`);
+      console.log(`🔍 Fetching users - page: ${page} size: ${size}`);
       
-      // Define the actual API response structure
-      interface UserApiResponse {
-        status: string;
-        statusCode: number;
-        message: string;
-        data: any[];
-        timestamp: string;
-        metadata: {
-          page: number;
-          size: number;
-          totalElements: number;
-          totalPages: number;
-          first: boolean;
-          last: boolean;
-        };
-      }
+      // Bypass the interceptor to get raw response with metadata
+      const apiClient = getApiClient();
+      const response = await apiClient.get(`/user/paged?page=${page}&size=${size}`, {
+        transformResponse: [(data) => data], // Keep raw response
+      });
       
-      const response = await getApiClient().get<UserApiResponse>(
-        `/user/paged?page=${page}&size=${size}`
-      );
+      // Parse the raw response
+      const rawData = JSON.parse(response.data);
+      console.log('🔍 Raw user API response:', rawData);
       
-      console.log('🔍 Raw user API response:', response.data);
-      
-      // Extract data and metadata from the API response
-      const usersData = response.data.data || [];
-      const metadata = response.data.metadata || {
-        page: 0,
-        size: 10,
-        totalElements: 0,
-        totalPages: 1,
-        first: true,
-        last: false
-      };
+      // Extract data and metadata from the response structure you provided
+      const usersData = rawData.data || [];
+      const metadata = rawData.metadata || {};
       
       console.log('👥 Users data:', usersData);
       console.log('📊 Metadata:', metadata);
