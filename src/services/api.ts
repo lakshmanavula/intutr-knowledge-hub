@@ -721,7 +721,25 @@ export const userProfileApi = {
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     try {
       console.log(`🔗 Making user API call to: /user/paged?page=${page}&size=${size}`);
-      const response = await getApiClient().get<ApiResponse<UserProfile[]>>(
+      
+      // Define the actual API response structure
+      interface UserApiResponse {
+        status: string;
+        statusCode: number;
+        message: string;
+        data: any[];
+        timestamp: string;
+        metadata: {
+          page: number;
+          size: number;
+          totalElements: number;
+          totalPages: number;
+          first: boolean;
+          last: boolean;
+        };
+      }
+      
+      const response = await getApiClient().get<UserApiResponse>(
         `/user/paged?page=${page}&size=${size}`
       );
       
@@ -729,7 +747,14 @@ export const userProfileApi = {
       
       // Extract data and metadata from the API response
       const usersData = response.data.data || [];
-      const metadata = response.data.metadata as any || {};
+      const metadata = response.data.metadata || {
+        page: 0,
+        size: 10,
+        totalElements: 0,
+        totalPages: 1,
+        first: true,
+        last: false
+      };
       
       console.log('👥 Users data:', usersData);
       console.log('📊 Metadata:', metadata);
@@ -740,11 +765,11 @@ export const userProfileApi = {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        phoneNumber: user.mobile || user.phoneNumber || '',
+        phoneNumber: user.mobile || '',
         dateOfBirth: user.dateOfBirth || '',
         gender: user.gender || '',
         address: user.address || '',
-        city: user.location || user.city || '',
+        city: user.location || '',
         state: user.state || '',
         country: user.country || '',
         postalCode: user.postalCode || '',
