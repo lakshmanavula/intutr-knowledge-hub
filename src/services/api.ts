@@ -712,7 +712,7 @@ export const userProfileApi = {
   // Get all users
   getAll: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     const response = await getApiClient().get<PaginatedResponse<UserProfile>>(
-      `/user-profiles/paged?page=${page}&size=${size}`
+      `/user/paged?page=${page}&size=${size}`
     );
     return response.data;
   },
@@ -720,9 +720,9 @@ export const userProfileApi = {
   // Get paginated users
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
     try {
-      console.log(`🔗 Making user API call to: /user-profiles/paged?page=${page}&size=${size}`);
+      console.log(`🔗 Making user API call to: /user/paged?page=${page}&size=${size}`);
       const response = await getApiClient().get<ApiResponse<UserProfile[]>>(
-        `/user-profiles/paged?page=${page}&size=${size}`
+        `/user/paged?page=${page}&size=${size}`
       );
       
       console.log('🔍 Raw user API response:', response.data);
