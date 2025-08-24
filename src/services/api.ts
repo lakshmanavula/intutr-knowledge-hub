@@ -719,67 +719,67 @@ export const userProfileApi = {
 
   // Get paginated users
   getPaginated: async (page: number = 0, size: number = 10): Promise<PaginatedResponse<UserProfile>> => {
-    // Bypass the interceptor to get raw response with metadata
-    const apiClient = getApiClient();
-    const response = await apiClient.get(`/user-profiles/paged?page=${page}&size=${size}`, {
-      transformResponse: [(data) => data], // Keep raw response
-    });
-    
-    // Parse the raw response
-    const rawData = JSON.parse(response.data);
-    console.log('🔍 Raw user API response:', rawData);
-    
-    // Extract data and metadata
-    const usersData = rawData.data || [];
-    const metadata = rawData.metadata || {};
-    
-    console.log('👥 Users data:', usersData);
-    console.log('🏢 Sample user location fields:', usersData[0] ? {
-      city: usersData[0].city,
-      state: usersData[0].state, 
-      country: usersData[0].country,
-      location: usersData[0].location,
-      address: usersData[0].address
-    } : 'No users');
-    console.log('📊 Metadata:', metadata);
-    
-    // Map API response to UserProfile structure
-    const mappedUsers = usersData.map((user: any): UserProfile => ({
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phoneNumber: user.phoneNumber || '',
-      dateOfBirth: user.dateOfBirth || '',
-      gender: user.gender || '',
-      address: user.address || '',
-      city: user.location || '', // Using location field
-      state: '', // Not available as separate field
-      country: '', // Not available as separate field
-      postalCode: user.postalCode || '',
-      profilePicture: user.profilePicture || '',
-      isActive: user.isActive,
-      lastLoggedIn: user.lastLoggedIn || user.modifiedDate || '',
-      createdBy: user.createdBy,
-      createdByName: user.createdByName,
-      modifiedBy: user.modifiedBy,
-      modifiedByName: user.modifiedByName,
-      createdDate: user.createdDate,
-      modifiedDate: user.modifiedDate,
-      deleted: user.deleted
-    }));
+    try {
+      console.log(`🔗 Making user API call to: /user-profiles/paged?page=${page}&size=${size}`);
+      const response = await getApiClient().get<ApiResponse<UserProfile[]>>(
+        `/user-profiles/paged?page=${page}&size=${size}`
+      );
+      
+      console.log('🔍 Raw user API response:', response.data);
+      
+      // Extract data and metadata from the API response
+      const usersData = response.data.data || [];
+      const metadata = response.data.metadata as any || {};
+      
+      console.log('👥 Users data:', usersData);
+      console.log('📊 Metadata:', metadata);
+      
+      // Map API response fields to UserProfile structure
+      const mappedUsers = usersData.map((user: any): UserProfile => ({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.mobile || user.phoneNumber || '',
+        dateOfBirth: user.dateOfBirth || '',
+        gender: user.gender || '',
+        address: user.address || '',
+        city: user.location || user.city || '',
+        state: user.state || '',
+        country: user.country || '',
+        postalCode: user.postalCode || '',
+        profilePicture: user.photoAvatar || user.profilePicture || '',
+        isActive: user.status === 'ACTIVE' || user.status === 'Active' || user.isActive === true,
+        lastLoggedIn: user.lastLoggedIn || user.modifiedDate || '',
+        createdBy: user.createdBy || '',
+        createdByName: user.createdByName || '',
+        modifiedBy: user.modifiedBy || '',
+        modifiedByName: user.modifiedByName || '',
+        createdDate: user.createdDate || '',
+        modifiedDate: user.modifiedDate || '',
+        deleted: user.deleted || false
+      }));
 
-    console.log('✅ Mapped users:', mappedUsers);
+      console.log('✅ Mapped users:', mappedUsers);
 
-    return {
-      content: mappedUsers,
-      totalElements: metadata.totalElements || mappedUsers.length,
-      totalPages: metadata.totalPages || Math.ceil((metadata.totalElements || mappedUsers.length) / size),
-      size: metadata.size || size,
-      number: metadata.page || page,
-      first: metadata.first !== undefined ? metadata.first : page === 0,
-      last: metadata.last !== undefined ? metadata.last : false,
-    };
+      const result = {
+        content: mappedUsers,
+        totalElements: metadata.totalElements || 0,
+        totalPages: metadata.totalPages || 1,
+        size: metadata.size || size,
+        number: metadata.page || page,
+        first: metadata.first !== undefined ? metadata.first : page === 0,
+        last: metadata.last !== undefined ? metadata.last : false,
+      };
+      
+      console.log('📤 Final API result:', result);
+      return result;
+    } catch (error: any) {
+      console.error('❌ Error in getPaginated users:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      throw error;
+    }
   },
 
   // Get user by ID
