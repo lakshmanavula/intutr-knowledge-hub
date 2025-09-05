@@ -1,13 +1,13 @@
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
 	content: [
+		"./src/**/*.{ts,tsx}",
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
 	],
-	prefix: "",
+	darkMode: "class",
 	theme: {
 		container: {
 			center: true,
@@ -100,5 +100,6 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+	plugins: [],
+};
+export default config;
