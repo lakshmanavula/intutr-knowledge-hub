@@ -32,12 +32,12 @@ const lobDataSchema = z.object({
   lobName: z.string().min(1, "Content name is required").max(200, "Content name must be less than 200 characters"),
   content: z.string().min(1, "Content is required"),
   lobType: z.enum(["QUESTION", "EXPLANATION", "EXAMPLE", "EXERCISE"], {
-    required_error: "Please select a content type",
+    message: "Please select a content type",
   }),
   orderIndex: z.number().min(0, "Order index must be 0 or greater"),
   estimatedTimeMinutes: z.number().min(1, "Duration must be at least 1 minute"),
   difficulty: z.enum(["EASY", "MEDIUM", "HARD"], {
-    required_error: "Please select difficulty",
+    message: "Please select difficulty",
   }),
   isActive: z.boolean(),
 });

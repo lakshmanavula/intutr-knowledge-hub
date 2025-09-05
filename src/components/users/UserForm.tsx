@@ -37,7 +37,7 @@ const userSchema = z.object({
   phoneNumber: z.string().min(1, "Phone number is required").max(20, "Phone number must be less than 20 characters"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
-    required_error: "Please select a gender",
+    message: "Please select a gender",
   }),
   address: z.string().min(1, "Address is required").max(200, "Address must be less than 200 characters"),
   city: z.string().min(1, "City is required").max(50, "City must be less than 50 characters"),
